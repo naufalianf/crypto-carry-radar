@@ -1,0 +1,41 @@
+{
+  "positions": {
+    "ZECUSDT": {
+      "symbol": "ZECUSDT",
+      "opened": 1795471091.805565,
+      "opened_iso": "2026-11-23 21:58",
+      "spot_entry": 774.13,
+      "perp_entry": 773.85,
+      "cost": 0.0030299999999999997,
+      "funding": 0.0,
+      "last_funding_ms": 1795449600000,
+      "apr_entry": 5.45,
+      "notional": 1000.0,
+      "events": 1,
+      "spot_now": 774.91,
+      "perp_now": 774.77,
+      "gross": -0.00018127818460644818,
+      "net": -0.003211278184606448
+    },
+    "QNTUSDT": {
+      "symbol": "QNTUSDT",
+      "opened": 1795471092.179184,
+      "opened_iso": "2026-11-23 21:58",
+      "spot_entry": 157.43,
+      "perp_entry": 157.38,
+      "cost": 0.00332,
+      "funding": 0.0,
+      "last_funding_ms": 1795449600000,
+      "apr_entry": 4.72,
+      "notional": 1000.0,
+      "events": 1,
+      "spot_now": 157.62,
+      "perp_now": 157.49,
+      "gross": 0.0005079403718388775,
+      "net": -0.0028120596281611225
+    }
+  },
+  "closed": [],
+  "equity": 1000.0,
+  "started": 1795470995.3695765
+}

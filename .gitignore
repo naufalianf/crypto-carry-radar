@@ -1,0 +1,13 @@
+# data publik Binance (cache), jangan di-commit
+data/
+# jangan pernah commit kredensial
+.alertbot.env
+*.env
+env/
+# sampah runtime
+__pycache__/
+*.pyc
+loop.out
+*.log
+alert_queue.jsonl
+paper_trades_selftest.csv

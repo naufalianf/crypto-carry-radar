@@ -1,0 +1,16 @@
+[2026-11-23 21:56 UTC] tick: 60 koin di radar, 0 posisi terbuka
+[2026-11-23 21:56 UTC] gagal ambil harga EVAAUSDT: HTTP Error 400: Bad Request
+[2026-11-23 21:56 UTC] gagal ambil harga ELSAUSDT: HTTP Error 400: Bad Request
+[2026-11-23 21:56 UTC] gagal ambil harga PIEVERSEUSDT: HTTP Error 400: Bad Request
+[2026-11-23 21:56 UTC] gagal ambil harga BLESSUSDT: HTTP Error 400: Bad Request
+[2026-11-23 21:56 UTC] gagal ambil harga IDOLUSDT: HTTP Error 400: Bad Request
+[2026-11-23 21:56 UTC] gagal ambil harga ARIAUSDT: HTTP Error 400: Bad Request
+[2026-11-23 21:57 UTC] tick: 60 koin di radar, 0 posisi terbuka
+[2026-11-23 21:57 UTC] tick: 60 koin di radar, 0 posisi terbuka
+[2026-11-23 21:58 UTC] tick: 60 koin di radar, 0 posisi terbuka
+[2026-11-23 21:58 UTC] MASUK  ZECUSDT: APR 5.45% biaya 0.303% kapasitas $0
+[2026-11-23 21:58 UTC] MASUK  QNTUSDT: APR 4.72% biaya 0.332% kapasitas $0
+[2026-11-23 21:58 UTC] paper carry mulai: mode loop tiap 4 jam
+[2026-11-23 21:58 UTC] tick: 60 koin di radar, 2 posisi terbuka
+[2026-11-23 21:58 UTC] TAHAN  ZECUSDT: net -0.321% (funding 0.000%) apr7d 5.45%
+[2026-11-23 21:58 UTC] TAHAN  QNTUSDT: net -0.281% (funding 0.000%) apr7d 4.72%

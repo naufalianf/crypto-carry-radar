@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radar Funding — Carry Crypto</title>
+<style>
+  :root{
+    --bg:#0a0d12; --panel:#12161d; --line:#1e2530; --txt:#e8eef5; --mut:#8b97a6;
+    --acc:#3ddc97; --warn:#ffcc66; --bad:#ff8a8a; --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);
+    font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    padding:24px 20px 40px}
+  .wrap{max-width:1280px;margin:0 auto}
+  header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
+    flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:14px}
+  h1{font-size:19px;margin:0;letter-spacing:-.01em}
+  h1 span{color:var(--acc)}
+  h2{font-size:12px;margin:26px 0 10px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut)}
+  .meta{font:12px/1.6 var(--mono);color:var(--mut);text-align:right}
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .card b{display:block;font:600 22px/1.2 var(--mono);margin-top:4px}
+  .card small{color:var(--mut);font-size:12px}
+  .banner{background:rgba(61,220,151,.08);border:1px solid rgba(61,220,151,.35);
+    border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:14px}
+  .banner.warn{background:rgba(255,204,102,.08);border-color:rgba(255,204,102,.35)}
+  .banner b{color:var(--acc)}
+  .banner.warn b{color:var(--warn)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  button{background:var(--panel);color:var(--txt);border:1px solid var(--line);
+    border-radius:999px;padding:6px 14px;font-size:13px;cursor:pointer}
+  button:hover{border-color:#33404f}
+  button.on{border-color:var(--acc);color:var(--acc)}
+  table{width:100%;border-collapse:collapse;background:var(--panel);
+    border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  th,td{padding:9px 11px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);
+    font-weight:600;cursor:pointer;user-select:none}
+  td{font:13px/1.4 var(--mono)}
+  th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:#161b24}
+  .sym{font-weight:600;color:var(--txt);font-family:inherit}
+  .pos{color:var(--acc)} .neg{color:var(--bad)} .mid{color:var(--warn)}
+  .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;
+    border:1px solid #2f3b4a;color:#b9c4d0;background:#161c25}
+  .pill.hot{color:var(--acc);border-color:rgba(61,220,151,.4);background:rgba(61,220,151,.08)}
+  .rej{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:2px 14px}
+  .rej div{display:flex;justify-content:space-between;gap:12px;padding:8px 0;
+    border-bottom:1px solid var(--line);font-size:13px}
+  .rej div:last-child{border-bottom:none}
+  .rej span:last-child{color:var(--mut);text-align:right}
+  footer{margin-top:20px;color:var(--mut);font-size:12px;line-height:1.7}
+  .foot{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:820px){
+    body{padding:16px 12px 32px}
+    .cards{grid-template-columns:1fr 1fr}
+    .foot{grid-template-columns:1fr}
+    .meta{text-align:left}
+    th,td{padding:8px 7px}
+    .hide-sm{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Radar <span>Funding</span> — peluang carry delta-neutral</h1>
+      <div style="color:var(--mut);font-size:13px;margin-top:4px">
+        Pemantau saja. Tidak menyentuh saldo, tidak memasang order.
+      </div>
+    </div>
+    <div class="meta">
+      dipindai: <span id="gen">—</span><br>
+      gate: umur ≥30h · spread ≤15bps · vol ≥50jt
+    </div>
+  </header>
+
+  <div class="cards">
+    <div class="card"><small>koin dipindai</small><b id="c-univ">—</b></div>
+    <div class="card"><small>APR 7d tertinggi</small><b id="c-top" class="pos">—</b></div>
+    <div class="card"><small>lolos gate</small><b id="c-alert" class="pos">—</b></div>
+    <div class="card"><small>APR tinggi, gagal gate</small><b id="c-rej" class="warn">—</b></div>
+  </div>
+
+  <div class="banner" id="banner">memuat…</div>
+
+  <div class="chips">
+    <button id="f-all" class="on">semua</button>
+    <button id="f-hot">lolos gate</button>
+    <button id="f-pos">APR positif</button>
+    <button id="btn-scan" style="margin-left:auto">scan ulang</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th data-k="rank">#</th>
+        <th data-k="symbol">simbol</th>
+        <th data-k="volume_musd" class="hide-sm">vol (jt$)</th>
+        <th data-k="bond_days" class="hide-sm">umur</th>
+        <th data-k="spread_bps" class="hide-sm">spread</th>
+        <th data-k="apr_7d">APR 7d</th>
+        <th data-k="apr_30d">APR 30d</th>
+        <th data-k="pos_pct" class="hide-sm">fund+</th>
+        <th data-k="carry_cost_pct" class="hide-sm">biaya</th>
+        <th data-k="breakeven_days">balik modal</th>
+        <th data-k="depth_usd" class="hide-sm">kapasitas</th>
+        <th data-k="status">status</th>
+      </tr>
+    </thead>
+    <tbody id="rows"></tbody>
+  </table>
+
+  <h2 id="rej-h">APR tinggi tapi gagal gate</h2>
+  <div class="rej" id="rej"></div>
+
+  <footer>
+    <div class="foot">
+      <div>
+        <b>Cara baca.</b> Carry delta-neutral = beli spot + short perpetual, nominal sama;
+        hasilnya funding yang dibayar ke posisi short, di-annualize jadi kolom APR.
+        "biaya" = fee masuk+keluar + menyeberang spread di dua kaki.
+        "balik modal" = hari yang dibutuhkan funding untuk menutup biaya itu.
+        "kapasitas" = nilai orderbook 20 level — batas kasar ukuran posisi yang tidak menggerakkan harga.
+      </div>
+      <div>
+        <b>Kenapa ada gate.</b> APR 50% di koin umur seminggu berspread lebar bukan peluang, itu jebakan:
+        spread dan biaya masuk-keluar menghabiskan hasil, dan funding di koin baru gampang berbalik negatif.
+        Gate menyaring yang kelihatan besar tapi tidak bisa dieksekusi. Modal riil &gt; nominal karena kaki
+        short butuh margin. Ini alat pantau, bukan ajakan pasang modal.
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+let data = null, filter = "all", sortKey = null, sortDir = -1;
+const fmt = (v, s = "%") => v === null || v === undefined ? "—" : v.toFixed(2) + s;
+const cls = v => v === null ? "" : v >= 8 ? "pos" : v > 0 ? "mid" : "neg";
+const usd = v => v === null || v === undefined ? "—"
+  : v >= 1e6 ? "$" + (v / 1e6).toFixed(1) + "jt" : "$" + Math.round(v).toLocaleString("en-US");
+
+function render() {
+  if (!data) return;
+  document.getElementById("gen").textContent = data.generated_at || "—";
+  document.getElementById("c-univ").textContent = data.universe ?? "—";
+  document.getElementById("c-alert").textContent = (data.alerts || []).length;
+  document.getElementById("c-rej").textContent = (data.rejected || []).length;
+  const top = (data.rows || [])[0];
+  document.getElementById("c-top").textContent = top ? fmt(top.apr_7d) : "—";
+
+  const b = document.getElementById("banner");
+  const n = (data.alerts || []).length;
+  if (n) {
+    b.className = "banner";
+    b.innerHTML = "<b>" + n + " koin lolos gate</b> — " + data.alerts.join(", ") +
+      ". Tetap cek kapasitas: lolos gate belum berarti muat modal besar.";
+  } else {
+    b.className = "banner warn";
+    b.innerHTML = "<b>Belum ada yang lolos gate ambang " + data.threshold +
+      "%</b> — hari ini carry tidak layak dibuka.";
+  }
+
+  let rows = (data.rows || []).map((r, i) => ({...r, rank: i + 1, status: r.alert ? 1 : 0}));
+  if (filter === "hot") rows = rows.filter(r => r.status === 1);
+  if (filter === "pos") rows = rows.filter(r => r.apr_7d > 0);
+  if (sortKey) rows.sort((a, z) => {
+    const x = a[sortKey] ?? -1e9, y = z[sortKey] ?? -1e9;
+    return (typeof x === "string" ? x.localeCompare(y) : x - y) * sortDir;
+  });
+
+  document.getElementById("rows").innerHTML = rows.map(r => `
+    <tr>
+      <td>${r.rank}</td>
+      <td class="sym">${r.symbol}</td>
+      <td class="hide-sm">${r.volume_musd.toFixed(0)}</td>
+      <td class="hide-sm">${r.bond_days}h</td>
+      <td class="hide-sm">${r.spread_bps === null ? "—" : r.spread_bps.toFixed(1)}</td>
+      <td class="${cls(r.apr_7d)}">${fmt(r.apr_7d)}</td>
+      <td class="${cls(r.apr_30d)}">${fmt(r.apr_30d)}</td>
+      <td class="hide-sm">${r.pos_pct.toFixed(0)}%</td>
+      <td class="hide-sm">${r.carry_cost_pct.toFixed(2)}%</td>
+      <td>${r.breakeven_days ? r.breakeven_days.toFixed(0) + " hari" : "—"}</td>
+      <td class="hide-sm">${usd(r.depth_usd)}</td>
+      <td>${r.status ? '<span class="pill hot">lolos</span>' : '<span class="pill">pantau</span>'}</td>
+    </tr>`).join("") || `<tr><td colspan="12" style="text-align:center;color:var(--mut)">
+      tidak ada baris untuk filter ini</td></tr>`;
+
+  const rej = data.rejected || [];
+  document.getElementById("rej-h").style.display = rej.length ? "block" : "none";
+  document.getElementById("rej").style.display = rej.length ? "block" : "none";
+  document.getElementById("rej").innerHTML = rej.map(r =>
+    `<div><span class="sym">${r.symbol} <span class="pos">${r.apr_7d.toFixed(2)}%</span></span>
+     <span>${r.flags.join(" · ")}</span></div>`).join("");
+}
+
+async function load() {
+  try {
+    data = await (await fetch("/api/radar")).json();
+    render();
+  } catch (e) {
+    const b = document.getElementById("banner");
+    b.className = "banner warn";
+    b.textContent = "gagal memuat data: " + e;
+  }
+}
+
+document.querySelectorAll("thead th").forEach(th => th.onclick = () => {
+  const k = th.dataset.k;
+  if (sortKey === k) sortDir *= -1; else { sortKey = k; sortDir = -1; }
+  render();
+});
+const setFilter = (id, val) => {
+  filter = val;
+  ["f-all", "f-hot", "f-pos"].forEach(x =>
+    document.getElementById(x).classList.toggle("on", x === id));
+  render();
+};
+document.getElementById("f-all").onclick = () => setFilter("f-all", "all");
+document.getElementById("f-hot").onclick = () => setFilter("f-hot", "hot");
+document.getElementById("f-pos").onclick = () => setFilter("f-pos", "pos");
+document.getElementById("btn-scan").onclick = async (e) => {
+  e.target.textContent = "memindai…"; e.target.disabled = true;
+  try { await fetch("/api/scan", {method: "POST"}); await load(); }
+  finally { e.target.textContent = "scan ulang"; e.target.disabled = false; }
+};
+
+load();
+setInterval(load, 60000);
+</script>
+</body>
+</html>

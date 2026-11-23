@@ -1,0 +1,76 @@
+{
+  "BTCUSDT": {
+    "selalu aktif": {
+      "net_pct": 20.58,
+      "apr_pct": 6.44,
+      "days_in_market": 982,
+      "switches": 21,
+      "mdd_pct": -1.58
+    },
+    "5%": {
+      "net_pct": 11.94,
+      "apr_pct": 3.83,
+      "days_in_market": 685,
+      "switches": 56,
+      "mdd_pct": -1.36
+    },
+    "10%": {
+      "net_pct": 10.11,
+      "apr_pct": 3.26,
+      "days_in_market": 253,
+      "switches": 16,
+      "mdd_pct": -0.55
+    },
+    "15%": {
+      "net_pct": 6.19,
+      "apr_pct": 2.02,
+      "days_in_market": 107,
+      "switches": 10,
+      "mdd_pct": -0.31
+    },
+    "20%": {
+      "net_pct": 4.0,
+      "apr_pct": 1.32,
+      "days_in_market": 60,
+      "switches": 8,
+      "mdd_pct": -0.3
+    }
+  },
+  "ETHUSDT": {
+    "selalu aktif": {
+      "net_pct": 19.99,
+      "apr_pct": 6.26,
+      "days_in_market": 994,
+      "switches": 23,
+      "mdd_pct": -1.35
+    },
+    "5%": {
+      "net_pct": 10.15,
+      "apr_pct": 3.27,
+      "days_in_market": 632,
+      "switches": 62,
+      "mdd_pct": -4.28
+    },
+    "10%": {
+      "net_pct": 10.4,
+      "apr_pct": 3.35,
+      "days_in_market": 259,
+      "switches": 20,
+      "mdd_pct": -0.65
+    },
+    "15%": {
+      "net_pct": 6.53,
+      "apr_pct": 2.13,
+      "days_in_market": 105,
+      "switches": 10,
+      "mdd_pct": -0.46
+    },
+    "20%": {
+      "net_pct": 5.08,
+      "apr_pct": 1.67,
+      "days_in_market": 83,
+      "switches": 12,
+      "mdd_pct": -0.29
+    }
+  }
+}
