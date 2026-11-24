@@ -28,7 +28,9 @@ class Base(unittest.TestCase):
     def setUp(self):
         self.dir = tempfile.mkdtemp()
         self.keep = (pc.STATE, pc.TRADES, pc.LOG, pc.RADAR_JSON, pc.PAPER_JSON,
-                     pc.perp_info, pc.spot_price, pc.new_funding)
+                     pc.perp_info, pc.spot_price, pc.new_funding, pc.NOTIF)
+        self.pesan = []
+        pc.NOTIF = lambda t: self.pesan.append(t) or "terkirim"
         pc.STATE = os.path.join(self.dir, "state.json")
         pc.TRADES = os.path.join(self.dir, "trades.csv")
         pc.LOG = os.path.join(self.dir, "log.txt")
@@ -41,7 +43,7 @@ class Base(unittest.TestCase):
 
     def tearDown(self):
         (pc.STATE, pc.TRADES, pc.LOG, pc.RADAR_JSON, pc.PAPER_JSON,
-         pc.perp_info, pc.spot_price, pc.new_funding) = self.keep
+         pc.perp_info, pc.spot_price, pc.new_funding, pc.NOTIF) = self.keep
         shutil.rmtree(self.dir, ignore_errors=True)
 
     def radar(self, rows, now, umur_jam=0.0):
@@ -189,6 +191,73 @@ class TestKillSwitch(Base):
         d1, d7, d30 = pc.perubahan_pnl(st, T0 + 5 * 86400, total)
         level, _, _ = risk.cek_drawdown(pc.MODAL_BUKU, d1, d7, d30)
         self.assertEqual(level, "mingguan")
+
+
+class TestNotif(Base):
+    def cari(self, kata):
+        return [t for t in self.pesan if kata in t]
+
+    def test_masuk_dan_keluar_dikirim(self):
+        self.radar([row("A", 10)], T0)
+        self.tick(T0)
+        self.assertEqual(len(self.cari("MASUK A")), 1)
+        st = pc.load()
+        pc.mark(st["positions"]["A"])
+        pc.keluar(st, "A", st["positions"]["A"], "uji", T0 + H)
+        self.assertEqual(len(self.cari("KELUAR A")), 1)
+
+    def test_kill_switch_dikirim_sekali_dan_menyebut_cara_reset(self):
+        self.radar([row("A", 10), row("B", 9)], T0)
+        self.tick(T0)
+        self.spot["A"] = self.spot["B"] = 98.7
+        self.radar([row("A", 10), row("B", 9)], T0 + 4 * H)
+        self.tick(T0 + 4 * H)
+        self.radar([row("C", 8)], T0 + 8 * H)
+        self.tick(T0 + 8 * H)
+        ks = self.cari("KILL SWITCH")
+        self.assertEqual(len(ks), 1, "tick berikutnya selagi HALT tidak boleh mengirim ulang")
+        self.assertIn("--reset-halt", ks[0])
+
+    def test_radar_basi_dikirim_sekali_lalu_pulih(self):
+        self.radar([row("A", 10)], T0, umur_jam=10)
+        self.tick(T0)
+        self.radar([row("A", 10)], T0 + 4 * H, umur_jam=10)
+        self.tick(T0 + 4 * H)
+        self.assertEqual(len(self.cari("TIDAK BUKA POSISI")), 1, "kondisi sama tidak diulang tiap tick")
+        self.radar([row("A", 10)], T0 + 8 * H)
+        self.tick(T0 + 8 * H)
+        self.assertEqual(len(self.cari("kembali normal")), 1)
+
+    def test_margin_memberi_peringatan_sekali_lalu_pulih(self):
+        self.radar([row("A", 10)], T0)
+        self.tick(T0)
+        self.spot["A"] = self.perp["A"] = 175.0      # pompa 75%: spot ikut naik, net aman, tapi short mendekati likuidasi
+        self.radar([row("A", 10)], T0 + 4 * H)
+        self.tick(T0 + 4 * H)
+        self.tick(T0 + 5 * H)
+        m = self.cari("MARGIN")
+        self.assertEqual(len(m), 1, "tidak diulang selama level sama")
+        self.assertIn("BAHAYA", m[0])
+        self.spot["A"] = self.perp["A"] = 100.0
+        self.tick(T0 + 9 * H)
+        self.assertEqual(len(self.cari("Margin A kembali aman")), 1)
+
+    def test_margin_darurat_menutup_posisi(self):
+        self.radar([row("A", 10)], T0)
+        self.tick(T0)
+        self.spot["A"] = self.perp["A"] = 190.0      # tinggal ~4% ke likuidasi
+        self.radar([row("A", 10)], T0 + 4 * H)
+        st = self.tick(T0 + 4 * H)
+        self.assertNotIn("A", st["positions"])
+        self.assertIn("likuidasi", st["closed"][-1]["exit_reason"])
+
+    def test_telegram_error_tidak_menggagalkan_tick(self):
+        def meledak(t):
+            raise OSError("telegram down")
+        pc.NOTIF = meledak
+        self.radar([row("A", 10)], T0)
+        st = self.tick(T0)
+        self.assertIn("A", st["positions"], "posisi tetap dibuka walau notifikasi gagal")
 
 
 class TestExportWeb(Base):

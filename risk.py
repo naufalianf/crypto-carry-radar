@@ -157,7 +157,53 @@ def sizing_dari_risiko(modal, risiko_pct, jarak_stop_pct, max_pct=MAX_NOTIONAL_P
     return min(n, batas_notional(modal, max_pct))
 
 
+# --- jarak ke likuidasi kaki short perp -------------------------------------------------------
+# Carry delta-neutral tidak rugi saat harga naik (spot ikut naik), TAPI likuidasi terjadi di akun
+# perp saja. Harga naik tajam bisa melikuidasi short sebelum margin sempat ditambah dari spot.
+# Rumus di bawah PERKIRAAN isolated margin; angka pasti Binance bergantung tier dan mode margin.
+MMR_ASUMSI_PCT = 0.5          # maintenance margin rate yang diasumsikan (konservatif untuk koin tipis: naikkan)
+LIKUIDASI_WASPADA_PCT = 40.0  # jarak harga ke likuidasi < ini -> peringatan, tambah margin / kurangi posisi
+LIKUIDASI_BAHAYA_PCT = 20.0
+LIKUIDASI_DARURAT_PCT = 10.0  # < ini -> tutup perp sekarang (spot ikut dijual)
+
+
+def harga_likuidasi_short(entry, leverage=MAX_LEVERAGE, mmr_pct=MMR_ASUMSI_PCT):
+    """Perkiraan harga likuidasi short isolated: entry * (1 + 1/L) / (1 + mmr)."""
+    if entry <= 0 or leverage <= 0:
+        raise ValueError("entry dan leverage harus positif")
+    return entry * (1 + 1.0 / leverage) / (1 + mmr_pct / 100.0)
+
+
+def cek_margin(entry, mark, leverage=MAX_LEVERAGE, mmr_pct=MMR_ASUMSI_PCT):
+    """(level, jarak_pct, harga_likuidasi). level: None | 'waspada' | 'bahaya' | 'darurat'.
+    jarak_pct = berapa persen lagi harga mark harus naik sampai likuidasi.
+    Input tak valid -> 'darurat' (fail closed)."""
+    try:
+        liq = harga_likuidasi_short(entry, leverage, mmr_pct)
+        if mark <= 0:
+            raise ValueError("mark tidak valid")
+    except (ValueError, TypeError):
+        return "darurat", 0.0, 0.0
+    jarak = (liq / mark - 1) * 100
+    if jarak < LIKUIDASI_DARURAT_PCT:
+        return "darurat", jarak, liq
+    if jarak < LIKUIDASI_BAHAYA_PCT:
+        return "bahaya", jarak, liq
+    if jarak < LIKUIDASI_WASPADA_PCT:
+        return "waspada", jarak, liq
+    return None, jarak, liq
+
+
 def selfcheck():
+    # margin: 1x short, entry 100 -> likuidasi ~199, bukan 100
+    assert abs(harga_likuidasi_short(100, 1.0, 0.5) - 199.0049) < 0.01
+    assert cek_margin(100, 100)[0] is None, "1x di harga entry sangat aman"
+    assert cek_margin(100, 150)[0] == "waspada" and cek_margin(100, 150)[1] < 40
+    assert cek_margin(100, 170)[0] == "bahaya", cek_margin(100, 170)
+    assert cek_margin(100, 185)[0] == "darurat"
+    assert cek_margin(100, 100, leverage=5)[0] == "bahaya", "5x: likuidasi ~ +19,4%, jarak di bawah 20%"
+    assert cek_margin(0, 100)[0] == "darurat" and cek_margin(100, 0)[0] == "darurat", "fail closed"
+    assert cek_margin(100, 90)[1] > cek_margin(100, 100)[1], "harga turun menjauhkan likuidasi"
     assert batas_notional(1000) == 200.0, "plafon notional salah"
     assert cek_kill_switch(1000, 970, 3.0)[0] is True, "rugi 3% harus memicu"
     assert cek_kill_switch(1000, 971, 3.0)[0] is False, "rugi 2.9% tidak boleh memicu"
