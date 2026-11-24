@@ -181,6 +181,32 @@ def _cred(name):
     return None
 
 
+def _flush(tok, chat):
+    """Kirim ulang alert yang tadi gagal, lalu kosongkan antrian.
+
+    Tanpa ini antrian cuma menumpuk: pesan yang gagal waktu Telegram down tidak
+    akan pernah sampai walau koneksi sudah pulih.
+    """
+    if not os.path.exists(QUEUE):
+        return 0
+    baris = [l for l in open(QUEUE).read().splitlines() if l.strip()]
+    if not baris:
+        return 0
+    sisa, terkirim = [], 0
+    for l in baris:
+        try:
+            data = urllib.parse.urlencode({"chat_id": chat,
+                                           "text": json.loads(l)["text"]}).encode()
+            urllib.request.urlopen(f"https://api.telegram.org/bot{tok}/sendMessage",
+                                   data, timeout=20)
+            terkirim += 1
+        except Exception:
+            sisa.append(l)
+    with open(QUEUE, "w") as f:
+        f.write("\n".join(sisa) + ("\n" if sisa else ""))
+    return terkirim
+
+
 def send(text):
     """Kirim pesan ke bot alert. Kredensial tidak pernah ditulis di kode/log."""
     tok = _cred("ALERT_BOT_TOKEN") or _cred("TELEGRAM_BOT_TOKEN")
@@ -190,12 +216,14 @@ def send(text):
     data = urllib.parse.urlencode({"chat_id": chat, "text": text}).encode()
     try:
         urllib.request.urlopen(f"https://api.telegram.org/bot{tok}/sendMessage", data, timeout=20)
-        return "terkirim"
     except Exception as e:
         # jangan buang alert: simpan ke antrian supaya bisa dikirim ulang
         with open(QUEUE, "a") as f:
             f.write(json.dumps({"ts": time.time(), "text": text}) + "\n")
         return f"gagal kirim ({e}); disimpan ke antrian"
+    # pengiriman berhasil = kesempatan kirim ulang antrian lama
+    n = _flush(tok, chat)
+    return f"terkirim ({n} antrian tertunda ikut dikirim)" if n else "terkirim"
 
 
 def notify(payload):
