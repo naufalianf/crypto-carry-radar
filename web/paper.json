@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-24 10:43 UTC",
+ "generated_at": "2026-11-24 14:43 UTC",
  "started_ms": 1795470995369,
  "modal_buku": 3000.0,
  "limits": {
@@ -9,28 +9,28 @@
  },
  "halt": null,
  "pnl": {
-  "terbuka": -6.26,
-  "total": -6.26,
-  "d1": -6.26,
-  "d7": -6.26,
-  "d30": -6.26
+  "terbuka": -6.22,
+  "total": -6.22,
+  "d1": -6.22,
+  "d7": -6.22,
+  "d30": -6.22
  },
  "positions": [
   {
    "symbol": "ZECUSDT",
-   "hari": 0.53,
+   "hari": 0.7,
    "apr_entry": 5.45,
    "funding_pct": 0.003,
-   "basis_geser_pct": 0.008,
-   "net_pct": -0.307
+   "basis_geser_pct": 0.023,
+   "net_pct": -0.321
   },
   {
    "symbol": "QNTUSDT",
-   "hari": 0.53,
+   "hari": 0.7,
    "apr_entry": 4.72,
    "funding_pct": 0.011,
-   "basis_geser_pct": -0.003,
-   "net_pct": -0.319
+   "basis_geser_pct": -0.023,
+   "net_pct": -0.3
   }
  ],
  "closed": [],
