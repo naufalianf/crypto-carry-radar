@@ -11,3 +11,4 @@ loop.out
 *.log
 alert_queue.jsonl
 paper_trades_selftest.csv
+watchdog_state.json
