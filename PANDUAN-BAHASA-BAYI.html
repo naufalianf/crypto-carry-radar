@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<title>Panduan Sistem Crypto — Versi Bahasa Bayi</title>
+<style>
+@page { size: A4; margin: 18mm 16mm; }
+body { font-family: -apple-system, "Segoe UI", Roboto, sans-serif; font-size: 10.5pt;
+       line-height: 1.55; color: #1a1a1a; max-width: 100%; }
+h1 { font-size: 20pt; border-bottom: 3px solid #2563eb; padding-bottom: 6px; margin-top: 0; }
+h2 { font-size: 14pt; margin-top: 22px; color: #1e3a8a; border-bottom: 1px solid #dbeafe;
+     padding-bottom: 3px; page-break-after: avoid; }
+h3 { font-size: 11.5pt; margin-top: 16px; color: #1f2937; page-break-after: avoid; }
+p { margin: 7px 0; }
+ul, ol { margin: 7px 0; padding-left: 22px; }
+li { margin: 3px 0; }
+code { background: #f1f5f9; padding: 1px 4px; border-radius: 3px;
+       font-family: ui-monospace, Consolas, monospace; font-size: 9.5pt; }
+table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 9.5pt;
+        page-break-inside: avoid; }
+th { background: #eff6ff; text-align: left; font-weight: 600; }
+th, td { border: 1px solid #cbd5e1; padding: 5px 8px; vertical-align: top; }
+blockquote { border-left: 4px solid #f59e0b; background: #fffbeb; margin: 10px 0;
+             padding: 8px 14px; color: #78350f; page-break-inside: avoid; }
+hr { border: none; border-top: 1px solid #e2e8f0; margin: 20px 0; }
+strong { color: #0f172a; }
+</style></head><body><h1>Panduan Sistem Crypto — Versi Bahasa Bayi</h1>
+<p><strong>Untuk:</strong> Bro Ian <strong>Tanggal:</strong> 24 November 2026 <strong>Status sistem:</strong> masih tahap uji. <strong>Belum ada satu order nyata pun.</strong></p>
+<hr>
+<h2>Bagian 1 — Kita ini sedang bikin apa, sih?</h2>
+<p>Bayangkan <strong>toko penukaran uang</strong> di mall.</p>
+<p>Toko itu tidak menebak arah harga. Dia cuma mengambil untung dari <strong>selisih harga antara dua meja</strong> yang menjual barang yang sama. Kalau meja A jual lebih murah daripada meja B, dia beli di A, jual di B, kantong selisihnya. Harga naik atau turun tidak peduli — yang penting selisihnya tetap ada.</p>
+<p>Nah, di crypto ada dua "meja" untuk koin yang sama:</p>
+<ul>
+<li><strong>Meja spot</strong> — tempat beli koin beneran. Barang masuk ke tangan.</li>
+<li><strong>Meja perpetual</strong> — tempat bertaruh harga naik/turun, tanpa barang. Cuma kontrak. Ini yang disebut "futures".</li>
+</ul>
+<p>Di meja perpetual ada biaya unik namanya <strong>funding</strong>. Setiap 8 jam, orang yang bertaruh harga naik membayar orang yang bertaruh harga turun (atau sebaliknya, tergantung pasar).</p>
+<p>Jadi triknya:</p>
+<ol>
+<li>Beli 1 koin di meja spot (uang keluar).</li>
+<li>Bertaruh "harga turun" di meja perpetual untuk 1 koin yang sama (uang masuk).</li>
+<li>Harga naik? Spot untung, taruhan rugi. Harga turun? Spot rugi, taruhan untung.</li>
+</ol>
+<p><strong>Saling menutup.</strong> Itu sebabnya disebut <strong>delta-netral</strong> — arah harga jadi tidak berpengaruh.</p>
+<ol>
+<li>Yang kita kumpulkan tinggal <strong>funding</strong> tiap 8 jam itu.</li>
+</ol>
+<p>Ibaratnya: kita jadi <strong>pemilik warung parkir</strong>, bukan penebak arah mobil. Mobil mau ke utara atau selatan, kita tetap dapat koin parkir.</p>
+<p><strong>Ini yang kita bangun.</strong> Bukan mesin penebak harga. Mesin penagih sewa.</p>
+<hr>
+<h2>Bagian 2 — Sekarang sistemnya bisa apa?</h2>
+<p>Ada 8 bagian. Anggap ini 8 orang pegawai warung.</p>
+<h3>1. <code>bot.py</code> — Tukang hitung di belakang</h3>
+<p>Menghitung ulang ribuan kemungkinan strategi pakai data harga lama. Gunanya untuk <strong>membuktikan atau membantah</strong> ide sebelum uang dipakai.</p>
+<p><strong>Hasilnya justru mengecewakan</strong> — dan itu bagus, karena lebih murah kecewa di hitung-hitungan daripada kecewa di dompet. (Cerita lengkapnya di Bagian 3.)</p>
+<h3>2. <code>runner.py</code> — Pegawai latihan (paper spot)</h3>
+<p>Menjalankan strategi beli-jual pakai <strong>uang bohongan</strong> $1.000 per buku. Tidak menyentuh uang asli. Sekarang ada 4 buku jalan, hasilnya campur: tiga rugi kecil, satu untung 6,3%.</p>
+<h3>3. <code>radar.py</code> — Petugas ronda</h3>
+<p>Setiap 4 jam dia keliling ke <strong>701 pasar perpetual</strong> di Binance, lalu mencatat:</p>
+<ul>
+<li>berapa funding-nya sekarang,</li>
+<li>kalau di-setahunkan jadi berapa persen (APR),</li>
+<li>umur koin (koin baru sering liar),</li>
+<li>lebar spread (makin lebar makin mahal masuk-keluar),</li>
+<li>volume dagang (cukup ramai atau tidak).</li>
+</ul>
+<p>Dia juga mengecek <strong>satu hal yang paling sering dilupakan orang: apakah koin itu punya pasar spot?</strong> Kalau tidak ada spot, strategi kita mustahil dijalankan. Titik. Tidak ada barang untuk dibeli.</p>
+<h3>4. Gate — Satpam</h3>
+<p>Dari 701 koin, satpam menyaring pakai 5 aturan. Koin baru boleh masuk daftar "layak" kalau <strong>semua</strong> aturan lolos:</p>
+<table><thead><tr><th>Aturan</th><th>Batas</th><th>Kenapa</th></tr></thead><tbody>
+<tr><td>Punya pasar spot</td><td>wajib</td><td>tanpa ini mustahil</td></tr>
+<tr><td>Umur listing</td><td>≥ 30 hari</td><td>koin baru = funding liar</td></tr>
+<tr><td>Spread</td><td>≤ 15 bps</td><td>mahal masuk-keluar</td></tr>
+<tr><td>Volume 24 jam</td><td>≥ $50 juta</td><td>kalau mau keluar, harus ada pembeli</td></tr>
+<tr><td>Balik modal</td><td>&gt; 3 hari</td><td>APR tidak masuk akal</td></tr>
+</tbody></table>
+<h3>5. <code>carry.py</code> — Tukang audit masa lalu</h3>
+<p>Menghitung: kalau strategi ini sudah dijalankan 3 tahun terakhir, hasilnya berapa? Ini yang memberi angka APR realistis, bukan angka brosur.</p>
+<h3>6. <code>paper_carry.py</code> — Pegawai latihan (paper carry)</h3>
+<p>Menjalankan strategi carry pakai <strong>uang bohongan</strong> $1.000 per posisi. Mencatat funding yang benar-benar masuk tiap 8 jam. Ini <strong>bukti akuntansi</strong> — kalau nanti pakai uang asli, angkanya harus cocok dengan catatan ini.</p>
+<h3>7. <code>plan_order.py</code> — Notaris</h3>
+<p>Kalau ada peluang, dia menyusun <strong>rencana order tertulis</strong>: beli berapa, di harga berapa, biayanya berapa, kapan balik modal, kapan harus keluar. Ukuran posisinya dihitung dari <strong>kedalaman orderbook nyata</strong>, bukan ditebak.</p>
+<p>Dia <strong>tidak mengirim order.</strong> Dia cuma menulis di kertas.</p>
+<h3>8. Dashboard — Papan pengumuman</h3>
+<p>Halaman web yang bisa dibuka dari HP. Isinya tabel semua koin yang dipantau, lengkap dengan status "lolos gate" atau "gagal karena apa". Sekarang sudah online di Vercel.</p>
+<hr>
+<h2>Bagian 3 — Apa yang SUDAH tercapai</h2>
+<p>Ini yang benar-benar sudah jadi dan sudah diuji, bukan rencana.</p>
+<h3>✅ Tiga ide besar sudah diuji, dan dua di antaranya gugur</h3>
+<p>Ini bagian terpenting. Kita <strong>tidak</strong> langsung percaya ide bagus. Kita uji dulu.</p>
+<p><strong>Ide 1 — Ikut tren pakai indikator (SMA / mean-reversion).</strong> Diuji 80 variasi strategi, diuji ulang di 23 periode berbeda.</p>
+<p>Hasil: <strong>gugur.</strong> Dari 80 strategi, cuma 5 yang untung. Dan yang untung di periode lama, belum tentu untung di periode berikutnya — parameternya berganti <strong>13 kali</strong>. Artinya: itu bukan ilmu, itu kebetulan.</p>
+<p><strong>Ide 2 — Ikut tren jangka panjang (TSMOM), 10 koin.</strong> Awalnya terlihat hebat: +287%. Lalu saya temukan <strong>bug</strong>: strategi itu diam-diam "mengintip" harga yang belum terjadi. Sesuatu yang mustahil di dunia nyata.</p>
+<p>Setelah bug diperbaiki: <strong>+182%</strong> dalam 5 tahun. Sementara cuma <strong>beli BTC lalu diam</strong> hasilnya <strong>+268%</strong>.</p>
+<p>Jadi: lebih ribet, lebih banyak biaya, hasilnya lebih kecil. <strong>Gugur</strong> sebagai mesin profit. Yang tersisa cuma gunanya sebagai penahan rugi saat pasar jatuh.</p>
+<blockquote>Ini contoh kenapa saya tidak mau menjanjikan apa-apa. Angka +287% itu terlihat seperti jackpot. Ternyata bohong, dan bohongnya ketemu karena diuji ulang.</blockquote>
+<p><strong>Ide 3 — Carry funding (yang sekarang kita pakai).</strong> Diuji 3 tahun data: <strong>+24% total, setara 7,44% per tahun.</strong> Risiko jatuh sangat kecil (maks -0,43%).</p>
+<p>Tapi ada catatan jujur: <strong>makin lama makin kecil.</strong> Tahun pertama 7,44%, tahun terakhir tinggal <strong>3,18%</strong>. Pasar makin ramai, sewa parkir makin murah.</p>
+<h3>✅ Radar sudah jalan dan memindai pasar nyata</h3>
+<p>60 koin teratas dipindai dalam <strong>2 detik</strong>. Bisa juga 701 koin.</p>
+<p>Dan hasil pemindaiannya menemukan sesuatu yang <strong>tidak terlihat dari luar</strong>:</p>
+<blockquote>10 koin dengan APR tertinggi — BULLAUSDT 63%, EVAAUSDT 30%, ELSAUSDT 25% — <strong>semuanya tidak punya pasar spot.</strong></blockquote>
+<p>Artinya: angka 63% itu umpan. Tidak ada barang untuk dibeli. Orang yang tergiur angka itu akan masuk lewat jalur yang salah dan rugi.</p>
+<p>Yang punya spot dan APR masuk akal cuma: <strong>ZEC 5,45%</strong> dan <strong>QNT 4,72%</strong>.</p>
+<h3>✅ Sistem sudah bisa menyusun rencana order yang bisa diperiksa</h3>
+<p>Kalau ada peluang, sistem mengeluarkan kertas berisi: beli berapa koin, di harga berapa, biaya berapa, balik modal berapa hari, kapan keluar. Semua angka bisa Bro cek sendiri. Tidak ada yang disembunyikan.</p>
+<h3>✅ Batas risiko dipaksa di dalam kode, bukan cuma ditulis di dokumen</h3>
+<p>Ini bedanya "janji" dan "pagar beton":</p>
+<ul>
+<li>Maksimal <strong>20% modal</strong> per posisi</li>
+<li>Maksimal <strong>3 posisi</strong> terbuka</li>
+<li>Leverage maksimal <strong>1x</strong> (tidak ada utang)</li>
+<li>Rugi harian <strong>3%</strong> → sistem berhenti sendiri hari itu</li>
+<li>Basis bergeser <strong>0,5%</strong> → posisi ditutup otomatis</li>
+</ul>
+<p>Kalau Bro menulis "jangan lebih dari 20%" di dokumen, tidak ada yang menjamin. Kalau ditulis di kode, sistemnya <strong>menolak</strong> perintah yang melanggar.</p>
+<h3>✅ Dashboard online dan tidak bisa mati</h3>
+<p>Sudah di Vercel. Tidak butuh server sendiri, tidak butuh tunnel, tidak bisa kena blokir ISP. Datanya dari mesin sini, dikirim ke GitHub, dibaca dashboard.</p>
+<h3>✅ Belum pernah menyentuh uang asli</h3>
+<p>Tidak ada API key terpasang. Tidak ada akses saldo. Semua angka di sistem ini <strong>uang bohongan</strong>.</p>
+<hr>
+<h2>Bagian 4 — Apa yang BELUM tercapai</h2>
+<p>Saya tulis apa adanya, karena ini yang Bro bayar mahal kalau disembunyikan.</p>
+<h3>❌ 1. Bot tidak menghasilkan uang. Belum pernah. Nol.</h3>
+<p>Belum ada satu rupiah pun masuk. Yang ada: catatan bahwa strategi ini <strong>layak diuji lebih lanjut</strong>, bukan bahwa strategi ini menguntungkan.</p>
+<h3>❌ 2. Gate-nya sekarang menyaring terlalu ketat — hasilnya nol</h3>
+<p>Hari ini, dari 60 koin: <strong>0 yang lolos.</strong></p>
+<p>Bukan karena sistem rusak. Memang <strong>tidak ada yang layak</strong> hari ini. Tapi artinya juga: kalau Bro menunggu bot ini "kasih sinyal beli", Bro akan menunggu lama.</p>
+<h3>❌ 3. Paper carry baru jalan 7 jam, syaratnya 30 hari</h3>
+<p>Target: 30 hari penuh tanpa celah, dengan minimal 3 posisi ditutup lengkap.</p>
+<p>Sekarang: <strong>7 jam</strong>, 2 posisi masih terbuka, hasil sementara <strong>-0,29%</strong> (itu biaya masuk, belum sempat dapat funding).</p>
+<p>Dari <strong>9 syarat</strong> untuk naik ke tahap berikutnya, <strong>nol</strong> yang lulus penuh.</p>
+<h3>❌ 4. Belum ada tombol "setujui" di Telegram</h3>
+<p>Rencananya: bot menyiapkan order, Bro tekan satu tombol, order dikirim. Sekarang yang ada baru rencana tertulis di layar. Tombolnya belum dibuat.</p>
+<h3>❌ 5. Satu lubang yang baru ditemukan, belum ditambal</h3>
+<p>Sistem memantau <strong>selisih harga</strong> antara spot dan perpetual — kalau selisihnya melebar, posisi ditutup.</p>
+<p>Tapi ada yang tidak dipantau: <strong>kalau funding berbalik negatif terus-menerus.</strong> Kita jadi yang <strong>membayar</strong>, bukan yang dibayar. Simulasi menunjukkan: funding negatif -0,03% per hari selama 24 hari = rugi -0,72%, dan <strong>sistem tidak akan menutup posisi</strong> karena selisih harga tidak berubah.</p>
+<p>Ini bukan kebocoran fatal (masih ada batas 60 hari), tapi harus ditambal sebelum uang asli masuk.</p>
+<h3>❌ 6. Binance belum berizin OJK</h3>
+<p>Binance global bukan pedagang aset kripto berlisensi OJK. Yang berizin ada 28, salah satunya Tokocrypto.</p>
+<p>Ini <strong>keputusan risiko milik Bro</strong>, bukan sesuatu yang bisa saya putuskan atau sembunyikan. Saya pakai data harga publik Binance karena datanya terbuka, tapi kalau nanti taruh uang, ini harus Bro timbang sendiri.</p>
+<hr>
+<h2>Bagian 5 — Kenapa bot belum boleh kirim order sendiri</h2>
+<p>Karena ada 9 syarat, dan semuanya harus lulus. Bukan 8 dari 9. Bukan "hampir".</p>
+<table><thead><tr><th>#</th><th>Syarat</th><th>Status</th></tr></thead><tbody>
+<tr><td>1</td><td>Paper carry jalan ≥ 30 hari tanpa celah</td><td>❌ baru 7 jam</td></tr>
+<tr><td>2</td><td>Selisih catatan vs teori &lt; 0,20%</td><td>❌ belum bisa diuji</td></tr>
+<tr><td>3</td><td>Minimal 3 posisi ditutup lengkap</td><td>❌ nol</td></tr>
+<tr><td>4</td><td>Slippage nyata ≤ 0,3%</td><td>❌ belum ada order nyata</td></tr>
+<tr><td>5</td><td>Paper spot cocok dengan backtest &lt; 5%</td><td>⚠️ sebagian</td></tr>
+<tr><td>6</td><td>Dry-run, kill switch, batas rugi di kode</td><td>✅ <strong>lulus</strong></td></tr>
+<tr><td>7</td><td>Rekonsiliasi dua kaki otomatis</td><td>❌ belum ada</td></tr>
+<tr><td>8</td><td>API key tanpa izin withdraw</td><td>✅ siap (belum dipasang)</td></tr>
+<tr><td>9</td><td>Limit order saja</td><td>✅ aturan sudah ada</td></tr>
+</tbody></table>
+<p><strong>3 lulus, 1 separuh, 5 belum.</strong> Jadi: tetap di tahap uji.</p>
+<p>Kalau saya paksa buka sekarang, yang terjadi bukan "cepat kaya" — tapi "cepat rugi tanpa tahu kenapa".</p>
+<hr>
+<h2>Bagian 6 — Kamus istilah</h2>
+<p>Biar Bro tidak perlu tanya ulang tiap kali.</p>
+<p><strong>Spot</strong> — beli koin beneran. Barang masuk tangan.</p>
+<p><strong>Perpetual (perp)</strong> — kontrak bertaruh harga, tanpa barang. Bisa pakai utang (leverage). Ini yang berbahaya.</p>
+<p><strong>Funding</strong> — biaya tiap 8 jam di perpetual. Kadang kita terima, kadang kita bayar.</p>
+<p><strong>APR</strong> — kalau hasilnya diulang setahun penuh, jadi berapa persen. APR 7,44% artinya: kalau konsisten setahun, untung 7,44%.</p>
+<p><strong>Delta-netral</strong> — dua posisi berlawanan yang saling menutup, jadi arah harga tidak berpengaruh.</p>
+<p><strong>Spread</strong> — selisih harga beli dan harga jual. Makin lebar makin mahal.</p>
+<p><strong>bps</strong> — satuan kecil. 100 bps = 1%. 15 bps = 0,15%.</p>
+<p><strong>Gate</strong> — satpam penyaring. Koin harus lolos 5 aturan.</p>
+<p><strong>Kapasitas</strong> — berapa banyak uang yang bisa masuk tanpa menggeser harga.</p>
+<p><strong>Slippage</strong> — harga yang akhirnya didapat beda dari yang direncanakan.</p>
+<p><strong>Paper trading</strong> — latihan pakai uang bohongan.</p>
+<p><strong>Max drawdown (MDD)</strong> — rugi terdalam dari puncak ke lembah. -0,43% artinya pernah turun paling parah 0,43%.</p>
+<p><strong>Look-ahead bug</strong> — kesalahan di mana program diam-diam memakai informasi masa depan. Bikin hasil backtest terlihat bagus padahal mustahil.</p>
+<hr>
+<h2>Bagian 7 — Jadi, apa keputusan yang ada di tangan Bro?</h2>
+<p>Ini bagian yang saya butuh Bro komentar. Pilih saja, tidak perlu teknis.</p>
+<h3>Pertanyaan 1 — Kita lanjut atau berhenti?</h3>
+<p>Fakta yang perlu Bro tahu sebelum jawab:</p>
+<ul>
+<li>Carry funding <strong>positif tapi kecil</strong>, dan <strong>menyusut</strong> tiap tahun (7,44% → 3,18%).</li>
+<li>Untuk modal kecil, 3% setahun <strong>kalah</strong> dari deposito, dan ada risiko exchange.</li>
+<li>Tidak ada strategi lain yang lolos uji.</li>
+</ul>
+<p>Pilihannya:</p>
+<p><strong>(a)</strong> Lanjut uji paper carry 30 hari. <strong>Rp0 risiko</strong>, tapi butuh sabar dan hasilnya kemungkinan cuma "layak, tapi kecil".</p>
+<p><strong>(b)</strong> Berhenti di sini. Simpan ilmunya, jangan taruh uang. Ini pilihan yang jujur dan tidak memalukan.</p>
+<p><strong>(c)</strong> Ganti arah: cari peluang lain yang lebih besar (bukan carry). Butuh riset baru dari nol, hasil belum tentu ada.</p>
+<h3>Pertanyaan 2 — Kalau lanjut, target hasilnya berapa?</h3>
+<p>Kalau Bro bilang "harus 20% setahun", saya harus bilang <strong>tidak bisa dijanjikan</strong> dengan data yang ada. Yang realistis dari carry: <strong>3-7% setahun</strong>, dengan risiko exchange.</p>
+<h3>Pertanyaan 3 — Sumber data boleh tetap Binance?</h3>
+<p>Data harga publik Binance dipakai karena terbuka dan lengkap. Yang jadi pertimbangan: Binance global tidak berizin OJK. Kalau Bro mau lebih aman secara regulasi, kita bisa pindah ke data Tokocrypto — tapi pilihannya lebih sedikit dan strateginya mungkin tidak bisa jalan.</p>
+<h3>Pertanyaan 4 — Mau saya tambal lubang funding negatif dulu?</h3>
+<p>Ini pekerjaan kecil: tambah satu pemeriksaan "kalau total funding sudah minus sekian persen, tutup posisi". Sekitar 15 menit. Sebaiknya dilakukan sebelum lanjut, karena ini lubang nyata.</p>
+<hr>
+<h2>Bagian 8 — Satu halaman ringkas</h2>
+<p>Kalau Bro cuma mau baca satu bagian, baca ini.</p>
+<p><strong>Yang sudah jadi:</strong></p>
+<ul>
+<li>Radar pemindai 701 pasar, jalan tiap 4 jam</li>
+<li>Satpam 5 aturan yang menyaring koin sampah</li>
+<li>Hitungan APR realistis, bukan angka brosur</li>
+<li>Rencana order tertulis yang bisa diperiksa</li>
+<li>Pagar risiko di dalam kode (20% modal, 3 posisi, 1x, stop 3%/hari)</li>
+<li>Latihan carry pakai uang bohongan</li>
+<li>Dashboard online, tidak bisa mati</li>
+</ul>
+<p><strong>Yang belum jadi:</strong></p>
+<ul>
+<li>Belum ada untung. Nol rupiah.</li>
+<li>Hari ini 0 dari 60 koin lolos gate</li>
+<li>Paper carry baru 7 jam dari 30 hari</li>
+<li>Belum ada tombol setujui di Telegram</li>
+<li>Ada lubang funding negatif yang belum ditambal</li>
+<li>Binance belum berizin OJK</li>
+</ul>
+<p><strong>Kesimpulan jujur:</strong></p>
+<p>Sistem ini sudah bisa <strong>menjawab pertanyaan</strong> dengan baik: "koin mana yang peluangnya nyata, dan berapa untungnya setelah semua biaya?" Itu sudah terbukti — dia berhasil membongkar bahwa 10 dari 10 APR tertinggi itu palsu.</p>
+<p>Yang <strong>belum</strong> bisa: menghasilkan uang. Dan tidak ada jalan pintas untuk itu. Yang bisa dilakukan cuma menguji dengan sabar, atau berhenti dengan jujur.</p>
+<p>Dua-duanya pilihan yang benar. Yang salah cuma satu: taruh uang karena sudah gemes.</p>
+<hr>
+<p><em>Dokumen ini ditulis 24 November 2026. Semua angka di dalamnya berasal dari hasil pengujian yang tersimpan di folder <code>hasil/</code>, bisa diperiksa ulang kapan saja.</em></p></body></html>
