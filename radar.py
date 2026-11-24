@@ -143,10 +143,15 @@ def scan(topn=TOPN, threshold=10.0):
                "breakeven_days": round(be, 1) if be else None}
         row["flags"] = gate(row, threshold)
         row["alert"] = not row["flags"]
-        row["depth_usd"] = depth_usd(sym) if row["alert"] else None
         rows.append(row)
     rows.sort(key=lambda r: -r["apr_7d"])
     ok = [r for r in rows if r["alert"]]
+    # Kedalaman orderbook dihitung untuk 20 koin teratas (yang tampil di dashboard)
+    # + semua yang lolos gate. Kalau hanya untuk yang lolos, kolom kapasitas selalu
+    # kosong saat gate tipis — padahal justru di situ orang ingin tahu "muat berapa?".
+    perlu = {r["symbol"] for r in rows[:20]} | {r["symbol"] for r in ok}
+    for r in rows:
+        r["depth_usd"] = depth_usd(r["symbol"]) if r["symbol"] in perlu else None
     payload = {"generated_at": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime()),
                "universe": len(rows), "scanned_rank": topn, "threshold": threshold,
                "round_trip_cost_pct": ROUND_TRIP * 100,

@@ -196,7 +196,13 @@ def total_pnl(st):
 
 
 def perubahan_pnl(st, now, total):
-    """Perubahan PnL kumulatif pada jendela 1d/7d/30d, dari kurva snapshot per tick."""
+    """Perubahan PnL kumulatif pada jendela 1d/7d/30d, dari kurva snapshot per tick.
+
+    Kalau riwayat belum menutupi satu jendela, angkanya = seluruh perubahan sejak
+    mulai. Itu tetap benar secara hitungan (rugi 7 hari dari sistem berumur 5 hari
+    memang seluruh ruginya), tapi berlabel menyesatkan. Dashboard yang menandai
+    jendela mana yang belum penuh, bukan fungsi ini yang memalsukan angka.
+    """
     hist, base = st.get("pnl_hist", []), st.get("base_pnl", 0.0)
 
     def sejak(detik):
@@ -248,6 +254,7 @@ def export_web(st, now):
     terbuka = sum(p.get("net", 0.0) * p["notional"] for p in st["positions"].values())
     out = {
         "generated_at": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime(now)),
+        "started_ms": int(st.get("started", now) * 1000),
         "modal_buku": MODAL_BUKU,
         "limits": {"harian": risk.KILL_SWITCH_HARIAN_PCT, "mingguan": risk.KILL_SWITCH_MINGGUAN_PCT,
                    "bulanan": risk.KILL_SWITCH_BULANAN_PCT},

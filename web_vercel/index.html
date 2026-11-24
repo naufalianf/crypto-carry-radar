@@ -345,8 +345,15 @@ function renderPaper(p) {
   const pct = v => v / m * 100;
   const umur = Date.parse(String(p.generated_at).replace(" UTC", "Z").replace(" ", "T"));
   const jam = isNaN(umur) ? null : (Date.now() - umur) / 3600000;
+  // Umur paper carry menentukan jendela mana yang datanya sudah lengkap. Kalau baru
+  // 10 jam jalan, "7 hari" dan "30 hari" bukan angka tujuh/tiga puluh hari — itu
+  // seluruh riwayat. Tandai di sini supaya angka tidak terbaca sebagai tiga kerugian.
+  const umur_hari = (Date.now() - (p.started_ms || 0)) / 86400000;
   const card = (judul, v, extra) =>
     `<div class="card"><small>${esc(judul)}</small><b class="${pcls(v)}">${sgn(v)}$</b><small>${esc(extra)}</small></div>`;
+  const jendela = (k, batas, hari) => (p.started_ms && umur_hari < hari)
+    ? "baru " + Math.floor(umur_hari * 24) + " jam (belum " + hari + " hari)"
+    : sgn(pct(p.pnl[k])) + "% (batas -" + batas + "%)";
   let html = "";
   if (p.halt) {
     html += `<div class="banner warn"><b>HALT ${esc(p.halt.level)}</b>: kill switch aktif, posisi baru dikunci sampai direset manual.</div>`;
@@ -355,9 +362,9 @@ function renderPaper(p) {
   }
   html += '<div class="sum">' +
     card("PnL total", p.pnl.total, "terbuka " + sgn(p.pnl.terbuka) + "$") +
-    card("24 jam", p.pnl.d1, sgn(pct(p.pnl.d1)) + "% (batas -" + p.limits.harian + "%)") +
-    card("7 hari", p.pnl.d7, sgn(pct(p.pnl.d7)) + "% (batas -" + p.limits.mingguan + "%)") +
-    card("30 hari", p.pnl.d30, sgn(pct(p.pnl.d30)) + "% (batas -" + p.limits.bulanan + "%)") + "</div>";
+    card("24 jam", p.pnl.d1, jendela("d1", p.limits.harian)) +
+    card("7 hari", p.pnl.d7, jendela("d7", p.limits.mingguan)) +
+    card("30 hari", p.pnl.d30, jendela("d30", p.limits.bulanan)) + "</div>";
   if ((p.positions || []).length) {
     html += '<div class="tscroll"><table class="ptable"><tr><th>simbol</th><th>umur (hari)</th><th>APR masuk</th>' +
       "<th>funding</th><th>basis geser</th><th>net</th></tr>" +

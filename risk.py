@@ -85,6 +85,8 @@ def cek_drawdown(modal, pnl_1d, pnl_7d, pnl_30d):
     for nama, pnl, batas in (("harian", pnl_1d, KILL_SWITCH_HARIAN_PCT),
                              ("mingguan", pnl_7d, KILL_SWITCH_MINGGUAN_PCT),
                              ("bulanan", pnl_30d, KILL_SWITCH_BULANAN_PCT)):
+        if pnl is None:
+            continue          # riwayat belum menutupi jendela ini — bukan berarti rugi 0
         rugi = pnl / modal * 100
         terburuk = min(terburuk, rugi)
         if rugi <= -batas + 1e-9:
