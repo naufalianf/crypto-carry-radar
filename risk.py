@@ -20,6 +20,37 @@ MAX_POSISI = 3
 KILL_SWITCH_HARIAN_PCT = 3.0  # rugi harian >= 3% -> tutup semua posisi, berhenti sampai direset manual
 DELTA_TOLERANSI_PCT = 5.0     # ketidakseimbangan dua kaki yang masih diterima
 BASIS_STOP_PCT = 0.5          # basis bergerak > 0.5% melawan -> keluar (di luar model biaya)
+NET_STOP_PCT = 1.0            # backstop: rugi bersih kumulatif >= 1% -> keluar
+FUNDING_STOP_PCT = 0.15       # funding kumulatif <= -0.15% -> tesis carry sudah salah
+
+
+def cek_funding(funding_kum_pct, batas_pct=FUNDING_STOP_PCT):
+    """(keluar, alasan). Funding yang TERAKUMULASI membayar, bukan menerima.
+
+    Ini lubang yang tidak tertangkap `cek_basis`: basis hanya melihat selisih
+    harga spot vs perp, sedangkan funding adalah aliran kas terpisah. Funding
+    negatif -0,03%/hari selama 24 hari = -0,72% tanpa basis bergerak sedikit pun,
+    jadi tidak ada pemicu apa pun. Ambang -0,15% setara ~5 hari berturut-turut
+    membayar — cukup untuk menyimpulkan tesis carry tidak berlaku lagi.
+    """
+    if funding_kum_pct <= -batas_pct + 1e-9:
+        return True, (f"funding kumulatif {funding_kum_pct:.3f}% (batas -{batas_pct}%) "
+                      f"— kita yang membayar, bukan menerima")
+    return False, ""
+
+
+def cek_net(net_pct, batas_pct=NET_STOP_PCT):
+    """(keluar, alasan). Backstop rugi kumulatif, BUKAN proksi basis/APR.
+
+    `cek_basis` hanya melihat level basis relatif entry. Funding negatif kecil
+    yang konsisten (-0,03%/hari) tidak menggeser basis sama sekali, jadi bisa
+    menumpuk berminggu-minggu tanpa pernah memicu apa pun: 24 hari = -0,72%.
+    Fungsi ini memeriksa angka yang sebenarnya — PnL bersih setelah biaya.
+    """
+    if net_pct <= -batas_pct + 1e-9:
+        return True, (f"rugi bersih kumulatif {net_pct:.3f}% "
+                      f"(batas -{batas_pct}%) — funding berbalik/biaya menumpuk")
+    return False, ""
 
 
 def batas_notional(modal, max_pct=MAX_NOTIONAL_PCT):
@@ -82,12 +113,28 @@ def selfcheck():
     assert cek_basis(+0.40, -0.10)[0] is True, "geser tepat 0.50% harus memicu"
     # arah tanda: basis turun menguntungkan short perp -> jangan keluar
     assert cek_basis(-0.9, -0.1)[0] is False, "basis turun menguntungkan, jangan keluar"
+    # backstop rugi kumulatif (Temuan A): funding negatif menumpuk tanpa geser basis
+    assert cek_net(-0.5)[0] is False, "rugi 0.5% masih di dalam batas"
+    assert cek_net(-1.0)[0] is True, "rugi 1.0% harus keluar"
+    assert cek_net(-1.5)[0] is True, "rugi 1.5% harus keluar"
+    assert cek_net(+0.2)[0] is False, "posisi untung tidak boleh ditutup"
+    # simulasi Temuan A: 24 hari funding -0.03%/hari, basis tidak bergerak
+    basis_entry, basis_now = -0.10, -0.10
+    net = -0.03 * 24
+    assert cek_basis(basis_now, basis_entry)[0] is False, "basis statis tidak memicu apa pun"
+    # -0.72% belum sampai backstop net 1%, jadi yang menangkap harus cek_funding
+    assert cek_net(net)[0] is False, "net -0.72% masih di bawah backstop 1%"
+    assert cek_funding(net)[0] is True, "funding -0.72% harus ditangkap cek_funding"
+    assert cek_funding(-0.1)[0] is False, "funding -0.1% masih di dalam batas"
+    assert cek_funding(-0.15)[0] is True, "funding tepat -0.15% harus keluar"
+    assert cek_funding(+0.5)[0] is False, "funding positif tidak boleh memicu"
     # risiko 1% modal, stop 2% -> 500 diminta, dipotong plafon 200
     assert abs(sizing_dari_risiko(1000, 1.0, 2.0) - 200.0) < 1e-9, "potong plafon gagal"
     # risiko 1% modal, stop 10% -> 100 diminta, di bawah plafon
     assert abs(sizing_dari_risiko(1000, 1.0, 10.0) - 100.0) < 1e-9, "sizing dasar salah"
     print(f"selfcheck OK (plafon {MAX_NOTIONAL_PCT:.0f}%, kill switch {KILL_SWITCH_HARIAN_PCT:.0f}%, "
-          f"delta {DELTA_TOLERANSI_PCT:.0f}%, basis stop {BASIS_STOP_PCT}%)")
+          f"delta {DELTA_TOLERANSI_PCT:.0f}%, basis stop {BASIS_STOP_PCT}%, "
+          f"funding stop -{FUNDING_STOP_PCT}%, net stop -{NET_STOP_PCT}%)")
 
 
 if __name__ == "__main__":

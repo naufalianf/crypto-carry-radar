@@ -115,12 +115,21 @@ def tick():
         p["events"] = p.get("events", 0) + 1
         mark(p)
         age = (time.time() - p["opened"]) / 86400
-        r = rows.get(sym, {})
-        apr = r.get("apr_7d", p["apr_entry"])
+        r = rows.get(sym)
+        # Temuan B: kalau simbol keluar dari top-N snapshot, dulu apr jatuh ke
+        # apr_entry (konstan) sehingga `apr < EXIT_APR` tak pernah terpicu tanpa
+        # jejak. Sekarang: tidak ada data = tidak bisa dinilai, dan itu dicatat.
+        apr = r.get("apr_7d") if r else None
         reason = None
         keluar_basis, _alasan_basis = risk.cek_basis(p.get("basis_pct", 0.0),
                                                      p.get("basis_entry_pct", 0.0))
-        if apr < EXIT_APR:
+        keluar_net, _alasan_net = risk.cek_net(p["net"] * 100)
+        keluar_fund, _alasan_fund = risk.cek_funding(p["funding"] * 100)
+        if keluar_fund:
+            reason = _alasan_fund
+        elif keluar_net:
+            reason = _alasan_net
+        elif apr is not None and apr < EXIT_APR:
             reason = f"APR turun ke {apr}%"
         elif keluar_basis:
             reason = _alasan_basis
@@ -129,17 +138,27 @@ def tick():
         if reason:
             keluar(st, sym, p, reason)
         else:
-            log(f"TAHAN  {sym}: net {p['net']*100:.3f}% (funding {p['funding']*100:.3f}%) "
-                f"basis {p.get('basis_pct', 0.0):.3f}% apr7d {apr}%")
+            if apr is None:
+                log(f"TAHAN  {sym}: TIDAK ADA DI SNAPSHOT RADAR — EXIT_APR tak bisa "
+                    f"dinilai, backstop net {risk.NET_STOP_PCT}% yang menjaga "
+                    f"(net {p['net']*100:.3f}%)")
+            else:
+                log(f"TAHAN  {sym}: net {p['net']*100:.3f}% (funding {p['funding']*100:.3f}%) "
+                    f"basis {p.get('basis_pct', 0.0):.3f}% apr7d {apr}%")
 
     # 1b. Kill switch harian — batas rugi dipaksa di kode, bukan di dokumen.
+    # Termasuk posisi yang SUDAH ditutup hari ini: kalau tidak, rugi yang
+    # direalisasikan pagi lalu posisi baru dibuka sore akan lolos dari hitungan.
     hari = time.strftime("%Y-%m-%d", time.gmtime())
     pnl_now = sum(p["net"] * p["notional"] for p in st["positions"].values())
+    pnl_closed = sum(p["net"] * p["notional"] for p in st.get("closed", [])
+                     if str(p.get("closed_iso", "")).startswith(hari))
+    pnl_hari = pnl_now + pnl_closed
     anchor = st.get("day") or {}
     if anchor.get("date") != hari:
-        anchor = {"date": hari, "pnl": pnl_now, "halted": bool(anchor.get("halted"))}
+        anchor = {"date": hari, "pnl": pnl_hari, "halted": bool(anchor.get("halted"))}
     st["day"] = anchor
-    terpicu, rugi = risk.cek_kill_switch(MODAL_BUKU + anchor["pnl"], MODAL_BUKU + pnl_now)
+    terpicu, rugi = risk.cek_kill_switch(MODAL_BUKU + anchor["pnl"], MODAL_BUKU + pnl_hari)
     if terpicu and not anchor["halted"]:
         anchor["halted"] = True
         log(f"KILL SWITCH: rugi harian {rugi:.2f}% >= batas {risk.KILL_SWITCH_HARIAN_PCT}% "
@@ -193,9 +212,9 @@ def status():
     print(f"{'simbol':<14}{'umur':>6}{'funding':>10}{'basis':>9}{'net':>9}{'APR masuk':>10}")
     for sym, p in st["positions"].items():
         mark(p)
-        age = (time.time() - p["opened"]) / 86400
+        age_h = (time.time() - p["opened"]) / 3600
         tot += p["net"]
-        print(f"{sym:<14}{age:>5.1f}h{p['funding']*100:>9.3f}%"
+        print(f"{sym:<14}{age_h:>5.1f}h{p['funding']*100:>9.3f}%"
               f"{(p['gross']-p['funding'])*100:>8.3f}%{p['net']*100:>8.3f}%{p['apr_entry']:>9.1f}%")
     if st["closed"]:
         print(f"\nsudah ditutup ({len(st['closed'])}):")
