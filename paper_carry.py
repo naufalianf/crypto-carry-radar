@@ -22,6 +22,7 @@ Penjaga (semuanya di kode, lihat risk.py):
   python3 paper_carry.py --loop          # tiap 4 jam
   python3 paper_carry.py --status
   python3 paper_carry.py --reset-halt
+  python3 paper_carry.py --loop --testnet   # order nyata ke Binance TESTNET (lihat HANDOFF-HERMES.md)
 """
 import argparse
 import calendar
@@ -33,7 +34,12 @@ import sys
 import time
 
 from radar import FAPI, get
+import execution
 import risk
+
+# Eksekusi nyata (opt-in, hanya testnet): None = paper murni. Diisi oleh `--testnet`.
+EXCHANGE = None
+EXEC_NOTIONAL = 150.0      # nominal order testnet per posisi (minimum order exchange ~100)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 STATE = os.path.join(HERE, "paper_carry_state.json")
@@ -201,6 +207,9 @@ def ts_tutup(c):
 def keluar(st, sym, p, reason, now=None, apr_exit=None):
     """Tutup posisi: catat ke CSV + tahan di riwayat. Satu jalur kode untuk semua alasan keluar."""
     now = now or time.time()
+    if p.get("exec"):
+        if not _tutup_exec(sym, p):
+            return False             # kaki nyata belum tertutup: posisi TETAP tercatat terbuka
     hari = (now - p["opened"]) / 86400
     p.update(exit_reason=reason, closed=now, closed_iso=iso(now), age_days=hari, apr_exit=apr_exit)
     st["closed"].append(p)
@@ -219,6 +228,26 @@ def keluar(st, sym, p, reason, now=None, apr_exit=None):
         f"dijanjikan APR masuk {harapan:.3f}%) — {reason}")
     notif(f"KELUAR {sym}: net {p['net']*100:.3f}% setelah {hari:.1f} hari. Alasan: {reason}")
     del st["positions"][sym]
+    return True
+
+
+def _tutup_exec(sym, p):
+    """Tutup kaki nyata. True kalau tertutup bersih. Gagal -> False + alert (posisi tetap terbuka)."""
+    e = p["exec"]
+    if EXCHANGE is None:
+        notif(f"EXEC {sym}: posisi nyata terbuka tapi daemon jalan tanpa --testnet; TIDAK ditutup "
+              f"di paper. Jalankan ulang dengan --testnet atau tutup manual.")
+        return False
+    e["close_try"] = e.get("close_try", 0) + 1       # cid baru tiap percobaan (IOC kedaluwarsa memakan cid)
+    hasil = execution.tutup_carry(EXCHANGE, sym, e["qty"], p.get("spot_now", p["spot_entry"]),
+                                  p.get("perp_now", p["perp_entry"]),
+                                  f"{e['trade_id']}x{e['close_try']}")
+    if hasil["status"] != "ok":
+        log(f"EXEC GAGAL TUTUP {sym}: {hasil.get('alasan')}")
+        notif(f"EXEC HALT {sym}: gagal menutup ({hasil.get('alasan')}). Posisi nyata masih terbuka; "
+              f"periksa manual lalu: python3 paper_carry.py --reset-exec-halt")
+        return False
+    return True
 
 
 def total_pnl(st):
@@ -432,6 +461,31 @@ def _tick(now):
         except Exception as e:
             log(f"gagal ambil harga {sym}: {type(e).__name__} {e}")
             continue
+        info = None
+        if EXCHANGE is not None:
+            if execution.halt_aktif():
+                notif_sekali(st, "exec_halt", "EXEC HALT aktif: tidak ada order baru. "
+                             "Periksa manual lalu: python3 paper_carry.py --reset-exec-halt",
+                             pulih="EXEC HALT sudah direset.")
+                break
+            notif_sekali(st, "exec_halt", None, pulih="EXEC HALT sudah direset.")
+            tid = f"{sym}-{int(now)}"
+            try:
+                if hasattr(EXCHANGE, "setup"):
+                    EXCHANGE.setup(sym)
+                hasil = execution.buka_carry(EXCHANGE, sym, EXEC_NOTIONAL, sp, float(pp), tid)
+            except (execution.Rejected, execution.Unknown) as e:
+                log(f"EXEC LEWATI {sym}: setup/qty gagal sebelum order ({e})")
+                continue
+            if hasil["status"] == "halt":
+                log(f"EXEC HALT {sym}: {hasil.get('alasan')}")
+                notif(f"EXEC HALT {sym}: {hasil.get('alasan')}. Bot berhenti membuka posisi; periksa manual.")
+                break
+            if hasil["status"] != "ok":
+                log(f"EXEC GAGAL BERSIH {sym}: {hasil.get('alasan')}")
+                continue
+            info = {"trade_id": tid, "qty": hasil["qty"]}
+            sp, pp = hasil["spot"][1], hasil["perp"][1]     # harga isi nyata, bukan harga referensi
         st["positions"][sym] = {
             "symbol": sym, "opened": now, "opened_iso": iso(now),
             "spot_entry": sp, "perp_entry": float(pp),
@@ -439,6 +493,8 @@ def _tick(now):
             "cost": r["carry_cost_pct"] / 100, "funding": 0.0,
             "last_funding_ms": hist[-1][0] if hist else int(now * 1000),
             "apr_entry": r["apr_7d"], "notional": NOTIONAL, "ticks": 0}
+        if info:
+            st["positions"][sym]["exec"] = info
         dibuka += 1
         log(f"MASUK  {sym}: APR {r['apr_7d']}% biaya {r['carry_cost_pct']}% "
             f"kapasitas ${r.get('depth_usd') or 0:,}")
@@ -512,8 +568,19 @@ if __name__ == "__main__":
     ap.add_argument("--loop", action="store_true")
     ap.add_argument("--status", action="store_true")
     ap.add_argument("--reset-halt", action="store_true")
+    ap.add_argument("--reset-exec-halt", action="store_true")
+    ap.add_argument("--testnet", action="store_true",
+                    help="kirim order sungguhan ke Binance TESTNET (kunci dari env BINANCE_TESTNET_*)")
     a = ap.parse_args()
-    if a.selftest:
+    if a.testnet:
+        import binance_testnet
+        EXCHANGE = binance_testnet.BinanceTestnet()
+        log("MODE TESTNET: order nyata ke Binance testnet, nominal "
+            f"{EXEC_NOTIONAL:.0f} per posisi")
+    if a.reset_exec_halt:
+        execution.reset_halt()
+        print("exec halt direset")
+    elif a.selftest:
         selfcheck()
     elif a.reset_halt:
         reset_halt()

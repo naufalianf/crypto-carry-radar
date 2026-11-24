@@ -316,5 +316,109 @@ class TestKetahanan(Base):
         self.assertEqual(sorted(st["positions"]), ["A", "B"], "A ditahan dengan angka lama, tick tetap selesai")
 
 
+class TestExec(Base):
+    """Eksekusi nyata (opt-in) dengan FakeExchange: kegagalan tidak boleh meninggalkan posisi gelap."""
+
+    def setUp(self):
+        super().setUp()
+        import execution
+        self.exm = execution
+        self.keep_ex = (pc.EXCHANGE, execution.HALT_FILE, execution.FILLS_CSV)
+        execution.HALT_FILE = os.path.join(self.dir, "halt.json")
+        execution.FILLS_CSV = os.path.join(self.dir, "fills.csv")
+        self.fake = execution.FakeExchange()
+        pc.EXCHANGE = self.fake
+
+    def tearDown(self):
+        pc.EXCHANGE, self.exm.HALT_FILE, self.exm.FILLS_CSV = self.keep_ex
+        super().tearDown()
+
+    def test_masuk_membuka_dua_kaki_dan_menyimpan_exec(self):
+        self.radar([row("A", 10)], T0)
+        st = self.tick(T0)
+        self.assertEqual(st["positions"]["A"]["exec"]["qty"], 1.5)       # 150 / 100
+        self.assertEqual(self.fake.eksposur(), (1.5, 1.5))
+
+    def test_tanpa_exchange_tidak_ada_order(self):
+        pc.EXCHANGE = None
+        self.radar([row("A", 10)], T0)
+        st = self.tick(T0)
+        self.assertNotIn("exec", st["positions"]["A"])
+        self.assertEqual(self.fake.panggilan, [])
+
+    def test_gagal_bersih_tidak_membuat_posisi(self):
+        self.fake.skrip["spot_buy"] = ["tolak"]
+        self.radar([row("A", 10)], T0)
+        st = self.tick(T0)
+        self.assertEqual(st["positions"], {})
+        self.assertEqual(self.fake.eksposur(), (0.0, 0.0))
+
+    def test_halt_eksekusi_menghentikan_entri_dan_memberi_tahu_sekali(self):
+        self.exm.set_halt("uji", path=self.exm.HALT_FILE)
+        self.radar([row("A", 10), row("B", 9)], T0)
+        st = self.tick(T0)
+        self.assertEqual(st["positions"], {})
+        self.assertEqual(self.fake.panggilan, [])
+        self.radar([row("A", 10)], T0 + 4 * H)
+        self.tick(T0 + 4 * H)
+        self.assertEqual(len([m for m in self.pesan if "EXEC HALT" in m]), 1, "tidak spam")
+
+    def test_keluar_menutup_kaki_nyata(self):
+        self.radar([row("A", 10)], T0)
+        self.tick(T0)
+        self.radar([row("A", 1.0)], T0 + 48 * H)
+        st = self.tick(T0 + 48 * H)
+        self.assertEqual(st["positions"], {})
+        self.assertEqual(self.fake.eksposur(), (0.0, 0.0))
+
+    def test_tutup_gagal_posisi_tetap_terbuka_dan_dicoba_lagi(self):
+        self.radar([row("A", 10)], T0)
+        self.tick(T0)
+        self.fake.skrip["perp_buy"] = ["tolak"]
+        self.radar([row("A", 1.0)], T0 + 48 * H)
+        st = self.tick(T0 + 48 * H)
+        self.assertIn("A", st["positions"], "kaki nyata masih terbuka, jangan dianggap tutup")
+        self.assertEqual(self.fake.eksposur(), (1.5, 1.5))
+        self.assertTrue([m for m in self.pesan if "EXEC HALT" in m])
+        self.radar([row("A", 1.0)], T0 + 52 * H)
+        st = self.tick(T0 + 52 * H)               # percobaan kedua berhasil (cid baru)
+        self.assertEqual(st["positions"], {})
+        self.assertEqual(self.fake.eksposur(), (0.0, 0.0))
+
+    def test_posisi_nyata_tanpa_exchange_tidak_ditutup_di_paper(self):
+        self.radar([row("A", 10)], T0)
+        self.tick(T0)
+        pc.EXCHANGE = None
+        self.radar([row("A", 1.0)], T0 + 48 * H)
+        st = self.tick(T0 + 48 * H)
+        self.assertIn("A", st["positions"])
+
+    def test_percobaan_tutup_memakai_cid_berbeda(self):
+        self.radar([row("A", 10)], T0)
+        self.tick(T0)
+        self.fake.skrip["perp_buy"] = ["tolak"]
+        self.radar([row("A", 1.0)], T0 + 48 * H)
+        self.tick(T0 + 48 * H)
+        self.radar([row("A", 1.0)], T0 + 52 * H)
+        self.tick(T0 + 52 * H)
+        cids = [p[1] for p in self.fake.panggilan if p[0] == "perp_buy"]
+        self.assertEqual(len(cids), 2)
+        self.assertEqual(len(set(cids)), 2, "cid yang sama akan ditolak exchange sebagai duplikat")
+
+    def test_halt_di_koin_pertama_menghentikan_koin_berikutnya(self):
+        self.fake.skrip["spot_buy"] = ["hilang"]
+        self.fake.status_hilang = 99
+        self.radar([row("A", 10), row("B", 9)], T0)
+        st = self.tick(T0)
+        self.assertEqual(st["positions"], {})
+        self.assertFalse([p for p in self.fake.panggilan if p[1].startswith("B-")], "B tidak boleh disentuh setelah HALT")
+
+    def test_harga_entry_memakai_harga_isi(self):
+        self.fake.skrip["spot_buy"] = [("slip", 50)]          # beli 0.5% lebih mahal
+        self.radar([row("A", 10)], T0)
+        st = self.tick(T0)
+        self.assertAlmostEqual(st["positions"]["A"]["spot_entry"], 100.5, places=2)
+
+
 if __name__ == "__main__":
     unittest.main()
