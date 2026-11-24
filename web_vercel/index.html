@@ -100,11 +100,19 @@
   .gbox li{margin-bottom:5px}
   .gbox b{color:var(--txt)}
   .gbox .note{margin-top:10px;color:var(--mut);font-size:12px}
+  .pnl-pos{color:var(--acc)} .pnl-neg{color:var(--bad)}
+  #paper .sum{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px}
+  #paper .ptable th{cursor:default;text-align:center}
+  #paper .ptable th:first-child,#paper .ptable td:first-child{text-align:left}
+  #paper .ptable td:nth-child(2){text-align:center}
+  #paper .plist{margin:10px 2px 0;font-size:12px;line-height:1.8;color:var(--mut)}
+  #paper .plist b{font-family:var(--mono);color:var(--txt)}
   th:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:-2px}
   @media(max-width:820px){
     body{padding:16px 12px 32px}
     .cards{grid-template-columns:1fr 1fr}
     .guide{grid-template-columns:1fr}
+    #paper .sum{grid-template-columns:1fr 1fr}
     .meta{text-align:left}
     th,td{padding:8px 5px}
     .hide-sm{display:none}
@@ -141,7 +149,8 @@
   <div class="banner" id="banner">memuat…</div>
 
   <div class="chips">
-    <button id="f-all" class="on" aria-pressed="true">semua</button>
+    <button id="f-carry" class="on" aria-pressed="true" title="Sembunyikan koin tanpa pasar spot: APR-nya tinggi tapi carry mustahil dibuat">bisa di-carry</button>
+    <button id="f-all" aria-pressed="false">semua</button>
     <button id="f-hot" aria-pressed="false">lolos gate</button>
     <button id="f-pos" aria-pressed="false">APR positif</button>
     <button id="f-lim" class="on" aria-pressed="true">top 20</button>
@@ -177,6 +186,11 @@
     <div class="rej" id="rej"></div>
   </details>
 
+  <section id="paper" hidden>
+    <h2>Paper carry · simulasi, bukan uang sungguhan</h2>
+    <div id="paper-body"></div>
+  </section>
+
   <section class="guide">
     <div class="gbox">
       <h3>Cara baca tabel</h3>
@@ -199,7 +213,7 @@
 </div>
 
 <script>
-let data = null, filter = "all", sortKey = "apr_7d", sortDir = -1, searchQ = "", limited = true;
+let data = null, filter = "carry", sortKey = "apr_7d", sortDir = -1, searchQ = "", limited = true;
 const TOP_N = 20;
 const ESC = {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"};
 const esc = v => String(v).replace(/[&<>"']/g, c => ESC[c]);
@@ -272,6 +286,8 @@ function render() {
   }
 
   let rows = (data.rows || []).map((r, i) => ({...r, rank: i + 1, status: r.alert ? 1 : 0}));
+  const tanpaSpot = rows.filter(r => r.has_spot === false).length;
+  if (filter === "carry") rows = rows.filter(r => r.has_spot !== false);
   if (filter === "hot") rows = rows.filter(r => r.status === 1);
   if (filter === "pos") rows = rows.filter(r => r.apr_7d > 0);
   if (searchQ) rows = rows.filter(r => r.symbol.includes(searchQ));
@@ -286,6 +302,9 @@ function render() {
   document.getElementById("more").textContent = lim
     ? "menampilkan " + TOP_N + " teratas dari " + total + " (urut sesuai kolom yang dipilih)"
     : "menampilkan " + total + " baris";
+  if (filter === "carry" && tanpaSpot) {
+    document.getElementById("more").textContent += " · " + tanpaSpot + " koin tanpa pasar spot disembunyikan (klik \"semua\" untuk melihatnya)";
+  }
   const lb = document.getElementById("f-lim");
   lb.textContent = limited ? "top " + TOP_N : "semua " + (data.rows || []).length;
   lb.classList.toggle("on", limited);
@@ -312,6 +331,62 @@ function render() {
   document.getElementById("rej").innerHTML = rej.map(r =>
     `<div><span class="sym">${esc(r.symbol)} <span class="pos">${r.apr_7d.toFixed(2)}%</span></span>
      <span>${r.flags.map(esc).join(" · ")}</span></div>`).join("");
+}
+
+const PAPER_JSON_URL =
+  "https://raw.githubusercontent.com/naufalianf/crypto-carry-radar/main/web/paper.json";
+const sgn = v => (v > 0 ? "+" : "") + v.toFixed(2);
+const pcls = v => v < 0 ? "pnl-neg" : v > 0 ? "pnl-pos" : "";
+
+function renderPaper(p) {
+  const sec = document.getElementById("paper");
+  if (!p || !p.pnl || !p.limits) { sec.hidden = true; return; }
+  const m = p.modal_buku || 1;
+  const pct = v => v / m * 100;
+  const umur = Date.parse(String(p.generated_at).replace(" UTC", "Z").replace(" ", "T"));
+  const jam = isNaN(umur) ? null : (Date.now() - umur) / 3600000;
+  const card = (judul, v, extra) =>
+    `<div class="card"><small>${esc(judul)}</small><b class="${pcls(v)}">${sgn(v)}$</b><small>${esc(extra)}</small></div>`;
+  let html = "";
+  if (p.halt) {
+    html += `<div class="banner warn"><b>HALT ${esc(p.halt.level)}</b>: kill switch aktif, posisi baru dikunci sampai direset manual.</div>`;
+  } else if (jam !== null && jam > 8) {
+    html += `<div class="banner warn">Data panel ini berumur <b>${Math.round(jam)} jam</b>; paper carry mungkin berhenti.</div>`;
+  }
+  html += '<div class="sum">' +
+    card("PnL total", p.pnl.total, "terbuka " + sgn(p.pnl.terbuka) + "$") +
+    card("24 jam", p.pnl.d1, sgn(pct(p.pnl.d1)) + "% (batas -" + p.limits.harian + "%)") +
+    card("7 hari", p.pnl.d7, sgn(pct(p.pnl.d7)) + "% (batas -" + p.limits.mingguan + "%)") +
+    card("30 hari", p.pnl.d30, sgn(pct(p.pnl.d30)) + "% (batas -" + p.limits.bulanan + "%)") + "</div>";
+  if ((p.positions || []).length) {
+    html += '<div class="tscroll"><table class="ptable"><tr><th>simbol</th><th>umur (hari)</th><th>APR masuk</th>' +
+      "<th>funding</th><th>basis geser</th><th>net</th></tr>" +
+      p.positions.map(x => `<tr><td><span class="sym">${esc(x.symbol)}</span></td><td>${x.hari.toFixed(1)}</td>` +
+        `<td>${x.apr_entry == null ? "—" : x.apr_entry.toFixed(1) + "%"}</td><td>${sgn(x.funding_pct)}%</td>` +
+        `<td>${sgn(x.basis_geser_pct)}%</td><td class="${pcls(x.net_pct)}">${sgn(x.net_pct)}%</td></tr>`).join("") +
+      "</table></div>";
+  } else {
+    html += '<div class="more">belum ada posisi terbuka</div>';
+  }
+  if ((p.closed || []).length) {
+    html += '<div class="plist">Ditutup terakhir (' + p.n_closed + ' total): ' +
+      p.closed.slice(0, 5).map(c => `<b>${esc(c.symbol)}</b> <span class="${pcls(c.net_pct)}">${sgn(c.net_pct)}%</span> ` +
+        `(${c.hari.toFixed(1)} hari, ${esc(c.alasan)})`).join(" · ") + "</div>";
+  }
+  html += '<div class="plist">Net dihitung setelah biaya masuk-keluar. Posisi baru langsung tercatat minus sebesar biaya itu, ' +
+    "dan baru impas setelah funding menutupnya. Nominal 1000 per posisi, modal buku " + m + "$.</div>";
+  document.getElementById("paper-body").innerHTML = html;
+  sec.hidden = false;
+}
+
+async function loadPaper() {
+  try {
+    const r = await fetch(PAPER_JSON_URL + "?t=" + Date.now(), {cache: "no-store"});
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    renderPaper(await r.json());
+  } catch (e) {
+    document.getElementById("paper").hidden = true;   // panel opsional: gagal = disembunyikan, bukan error
+  }
 }
 
 const RADAR_JSON_URL =
@@ -345,13 +420,14 @@ document.querySelectorAll("thead th").forEach(th => {
 });
 const setFilter = (id, val) => {
   filter = val;
-  ["f-all", "f-hot", "f-pos"].forEach(x => {
+  ["f-carry", "f-all", "f-hot", "f-pos"].forEach(x => {
     const el = document.getElementById(x);
     el.classList.toggle("on", x === id);
     el.setAttribute("aria-pressed", x === id);
   });
   render();
 };
+document.getElementById("f-carry").onclick = () => setFilter("f-carry", "carry");
 document.getElementById("f-all").onclick = () => setFilter("f-all", "all");
 document.getElementById("f-hot").onclick = () => setFilter("f-hot", "hot");
 document.getElementById("f-pos").onclick = () => setFilter("f-pos", "pos");
@@ -367,6 +443,8 @@ document.getElementById("q").oninput = e => {
   render();
 };
 
+loadPaper();
+setInterval(loadPaper, 180000);
 load();
 setInterval(load, 180000);  // 3 menit — data baru berubah tiap 4 jam
 </script>

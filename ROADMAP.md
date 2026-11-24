@@ -68,3 +68,16 @@ setelah persetujuan.
 - Tidak ada naik tahap tanpa bukti tertulis dari pengujian, bukan dari keyakinan.
 - Exchange: Binance global bukan pedagang berlisensi OJK. Ini keputusan risiko milik pemilik dana,
   bukan sesuatu yang bisa disembunyikan oleh bot.
+
+## Pembaruan penjaga risiko (24 Nov 2026)
+
+Terinspirasi pola `drawdown-circuit-breaker` dan `trader-memory-core` (repo claude-trading-skills) serta
+pengalaman praktisi bot di Threads, ditulis ulang dengan stdlib. Semuanya di `risk.py` / `paper_carry.py`
+dan dites oleh `test_paper_carry.py` (`python3 paper_carry.py --selftest`):
+
+- Kill switch berlapis 1d/7d/30d (1% / 2% / 3% dari modal buku), dihitung dari kurva PnL kumulatif.
+  Batas lama 3%/hari praktis tak terjangkau: stop per posisi hanya 0,33% dari modal buku.
+- Jeda 24 jam setelah 2 posisi tertutup rugi beruntun; jeda 24 jam per simbol setelah keluar; maks 2 posisi baru per tick.
+- Fail closed: `radar.json` > 6 jam atau tak terbaca -> tanpa posisi baru; `paper_carry_state.json` rusak -> berhenti, tidak dibuat ulang.
+- Lock per tick dan simpan state atomik. Jurnal `paper_carry_trades.csv` berheader, memuat APR masuk/keluar dan funding yang dijanjikan vs didapat.
+- Syarat Tahap 2 ("paper carry >= 30 hari") sekarang bisa dinilai dari jurnal itu, bukan dari tebakan.

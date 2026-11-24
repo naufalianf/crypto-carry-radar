@@ -167,7 +167,9 @@ Ini bedanya "janji" dan "pagar beton":
 - Maksimal **20% modal** per posisi
 - Maksimal **3 posisi** terbuka
 - Leverage maksimal **1x** (tidak ada utang)
-- Rugi harian **3%** → sistem berhenti sendiri hari itu
+- Rugi **1% dalam 24 jam, 2% dalam 7 hari, atau 3% dalam 30 hari** → sistem menutup semua posisi dan berhenti sampai dibuka manual
+- Dua posisi tertutup berturut-turut rugi → jeda 24 jam; simbol yang baru keluar tidak boleh masuk lagi 24 jam; maksimal 2 posisi baru per pengecekan
+- Data radar lebih tua dari 6 jam atau file status rusak → tidak buka posisi baru (lebih baik diam daripada menebak)
 - Basis bergeser **0,5%** → posisi ditutup otomatis
 
 Kalau Bro menulis "jangan lebih dari 20%" di dokumen, tidak ada yang menjamin.
@@ -353,7 +355,7 @@ Kalau Bro cuma mau baca satu bagian, baca ini.
 - Satpam 5 aturan yang menyaring koin sampah
 - Hitungan APR realistis, bukan angka brosur
 - Rencana order tertulis yang bisa diperiksa
-- Pagar risiko di dalam kode (20% modal, 3 posisi, 1x, stop 3%/hari)
+- Pagar risiko di dalam kode (20% modal, 3 posisi, 1x, kill switch 1%/hari, 2%/minggu, 3%/bulan, jeda setelah rugi beruntun)
 - Latihan carry pakai uang bohongan
 - Dashboard online, tidak bisa mati
 

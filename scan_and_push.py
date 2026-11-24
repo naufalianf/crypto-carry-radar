@@ -22,7 +22,7 @@ import radar  # noqa: E402
 
 GIT_SSH_KEY = os.environ.get(
     "GIT_SSH_KEY", "/opt/data/profiles/nerd-bot/home/.ssh/id_ed25519")
-DATA_FILE = "web/radar.json"
+DATA_FILES = ["web/radar.json", "web/paper.json"]   # paper.json ditulis paper_carry.py tiap tick
 JAM = 4
 
 
@@ -43,12 +43,13 @@ def scan_once(topn, threshold):
 
 
 def push_if_changed(payload):
-    """Commit + push hanya kalau isi radar.json berubah. Tahan konflik sekali."""
-    status = _git("status", "--porcelain", "--", DATA_FILE).stdout.strip()
+    """Commit + push hanya kalau radar.json / paper.json berubah. Tahan konflik sekali."""
+    ada = [f for f in DATA_FILES if os.path.exists(os.path.join(HERE, f))]
+    status = _git("status", "--porcelain", "--", *ada).stdout.strip()
     if not status:
         print("tidak ada perubahan, push dilewati")
         return False
-    _git("add", "--", DATA_FILE)
+    _git("add", "--", *ada)
     _git("commit", "-q", "-m",
          f"radar: snapshot {payload['generated_at']}")
     for attempt in (1, 2):

@@ -109,7 +109,9 @@ strong { color: #0f172a; }
 <li>Maksimal <strong>20% modal</strong> per posisi</li>
 <li>Maksimal <strong>3 posisi</strong> terbuka</li>
 <li>Leverage maksimal <strong>1x</strong> (tidak ada utang)</li>
-<li>Rugi harian <strong>3%</strong> → sistem berhenti sendiri hari itu</li>
+<li>Rugi <strong>1% dalam 24 jam, 2% dalam 7 hari, atau 3% dalam 30 hari</strong> → sistem menutup semua posisi dan berhenti sampai dibuka manual</li>
+<li>Dua posisi tertutup berturut-turut rugi → jeda 24 jam; simbol yang baru keluar tidak boleh masuk lagi 24 jam; maksimal 2 posisi baru per pengecekan</li>
+<li>Data radar lebih tua dari 6 jam atau file status rusak → tidak buka posisi baru (lebih baik diam daripada menebak)</li>
 <li>Basis bergeser <strong>0,5%</strong> → posisi ditutup otomatis</li>
 </ul>
 <p>Kalau Bro menulis "jangan lebih dari 20%" di dokumen, tidak ada yang menjamin. Kalau ditulis di kode, sistemnya <strong>menolak</strong> perintah yang melanggar.</p>
@@ -199,7 +201,7 @@ strong { color: #0f172a; }
 <li>Satpam 5 aturan yang menyaring koin sampah</li>
 <li>Hitungan APR realistis, bukan angka brosur</li>
 <li>Rencana order tertulis yang bisa diperiksa</li>
-<li>Pagar risiko di dalam kode (20% modal, 3 posisi, 1x, stop 3%/hari)</li>
+<li>Pagar risiko di dalam kode (20% modal, 3 posisi, 1x, kill switch 1%/hari, 2%/minggu, 3%/bulan, jeda setelah rugi beruntun)</li>
 <li>Latihan carry pakai uang bohongan</li>
 <li>Dashboard online, tidak bisa mati</li>
 </ul>

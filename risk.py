@@ -17,7 +17,16 @@ belum punya strategi berarah yang layak (lihat REVIEW.md).
 MAX_NOTIONAL_PCT = 20.0       # maks 20% modal per posisi
 MAX_LEVERAGE = 1.0            # carry 1x; leverage >1 mempercepat likuidasi, bukan menambah edge
 MAX_POSISI = 3
-KILL_SWITCH_HARIAN_PCT = 3.0  # rugi harian >= 3% -> tutup semua posisi, berhenti sampai direset manual
+KILL_SWITCH_HARIAN_PCT = 1.0  # rugi 24 jam >= 1% modal buku -> tutup semua posisi, berhenti sampai direset manual
+KILL_SWITCH_MINGGUAN_PCT = 2.0   # rugi 7 hari >= 2%
+KILL_SWITCH_BULANAN_PCT = 3.0    # rugi 30 hari >= 3%
+# Angka di atas dipilih supaya BISA tercapai: stop per posisi = -1% dari 1000 = $10 = 0,33% dari
+# modal buku 3000, jadi batas lama 3% ($90) butuh 9 stop sekaligus dan praktis tak pernah terpicu.
+COOLDOWN_RUGI_BERUNTUN = 2    # n posisi tertutup terakhir rugi semua -> berhenti buka posisi baru
+COOLDOWN_JAM = 24             # ... selama sekian jam sejak penutupan terakhir
+SIMBOL_COOLDOWN_JAM = 24      # simbol yang baru keluar tidak boleh masuk lagi sebelum ini (anti-churn di ambang APR)
+MAX_ENTRY_PER_TICK = 2        # rate limiter: maks posisi baru per tick
+SNAPSHOT_MAX_JAM = 6.0        # radar.json lebih tua dari ini -> jangan buka posisi baru (fail closed)
 DELTA_TOLERANSI_PCT = 5.0     # ketidakseimbangan dua kaki yang masih diterima
 BASIS_STOP_PCT = 0.5          # basis bergerak > 0.5% melawan -> keluar (di luar model biaya)
 NET_STOP_PCT = 1.0            # backstop: rugi bersih kumulatif >= 1% -> keluar
@@ -64,6 +73,53 @@ def cek_kill_switch(equity_awal, equity_sekarang, batas_pct=KILL_SWITCH_HARIAN_P
     return rugi <= -batas_pct, rugi
 
 
+def cek_drawdown(modal, pnl_1d, pnl_7d, pnl_30d):
+    """(level, rugi_pct, batas_pct). level None = aman; selain itu 'harian'/'mingguan'/'bulanan'.
+
+    Input = perubahan PnL kumulatif (dalam mata uang, bukan persen) pada tiap jendela.
+    Modal tidak valid -> terpicu (fail closed): tidak ada dasar untuk mengukur rugi.
+    """
+    if not modal or modal <= 0:
+        return "modal tidak valid", 0.0, 0.0
+    terburuk = 0.0
+    for nama, pnl, batas in (("harian", pnl_1d, KILL_SWITCH_HARIAN_PCT),
+                             ("mingguan", pnl_7d, KILL_SWITCH_MINGGUAN_PCT),
+                             ("bulanan", pnl_30d, KILL_SWITCH_BULANAN_PCT)):
+        rugi = pnl / modal * 100
+        terburuk = min(terburuk, rugi)
+        if rugi <= -batas + 1e-9:
+            return nama, rugi, batas
+    return None, terburuk, 0.0
+
+
+def cek_cooldown(closed_net, ts_tutup_terakhir, sekarang,
+                 n=COOLDOWN_RUGI_BERUNTUN, jam=COOLDOWN_JAM):
+    """(blokir, alasan). closed_net = net posisi tertutup, urut kronologis (lama -> baru)."""
+    if len(closed_net) < n or ts_tutup_terakhir is None:
+        return False, ""
+    if all(x < 0 for x in closed_net[-n:]) and sekarang - ts_tutup_terakhir < jam * 3600:
+        sisa = jam - (sekarang - ts_tutup_terakhir) / 3600
+        return True, f"{n} posisi tertutup terakhir rugi semua — jeda {sisa:.1f} jam lagi"
+    return False, ""
+
+
+def cek_cooldown_simbol(ts_tutup_simbol, sekarang, jam=SIMBOL_COOLDOWN_JAM):
+    """(blokir, sisa_jam). ts_tutup_simbol None = belum pernah keluar."""
+    if ts_tutup_simbol is None:
+        return False, 0.0
+    sisa = jam - (sekarang - ts_tutup_simbol) / 3600
+    return sisa > 0, max(sisa, 0.0)
+
+
+def cek_snapshot(umur_jam, maks_jam=SNAPSHOT_MAX_JAM):
+    """(layak, alasan). umur_jam None = tidak terbaca -> tidak layak (fail closed)."""
+    if umur_jam is None:
+        return False, "radar.json tidak ada / tidak terbaca / tanpa generated_at"
+    if umur_jam > maks_jam:
+        return False, f"radar.json berumur {umur_jam:.1f} jam (batas {maks_jam:.0f} jam)"
+    return True, ""
+
+
 def cek_delta(notional_spot, notional_perp, toleransi_pct=DELTA_TOLERANSI_PCT):
     """(bocor, selisih_pct). Bocor kalau dua kaki tidak seimbang di luar toleransi."""
     if notional_spot <= 0:
@@ -101,9 +157,26 @@ def sizing_dari_risiko(modal, risiko_pct, jarak_stop_pct, max_pct=MAX_NOTIONAL_P
 
 def selfcheck():
     assert batas_notional(1000) == 200.0, "plafon notional salah"
-    assert cek_kill_switch(1000, 970)[0] is True, "rugi 3% harus memicu"
-    assert cek_kill_switch(1000, 971)[0] is False, "rugi 2.9% tidak boleh memicu"
-    assert abs(cek_kill_switch(1000, 970)[1] + 3.0) < 1e-9, "hitung rugi salah"
+    assert cek_kill_switch(1000, 970, 3.0)[0] is True, "rugi 3% harus memicu"
+    assert cek_kill_switch(1000, 971, 3.0)[0] is False, "rugi 2.9% tidak boleh memicu"
+    assert abs(cek_kill_switch(1000, 970, 3.0)[1] + 3.0) < 1e-9, "hitung rugi salah"
+    # kill switch berlapis (modal 3000): harian 1% = $30, mingguan 2% = $60, bulanan 3% = $90
+    assert cek_drawdown(3000, -30, -30, -30)[0] == "harian"
+    assert cek_drawdown(3000, -29, -29, -29)[0] is None
+    assert cek_drawdown(3000, -10, -60, -60)[0] == "mingguan"
+    assert cek_drawdown(3000, -10, -20, -90)[0] == "bulanan"
+    assert cek_drawdown(3000, +50, +50, +50)[0] is None, "untung tidak boleh memicu"
+    assert cek_drawdown(0, 0, 0, 0)[0] is not None, "modal 0 harus fail closed"
+    # cooldown: dua rugi beruntun -> blokir 24 jam, lalu lepas
+    assert cek_cooldown([+0.1, -0.2, -0.3], 1000, 1000 + 3600)[0] is True
+    assert cek_cooldown([-0.2, +0.3], 1000, 1000 + 3600)[0] is False, "rugi tidak beruntun"
+    assert cek_cooldown([-0.2, -0.3], 1000, 1000 + 25 * 3600)[0] is False, "jeda sudah lewat"
+    assert cek_cooldown([-0.2], 1000, 1001)[0] is False, "baru satu rugi"
+    assert cek_cooldown_simbol(1000, 1000 + 3600)[0] is True
+    assert cek_cooldown_simbol(1000, 1000 + 25 * 3600)[0] is False
+    assert cek_cooldown_simbol(None, 1000)[0] is False
+    assert cek_snapshot(1.0)[0] is True and cek_snapshot(7.0)[0] is False
+    assert cek_snapshot(None)[0] is False, "snapshot tak terbaca harus fail closed"
     assert cek_delta(1000, 1030)[0] is False, "selisih 3% masih diterima"
     assert cek_delta(1000, 1060)[0] is True, "selisih 6% harus bocor"
     assert cek_basis(-0.6, -0.1)[0] is False, "basis negatif stabil tidak boleh keluar"
