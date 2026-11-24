@@ -231,7 +231,7 @@ def send(text):
     return f"terkirim ({n} antrian tertunda ikut dikirim)" if n else "terkirim"
 
 
-def notify(payload):
+def notify(payload, dry=False):
     if not payload["alerts"]:
         return "tidak ada yang lolos ambang; tidak ada alert dikirim"
     baris = "\n".join(
@@ -239,9 +239,10 @@ def notify(payload):
         f"kapasitas ${r['depth_usd']:,}" if r["depth_usd"] else
         f"{r['symbol']}: APR {r['apr_7d']}% | balik modal {r['breakeven_days']:.0f}h"
         for r in payload["passed"])
-    return send(f"RADAR FUNDING {payload['generated_at']}\n"
-                f"Lolos gate (ambang {payload['threshold']}%): {', '.join(payload['alerts'])}\n"
-                f"{baris}\n\nCek koin ini punya pasar spot + kapasitas cukup sebelum dianggap layak.")
+    teks = (f"RADAR FUNDING {payload['generated_at']}\n"
+            f"Lolos gate (ambang {payload['threshold']}%): {', '.join(payload['alerts'])}\n"
+            f"{baris}\n\nCek koin ini punya pasar spot + kapasitas cukup sebelum dianggap layak.")
+    return teks if dry else send(teks)
 
 
 def rows_layak(threshold=ENTRY_APR, max_age=1800):
@@ -318,6 +319,8 @@ if __name__ == "__main__":
     ap.add_argument("--run", action="store_true")
     ap.add_argument("--loop", action="store_true")
     ap.add_argument("--test-alert", action="store_true")
+    ap.add_argument("--preview-alert", type=float, metavar="AMBANG",
+                    help="cetak bentuk pesan alert untuk AMANG (tidak dikirim), pakai snapshot terakhir")
     ap.add_argument("--top", type=int, default=TOPN)
     ap.add_argument("--threshold", type=float, default=10.0)
     a = ap.parse_args()
@@ -326,8 +329,20 @@ if __name__ == "__main__":
     elif a.test_alert:
         print("uji alert:", send("Uji alert dari radar funding. Kalau pesan ini masuk, "
                                  "bot alert sudah tersambung."))
-    elif a.loop:
-        loop(a.top, a.threshold)
+    elif a.preview_alert is not None:
+        p = json.load(open(os.path.join(HERE, "web", "radar.json")))
+        th = a.preview_alert
+        p["threshold"] = th
+        for r in p["rows"]:
+            bad = gate(r, th)
+            r["flags"] = bad
+            r["alert"] = not bad
+        p["passed"] = [r for r in p["rows"] if r["alert"]]
+        p["alerts"] = [r["symbol"] for r in p["passed"]]
+        if not p["alerts"]:
+            print(f"(ambang {th}%: tidak ada yang lolos. Pesan tidak akan dikirim.)")
+        else:
+            print(notify(p, dry=True))
     elif a.run:
         show(scan(a.top, a.threshold), top=a.top)
     else:
