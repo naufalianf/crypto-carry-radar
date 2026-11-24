@@ -7,15 +7,15 @@
       "spot_entry": 774.13,
       "perp_entry": 773.85,
       "cost": 0.0030299999999999997,
-      "funding": 0.0,
-      "last_funding_ms": 1795449600000,
+      "funding": 3.973e-05,
+      "last_funding_ms": 1795478400001,
       "apr_entry": 5.45,
       "notional": 1000.0,
-      "events": 1,
-      "spot_now": 774.91,
-      "perp_now": 774.77,
-      "gross": -0.00018127818460644818,
-      "net": -0.003211278184606448
+      "events": 4,
+      "spot_now": 756.97,
+      "perp_now": 756.44,
+      "gross": 0.0003708105834042529,
+      "net": -0.002659189416595747
     },
     "QNTUSDT": {
       "symbol": "QNTUSDT",
@@ -24,18 +24,23 @@
       "spot_entry": 157.43,
       "perp_entry": 157.38,
       "cost": 0.00332,
-      "funding": 0.0,
-      "last_funding_ms": 1795449600000,
+      "funding": 9.046e-05,
+      "last_funding_ms": 1795478400001,
       "apr_entry": 4.72,
       "notional": 1000.0,
-      "events": 1,
-      "spot_now": 157.62,
-      "perp_now": 157.49,
-      "gross": 0.0005079403718388775,
-      "net": -0.0028120596281611225
+      "events": 4,
+      "spot_now": 153.65,
+      "perp_now": 153.57,
+      "gross": 0.00028870967321446785,
+      "net": -0.003031290326785532
     }
   },
   "closed": [],
   "equity": 1000.0,
-  "started": 1795470995.3695765
+  "started": 1795470995.3695765,
+  "day": {
+    "date": "2026-11-24",
+    "pnl": -5.497498489619731,
+    "halted": false
+  }
 }

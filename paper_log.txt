@@ -1631,3 +1631,14 @@
 [2026-11-23 16:00] sinyal ETHUSDT_20/100 bar_closed=2026-11-23 16:00 tgt=0 equity=978.78
 [2026-11-23 16:00] sinyal ETHUSDT_50/100 bar_closed=2026-11-23 16:00 tgt=0 equity=1063.03
 [2026-11-23 20:00 UTC] BTCUSDT_20/100   tgt=0 equity=984.07 | BTCUSDT_50/100   tgt=0 equity=963.33 | ETHUSDT_20/100   tgt=0 equity=978.78 | ETHUSDT_50/100   tgt=0 equity=1063.03
+[2026-11-23 20:00] sinyal BTCUSDT_20/100 bar_closed=2026-11-23 20:00 tgt=0 equity=984.07
+[2026-11-23 20:00] sinyal BTCUSDT_50/100 bar_closed=2026-11-23 20:00 tgt=0 equity=963.33
+[2026-11-23 20:00] sinyal ETHUSDT_20/100 bar_closed=2026-11-23 20:00 tgt=0 equity=978.78
+[2026-11-23 20:00] sinyal ETHUSDT_50/100 bar_closed=2026-11-23 20:00 tgt=0 equity=1063.03
+[2026-11-24 00:00 UTC] BTCUSDT_20/100   tgt=0 equity=984.07 | BTCUSDT_50/100   tgt=0 equity=963.33 | ETHUSDT_20/100   tgt=0 equity=978.78 | ETHUSDT_50/100   tgt=0 equity=1063.03
+[2026-11-23 20:00] sinyal BTCUSDT_20/100 bar_closed=2026-11-23 20:00 tgt=0 equity=1000.00
+[2026-11-23 20:00] sinyal BTCUSDT_50/100 bar_closed=2026-11-23 20:00 tgt=0 equity=1000.00
+[2026-11-23 20:00] sinyal ETHUSDT_20/100 bar_closed=2026-11-23 20:00 tgt=0 equity=1000.00
+[2026-11-23 20:00] sinyal ETHUSDT_50/100 bar_closed=2026-11-23 20:00 tgt=0 equity=1000.00
+[2026-11-24 02:55 UTC] ENTRY X                @ 100.05
+[2026-11-24 02:55 UTC] EXIT  X                @ 99.95  pnl -0.3%

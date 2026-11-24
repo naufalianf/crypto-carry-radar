@@ -1,5 +1,9 @@
 # REVIEW.md — untuk penelaah (Claude atau manusia)
 
+> **Baca juga `TELAAH-BALASAN.md`** — balasan atas telaah pertama: temuan yang
+> terverifikasi, bug look-ahead yang sudah diperbaiki beserta dampak terukurnya,
+> dan bagian saran risiko yang sengaja tidak dipakai (beserta alasannya).
+
 Tujuan file ini: memberi penelaah pijakan untuk **membantah**, bukan menyetujui.
 Semua angka di bawah bisa direproduksi sendiri dengan perintah yang tertera. Kalau
 angka tidak cocok saat Bro jalankan, anggap laporan ini salah dan cari penyebabnya.
@@ -18,7 +22,7 @@ angka tidak cocok saat Bro jalankan, anggap laporan ini salah dan cari penyebabn
 | --- | --- | --- |
 | Tidak ada edge di SMA/mean-reversion 4 jam | `python3 bot.py --selftest && python3 bot.py --sweep --interval 4h --years 3` | profit 6/80 BTC, 5/80 ETH; median strategi kalah dari beli-tahan |
 | Pemenang parameter tidak stabil (indikasi overfitting) | `python3 bot.py --walkforward --interval 4h` | BTC 10/23 window profit; parameter pemenang berganti 13 kali |
-| TSMOM harian = manajemen risiko, bukan mesin profit | `python3 portfolio.py --selftest && python3 portfolio.py --run --years 4` | bull: seri dengan BTC; bear 2 tahun: TSMOM -17% vs BTC -37%, tapi mayoritas varian kalah dari beli-tahan |
+| TSMOM harian = manajemen risiko, bukan mesin profit | `python3 portfolio.py --selftest && python3 portfolio.py --run --years 4` | **KLAIM LAMA DITARIK**: bug look-ahead membuat TSMOM tampak menang. Setelah diperbaiki: TSMOM L30/R7 +182% vs BTC +268% (kalah). Lihat `TELAAH-BALASAN.md` |
 | Carry funding positif tapi menyusut | `python3 carry.py --selftest && python3 carry.py --run --years 3` (ulangi dengan `--years 2` dan `--years 1`) | APR 7,44% -> 4,82% -> 3,18%; filter funding justru memperburuk |
 | Koin ber-APR tinggi hampir semua tidak punya pasar spot | `python3 radar.py --run --top 60 --threshold 8` | 10 dari 10 kandidat APR tertinggi tanpa pasar spot -> carry mustahil |
 | Kapasitas orderbook membatasi ukuran posisi | `python3 plan_order.py --run --capital 1000` | QNT: kapasitas pita 0,1% ~$6.459 -> ukuran dipotong ke $646 |

@@ -1,0 +1,41 @@
+{
+  "L30_R7": {
+    "lama": {
+      "ret_pct": 287.68,
+      "sharpe": 0.91,
+      "mdd_pct": -56.79
+    },
+    "baru": {
+      "ret_pct": 182.34,
+      "sharpe": 0.76,
+      "mdd_pct": -59.59
+    },
+    "selisih_ret_pp": 105.34
+  },
+  "L90_R30": {
+    "lama": {
+      "ret_pct": 103.65,
+      "sharpe": 0.59,
+      "mdd_pct": -70.46
+    },
+    "baru": {
+      "ret_pct": 49.15,
+      "sharpe": 0.46,
+      "mdd_pct": -76.03
+    },
+    "selisih_ret_pp": 54.5
+  },
+  "L180_R7": {
+    "lama": {
+      "ret_pct": 183.49,
+      "sharpe": 0.75,
+      "mdd_pct": -58.94
+    },
+    "baru": {
+      "ret_pct": 64.65,
+      "sharpe": 0.5,
+      "mdd_pct": -59.47
+    },
+    "selisih_ret_pp": 118.84
+  }
+}

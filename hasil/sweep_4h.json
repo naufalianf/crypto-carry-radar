@@ -1,0 +1,1622 @@
+{
+  "BTCUSDT": {
+    "buyhold_oos": -31.76,
+    "n": 80,
+    "median_ret": -30.02,
+    "median_sharpe": -1.275,
+    "beat_bh": 43,
+    "profit": 5,
+    "rows": [
+      {
+        "total_return_pct": 22.98,
+        "max_drawdown_pct": -13.17,
+        "sharpe": 1.06,
+        "trades": 10,
+        "win_rate_pct": 50.0,
+        "profit_factor": 3.36,
+        "final_equity": 1.2298,
+        "name": "sma20/100"
+      },
+      {
+        "total_return_pct": 13.97,
+        "max_drawdown_pct": -17.68,
+        "sharpe": 0.7,
+        "trades": 14,
+        "win_rate_pct": 42.9,
+        "profit_factor": 1.69,
+        "final_equity": 1.1397,
+        "name": "sma10/100"
+      },
+      {
+        "total_return_pct": 8.76,
+        "max_drawdown_pct": -24.56,
+        "sharpe": 0.5,
+        "trades": 9,
+        "win_rate_pct": 22.2,
+        "profit_factor": 1.58,
+        "final_equity": 1.0876,
+        "name": "sma10/200"
+      },
+      {
+        "total_return_pct": 4.17,
+        "max_drawdown_pct": -22.19,
+        "sharpe": 0.31,
+        "trades": 7,
+        "win_rate_pct": 42.9,
+        "profit_factor": 1.32,
+        "final_equity": 1.0417,
+        "name": "sma20/200"
+      },
+      {
+        "total_return_pct": 2.99,
+        "max_drawdown_pct": -14.85,
+        "sharpe": 0.26,
+        "trades": 6,
+        "win_rate_pct": 33.3,
+        "profit_factor": 1.11,
+        "final_equity": 1.0299,
+        "name": "sma50/200"
+      },
+      {
+        "total_return_pct": -0.71,
+        "max_drawdown_pct": -17.54,
+        "sharpe": 0.09,
+        "trades": 8,
+        "win_rate_pct": 50.0,
+        "profit_factor": 1.04,
+        "final_equity": 0.9929,
+        "name": "sma50/100"
+      },
+      {
+        "total_return_pct": -3.0,
+        "max_drawdown_pct": -23.97,
+        "sharpe": -0.0,
+        "trades": 25,
+        "win_rate_pct": 28.0,
+        "profit_factor": 1.09,
+        "final_equity": 0.97,
+        "name": "sma10/50"
+      },
+      {
+        "total_return_pct": -4.71,
+        "max_drawdown_pct": -23.4,
+        "sharpe": -0.09,
+        "trades": 20,
+        "win_rate_pct": 40.0,
+        "profit_factor": 1.25,
+        "final_equity": 0.9529,
+        "name": "sma20/50"
+      },
+      {
+        "total_return_pct": -7.54,
+        "max_drawdown_pct": -19.95,
+        "sharpe": -0.25,
+        "trades": 26,
+        "win_rate_pct": 65.4,
+        "profit_factor": 0.94,
+        "final_equity": 0.9246,
+        "name": "mr50_z2.0_x0.0_h24"
+      },
+      {
+        "total_return_pct": -7.91,
+        "max_drawdown_pct": -19.71,
+        "sharpe": -0.36,
+        "trades": 29,
+        "win_rate_pct": 51.7,
+        "profit_factor": 0.9,
+        "final_equity": 0.9209,
+        "name": "mr50_z2.0_x0.5_h12"
+      },
+      {
+        "total_return_pct": -8.67,
+        "max_drawdown_pct": -20.63,
+        "sharpe": -0.3,
+        "trades": 26,
+        "win_rate_pct": 61.5,
+        "profit_factor": 0.91,
+        "final_equity": 0.9133,
+        "name": "mr50_z2.0_x0.5_h24"
+      },
+      {
+        "total_return_pct": -8.78,
+        "max_drawdown_pct": -21.77,
+        "sharpe": -0.35,
+        "trades": 48,
+        "win_rate_pct": 54.2,
+        "profit_factor": 0.72,
+        "final_equity": 0.9122,
+        "name": "mr20_z2.0_x0.0_h12"
+      },
+      {
+        "total_return_pct": -8.81,
+        "max_drawdown_pct": -22.58,
+        "sharpe": -0.3,
+        "trades": 48,
+        "win_rate_pct": 52.1,
+        "profit_factor": 0.9,
+        "final_equity": 0.9119,
+        "name": "mr50_z1.5_x0.5_h12"
+      },
+      {
+        "total_return_pct": -9.16,
+        "max_drawdown_pct": -19.71,
+        "sharpe": -0.44,
+        "trades": 29,
+        "win_rate_pct": 51.7,
+        "profit_factor": 0.86,
+        "final_equity": 0.9084,
+        "name": "mr50_z2.0_x0.0_h12"
+      },
+      {
+        "total_return_pct": -10.19,
+        "max_drawdown_pct": -26.59,
+        "sharpe": -0.35,
+        "trades": 22,
+        "win_rate_pct": 81.8,
+        "profit_factor": 0.84,
+        "final_equity": 0.8981,
+        "name": "mr50_z2.0_x0.0_h48"
+      },
+      {
+        "total_return_pct": -10.2,
+        "max_drawdown_pct": -22.03,
+        "sharpe": -0.38,
+        "trades": 48,
+        "win_rate_pct": 52.1,
+        "profit_factor": 0.87,
+        "final_equity": 0.898,
+        "name": "mr50_z1.5_x0.0_h12"
+      },
+      {
+        "total_return_pct": -13.16,
+        "max_drawdown_pct": -25.77,
+        "sharpe": -0.46,
+        "trades": 42,
+        "win_rate_pct": 61.9,
+        "profit_factor": 0.71,
+        "final_equity": 0.8684,
+        "name": "mr20_z2.0_x0.5_h24"
+      },
+      {
+        "total_return_pct": -13.52,
+        "max_drawdown_pct": -22.18,
+        "sharpe": -0.58,
+        "trades": 47,
+        "win_rate_pct": 48.9,
+        "profit_factor": 0.66,
+        "final_equity": 0.8648,
+        "name": "mr20_z2.0_x0.5_h12"
+      },
+      {
+        "total_return_pct": -15.15,
+        "max_drawdown_pct": -26.53,
+        "sharpe": -0.52,
+        "trades": 50,
+        "win_rate_pct": 60.0,
+        "profit_factor": 0.76,
+        "final_equity": 0.8485,
+        "name": "mr20_z1.5_x0.5_h24"
+      },
+      {
+        "total_return_pct": -15.74,
+        "max_drawdown_pct": -26.16,
+        "sharpe": -0.64,
+        "trades": 44,
+        "win_rate_pct": 59.1,
+        "profit_factor": 0.64,
+        "final_equity": 0.8426,
+        "name": "mr20_z2.0_x0.0_h24"
+      },
+      {
+        "total_return_pct": -15.94,
+        "max_drawdown_pct": -26.38,
+        "sharpe": -0.61,
+        "trades": 20,
+        "win_rate_pct": 75.0,
+        "profit_factor": 0.73,
+        "final_equity": 0.8406,
+        "name": "mr50_z2.0_x0.5_h48"
+      },
+      {
+        "total_return_pct": -16.91,
+        "max_drawdown_pct": -27.82,
+        "sharpe": -0.67,
+        "trades": 17,
+        "win_rate_pct": 70.6,
+        "profit_factor": 0.65,
+        "final_equity": 0.8309,
+        "name": "mr100_z2.0_x0.0_h48"
+      },
+      {
+        "total_return_pct": -16.96,
+        "max_drawdown_pct": -27.01,
+        "sharpe": -0.64,
+        "trades": 54,
+        "win_rate_pct": 50.0,
+        "profit_factor": 0.7,
+        "final_equity": 0.8304,
+        "name": "mr20_z1.5_x0.0_h24"
+      },
+      {
+        "total_return_pct": -18.0,
+        "max_drawdown_pct": -27.3,
+        "sharpe": -0.72,
+        "trades": 34,
+        "win_rate_pct": 55.9,
+        "profit_factor": 0.75,
+        "final_equity": 0.82,
+        "name": "mr50_z1.5_x0.0_h24"
+      },
+      {
+        "total_return_pct": -18.55,
+        "max_drawdown_pct": -27.61,
+        "sharpe": -0.8,
+        "trades": 23,
+        "win_rate_pct": 56.5,
+        "profit_factor": 0.64,
+        "final_equity": 0.8145,
+        "name": "mr100_z2.0_x0.5_h24"
+      },
+      {
+        "total_return_pct": -19.7,
+        "max_drawdown_pct": -27.41,
+        "sharpe": -1.09,
+        "trades": 28,
+        "win_rate_pct": 46.4,
+        "profit_factor": 0.54,
+        "final_equity": 0.803,
+        "name": "mr100_z2.0_x0.0_h12"
+      },
+      {
+        "total_return_pct": -20.07,
+        "max_drawdown_pct": -27.99,
+        "sharpe": -0.91,
+        "trades": 23,
+        "win_rate_pct": 56.5,
+        "profit_factor": 0.59,
+        "final_equity": 0.7993,
+        "name": "mr100_z2.0_x0.0_h24"
+      },
+      {
+        "total_return_pct": -20.85,
+        "max_drawdown_pct": -26.95,
+        "sharpe": -0.84,
+        "trades": 34,
+        "win_rate_pct": 52.9,
+        "profit_factor": 0.71,
+        "final_equity": 0.7915,
+        "name": "mr50_z1.5_x0.5_h24"
+      },
+      {
+        "total_return_pct": -21.27,
+        "max_drawdown_pct": -26.84,
+        "sharpe": -0.95,
+        "trades": 63,
+        "win_rate_pct": 47.6,
+        "profit_factor": 0.68,
+        "final_equity": 0.7873,
+        "name": "mr20_z1.5_x0.0_h12"
+      },
+      {
+        "total_return_pct": -21.48,
+        "max_drawdown_pct": -29.02,
+        "sharpe": -1.2,
+        "trades": 28,
+        "win_rate_pct": 46.4,
+        "profit_factor": 0.49,
+        "final_equity": 0.7852,
+        "name": "mr100_z2.0_x0.5_h12"
+      },
+      {
+        "total_return_pct": -22.47,
+        "max_drawdown_pct": -28.91,
+        "sharpe": -0.91,
+        "trades": 38,
+        "win_rate_pct": 63.2,
+        "profit_factor": 0.57,
+        "final_equity": 0.7753,
+        "name": "mr20_z2.0_x0.5_h48"
+      },
+      {
+        "total_return_pct": -22.9,
+        "max_drawdown_pct": -28.79,
+        "sharpe": -0.96,
+        "trades": 15,
+        "win_rate_pct": 60.0,
+        "profit_factor": 0.55,
+        "final_equity": 0.771,
+        "name": "mr100_z2.0_x0.5_h48"
+      },
+      {
+        "total_return_pct": -23.58,
+        "max_drawdown_pct": -31.42,
+        "sharpe": -0.84,
+        "trades": 39,
+        "win_rate_pct": 79.5,
+        "profit_factor": 0.66,
+        "final_equity": 0.7642,
+        "name": "mr50_z1.0_x0.0_h48"
+      },
+      {
+        "total_return_pct": -23.94,
+        "max_drawdown_pct": -29.63,
+        "sharpe": -0.92,
+        "trades": 46,
+        "win_rate_pct": 60.9,
+        "profit_factor": 0.62,
+        "final_equity": 0.7606,
+        "name": "mr20_z1.5_x0.5_h48"
+      },
+      {
+        "total_return_pct": -24.93,
+        "max_drawdown_pct": -29.19,
+        "sharpe": -1.1,
+        "trades": 61,
+        "win_rate_pct": 47.5,
+        "profit_factor": 0.65,
+        "final_equity": 0.7507,
+        "name": "mr20_z1.5_x0.5_h12"
+      },
+      {
+        "total_return_pct": -26.57,
+        "max_drawdown_pct": -31.66,
+        "sharpe": -1.16,
+        "trades": 87,
+        "win_rate_pct": 51.7,
+        "profit_factor": 0.81,
+        "final_equity": 0.7343,
+        "name": "mr20_z1.0_x0.0_h12"
+      },
+      {
+        "total_return_pct": -27.39,
+        "max_drawdown_pct": -32.43,
+        "sharpe": -1.26,
+        "trades": 40,
+        "win_rate_pct": 60.0,
+        "profit_factor": 0.47,
+        "final_equity": 0.7261,
+        "name": "mr20_z2.0_x0.0_h48"
+      },
+      {
+        "total_return_pct": -27.8,
+        "max_drawdown_pct": -35.53,
+        "sharpe": -1.33,
+        "trades": 48,
+        "win_rate_pct": 43.8,
+        "profit_factor": 0.64,
+        "final_equity": 0.722,
+        "name": "mr100_z1.5_x0.0_h12"
+      },
+      {
+        "total_return_pct": -28.76,
+        "max_drawdown_pct": -33.73,
+        "sharpe": -1.25,
+        "trades": 50,
+        "win_rate_pct": 50.0,
+        "profit_factor": 0.52,
+        "final_equity": 0.7124,
+        "name": "mr20_z1.5_x0.0_h48"
+      },
+      {
+        "total_return_pct": -29.98,
+        "max_drawdown_pct": -35.06,
+        "sharpe": -1.26,
+        "trades": 72,
+        "win_rate_pct": 50.0,
+        "profit_factor": 0.76,
+        "final_equity": 0.7002,
+        "name": "mr50_z1.0_x0.0_h12"
+      },
+      {
+        "total_return_pct": -30.06,
+        "max_drawdown_pct": -37.67,
+        "sharpe": -1.31,
+        "trades": 27,
+        "win_rate_pct": 70.4,
+        "profit_factor": 0.55,
+        "final_equity": 0.6994,
+        "name": "mr50_z1.5_x0.0_h48"
+      },
+      {
+        "total_return_pct": -30.19,
+        "max_drawdown_pct": -38.64,
+        "sharpe": -1.11,
+        "trades": 51,
+        "win_rate_pct": 68.6,
+        "profit_factor": 0.6,
+        "final_equity": 0.6981,
+        "name": "mr50_z0.5_x0.0_h48"
+      },
+      {
+        "total_return_pct": -31.17,
+        "max_drawdown_pct": -37.83,
+        "sharpe": -1.29,
+        "trades": 49,
+        "win_rate_pct": 57.1,
+        "profit_factor": 0.56,
+        "final_equity": 0.6883,
+        "name": "mr50_z1.0_x0.0_h24"
+      },
+      {
+        "total_return_pct": -31.83,
+        "max_drawdown_pct": -36.77,
+        "sharpe": -1.33,
+        "trades": 72,
+        "win_rate_pct": 45.8,
+        "profit_factor": 0.73,
+        "final_equity": 0.6817,
+        "name": "mr50_z1.0_x0.5_h12"
+      },
+      {
+        "total_return_pct": -32.2,
+        "max_drawdown_pct": -36.9,
+        "sharpe": -1.31,
+        "trades": 59,
+        "win_rate_pct": 59.3,
+        "profit_factor": 0.67,
+        "final_equity": 0.678,
+        "name": "mr20_z1.0_x0.5_h24"
+      },
+      {
+        "total_return_pct": -32.22,
+        "max_drawdown_pct": -36.19,
+        "sharpe": -1.42,
+        "trades": 79,
+        "win_rate_pct": 50.6,
+        "profit_factor": 0.74,
+        "final_equity": 0.6778,
+        "name": "mr20_z1.0_x0.5_h12"
+      },
+      {
+        "total_return_pct": -32.35,
+        "max_drawdown_pct": -37.46,
+        "sharpe": -1.37,
+        "trades": 21,
+        "win_rate_pct": 61.9,
+        "profit_factor": 0.48,
+        "final_equity": 0.6765,
+        "name": "mr100_z1.5_x0.0_h48"
+      },
+      {
+        "total_return_pct": -32.41,
+        "max_drawdown_pct": -37.1,
+        "sharpe": -1.4,
+        "trades": 68,
+        "win_rate_pct": 54.4,
+        "profit_factor": 0.65,
+        "final_equity": 0.6759,
+        "name": "mr20_z1.0_x0.0_h24"
+      },
+      {
+        "total_return_pct": -32.42,
+        "max_drawdown_pct": -38.31,
+        "sharpe": -1.47,
+        "trades": 31,
+        "win_rate_pct": 51.6,
+        "profit_factor": 0.51,
+        "final_equity": 0.6758,
+        "name": "mr100_z1.5_x0.0_h24"
+      },
+      {
+        "total_return_pct": -33.87,
+        "max_drawdown_pct": -40.88,
+        "sharpe": -1.7,
+        "trades": 47,
+        "win_rate_pct": 44.7,
+        "profit_factor": 0.53,
+        "final_equity": 0.6613,
+        "name": "mr100_z1.5_x0.5_h12"
+      },
+      {
+        "total_return_pct": -34.04,
+        "max_drawdown_pct": -37.8,
+        "sharpe": -1.3,
+        "trades": 32,
+        "win_rate_pct": 65.6,
+        "profit_factor": 0.54,
+        "final_equity": 0.6596,
+        "name": "mr50_z1.0_x0.5_h48"
+      },
+      {
+        "total_return_pct": -34.72,
+        "max_drawdown_pct": -38.5,
+        "sharpe": -1.43,
+        "trades": 46,
+        "win_rate_pct": 47.8,
+        "profit_factor": 0.54,
+        "final_equity": 0.6528,
+        "name": "mr50_z1.0_x0.5_h24"
+      },
+      {
+        "total_return_pct": -34.72,
+        "max_drawdown_pct": -41.36,
+        "sharpe": -1.54,
+        "trades": 29,
+        "win_rate_pct": 48.3,
+        "profit_factor": 0.49,
+        "final_equity": 0.6528,
+        "name": "mr100_z1.5_x0.5_h24"
+      },
+      {
+        "total_return_pct": -35.84,
+        "max_drawdown_pct": -40.36,
+        "sharpe": -1.55,
+        "trades": 25,
+        "win_rate_pct": 64.0,
+        "profit_factor": 0.49,
+        "final_equity": 0.6416,
+        "name": "mr50_z1.5_x0.5_h48"
+      },
+      {
+        "total_return_pct": -37.45,
+        "max_drawdown_pct": -45.07,
+        "sharpe": -1.53,
+        "trades": 67,
+        "win_rate_pct": 55.2,
+        "profit_factor": 0.52,
+        "final_equity": 0.6255,
+        "name": "mr50_z0.5_x0.0_h24"
+      },
+      {
+        "total_return_pct": -37.59,
+        "max_drawdown_pct": -41.5,
+        "sharpe": -1.59,
+        "trades": 19,
+        "win_rate_pct": 47.4,
+        "profit_factor": 0.41,
+        "final_equity": 0.6241,
+        "name": "mr100_z1.5_x0.5_h48"
+      },
+      {
+        "total_return_pct": -38.13,
+        "max_drawdown_pct": -41.66,
+        "sharpe": -1.62,
+        "trades": 26,
+        "win_rate_pct": 61.5,
+        "profit_factor": 0.47,
+        "final_equity": 0.6187,
+        "name": "mr100_z1.0_x0.0_h48"
+      },
+      {
+        "total_return_pct": -39.05,
+        "max_drawdown_pct": -44.86,
+        "sharpe": -1.52,
+        "trades": 37,
+        "win_rate_pct": 59.5,
+        "profit_factor": 0.54,
+        "final_equity": 0.6095,
+        "name": "mr50_z0.5_x0.5_h48"
+      },
+      {
+        "total_return_pct": -39.91,
+        "max_drawdown_pct": -44.08,
+        "sharpe": -1.85,
+        "trades": 62,
+        "win_rate_pct": 53.2,
+        "profit_factor": 0.51,
+        "final_equity": 0.6009,
+        "name": "mr20_z1.0_x0.0_h48"
+      },
+      {
+        "total_return_pct": -40.28,
+        "max_drawdown_pct": -43.78,
+        "sharpe": -1.82,
+        "trades": 50,
+        "win_rate_pct": 60.0,
+        "profit_factor": 0.5,
+        "final_equity": 0.5972,
+        "name": "mr20_z1.0_x0.5_h48"
+      },
+      {
+        "total_return_pct": -40.96,
+        "max_drawdown_pct": -44.38,
+        "sharpe": -1.7,
+        "trades": 50,
+        "win_rate_pct": 48.0,
+        "profit_factor": 0.52,
+        "final_equity": 0.5904,
+        "name": "mr100_z0.5_x0.0_h24"
+      },
+      {
+        "total_return_pct": -41.25,
+        "max_drawdown_pct": -45.97,
+        "sharpe": -1.76,
+        "trades": 68,
+        "win_rate_pct": 60.3,
+        "profit_factor": 0.57,
+        "final_equity": 0.5875,
+        "name": "mr20_z0.5_x0.5_h24"
+      },
+      {
+        "total_return_pct": -41.55,
+        "max_drawdown_pct": -44.89,
+        "sharpe": -1.72,
+        "trades": 34,
+        "win_rate_pct": 64.7,
+        "profit_factor": 0.52,
+        "final_equity": 0.5845,
+        "name": "mr100_z0.5_x0.0_h48"
+      },
+      {
+        "total_return_pct": -42.04,
+        "max_drawdown_pct": -46.86,
+        "sharpe": -1.8,
+        "trades": 92,
+        "win_rate_pct": 45.7,
+        "profit_factor": 0.59,
+        "final_equity": 0.5796,
+        "name": "mr50_z0.5_x0.5_h12"
+      },
+      {
+        "total_return_pct": -42.61,
+        "max_drawdown_pct": -48.36,
+        "sharpe": -1.89,
+        "trades": 97,
+        "win_rate_pct": 48.5,
+        "profit_factor": 0.58,
+        "final_equity": 0.5739,
+        "name": "mr50_z0.5_x0.0_h12"
+      },
+      {
+        "total_return_pct": -42.72,
+        "max_drawdown_pct": -46.91,
+        "sharpe": -1.93,
+        "trades": 81,
+        "win_rate_pct": 55.6,
+        "profit_factor": 0.57,
+        "final_equity": 0.5728,
+        "name": "mr20_z0.5_x0.0_h24"
+      },
+      {
+        "total_return_pct": -42.81,
+        "max_drawdown_pct": -46.11,
+        "sharpe": -1.94,
+        "trades": 39,
+        "win_rate_pct": 48.7,
+        "profit_factor": 0.4,
+        "final_equity": 0.5719,
+        "name": "mr100_z1.0_x0.0_h24"
+      },
+      {
+        "total_return_pct": -43.22,
+        "max_drawdown_pct": -48.67,
+        "sharpe": -1.8,
+        "trades": 56,
+        "win_rate_pct": 46.4,
+        "profit_factor": 0.47,
+        "final_equity": 0.5678,
+        "name": "mr50_z0.5_x0.5_h24"
+      },
+      {
+        "total_return_pct": -44.82,
+        "max_drawdown_pct": -48.86,
+        "sharpe": -2.07,
+        "trades": 74,
+        "win_rate_pct": 55.4,
+        "profit_factor": 0.48,
+        "final_equity": 0.5518,
+        "name": "mr20_z0.5_x0.0_h48"
+      },
+      {
+        "total_return_pct": -45.67,
+        "max_drawdown_pct": -49.65,
+        "sharpe": -2.18,
+        "trades": 107,
+        "win_rate_pct": 49.5,
+        "profit_factor": 0.73,
+        "final_equity": 0.5433,
+        "name": "mr20_z0.5_x0.0_h12"
+      },
+      {
+        "total_return_pct": -45.81,
+        "max_drawdown_pct": -48.32,
+        "sharpe": -2.16,
+        "trades": 68,
+        "win_rate_pct": 38.2,
+        "profit_factor": 0.51,
+        "final_equity": 0.5419,
+        "name": "mr100_z1.0_x0.0_h12"
+      },
+      {
+        "total_return_pct": -46.25,
+        "max_drawdown_pct": -51.23,
+        "sharpe": -2.06,
+        "trades": 57,
+        "win_rate_pct": 56.1,
+        "profit_factor": 0.42,
+        "final_equity": 0.5375,
+        "name": "mr20_z0.5_x0.5_h48"
+      },
+      {
+        "total_return_pct": -46.69,
+        "max_drawdown_pct": -49.17,
+        "sharpe": -2.07,
+        "trades": 83,
+        "win_rate_pct": 47.0,
+        "profit_factor": 0.61,
+        "final_equity": 0.5331,
+        "name": "mr100_z0.5_x0.0_h12"
+      },
+      {
+        "total_return_pct": -46.89,
+        "max_drawdown_pct": -49.96,
+        "sharpe": -2.15,
+        "trades": 38,
+        "win_rate_pct": 42.1,
+        "profit_factor": 0.34,
+        "final_equity": 0.5311,
+        "name": "mr100_z1.0_x0.5_h24"
+      },
+      {
+        "total_return_pct": -47.01,
+        "max_drawdown_pct": -51.26,
+        "sharpe": -2.18,
+        "trades": 99,
+        "win_rate_pct": 52.5,
+        "profit_factor": 0.74,
+        "final_equity": 0.5299,
+        "name": "mr20_z0.5_x0.5_h12"
+      },
+      {
+        "total_return_pct": -47.21,
+        "max_drawdown_pct": -50.09,
+        "sharpe": -1.99,
+        "trades": 28,
+        "win_rate_pct": 46.4,
+        "profit_factor": 0.4,
+        "final_equity": 0.5279,
+        "name": "mr100_z0.5_x0.5_h48"
+      },
+      {
+        "total_return_pct": -48.23,
+        "max_drawdown_pct": -50.64,
+        "sharpe": -2.3,
+        "trades": 67,
+        "win_rate_pct": 37.3,
+        "profit_factor": 0.48,
+        "final_equity": 0.5177,
+        "name": "mr100_z1.0_x0.5_h12"
+      },
+      {
+        "total_return_pct": -48.37,
+        "max_drawdown_pct": -51.34,
+        "sharpe": -2.13,
+        "trades": 22,
+        "win_rate_pct": 45.5,
+        "profit_factor": 0.33,
+        "final_equity": 0.5163,
+        "name": "mr100_z1.0_x0.5_h48"
+      },
+      {
+        "total_return_pct": -48.67,
+        "max_drawdown_pct": -51.63,
+        "sharpe": -2.12,
+        "trades": 45,
+        "win_rate_pct": 40.0,
+        "profit_factor": 0.43,
+        "final_equity": 0.5133,
+        "name": "mr100_z0.5_x0.5_h24"
+      },
+      {
+        "total_return_pct": -51.45,
+        "max_drawdown_pct": -53.71,
+        "sharpe": -2.41,
+        "trades": 80,
+        "win_rate_pct": 45.0,
+        "profit_factor": 0.51,
+        "final_equity": 0.4855,
+        "name": "mr100_z0.5_x0.5_h12"
+      }
+    ]
+  },
+  "ETHUSDT": {
+    "buyhold_oos": -43.2,
+    "n": 80,
+    "median_ret": -40.9,
+    "median_sharpe": -1.4049999999999998,
+    "beat_bh": 45,
+    "profit": 5,
+    "rows": [
+      {
+        "total_return_pct": 38.42,
+        "max_drawdown_pct": -15.77,
+        "sharpe": 1.22,
+        "trades": 10,
+        "win_rate_pct": 70.0,
+        "profit_factor": 4.29,
+        "final_equity": 1.3842,
+        "name": "sma50/100"
+      },
+      {
+        "total_return_pct": 29.13,
+        "max_drawdown_pct": -18.55,
+        "sharpe": 0.99,
+        "trades": 8,
+        "win_rate_pct": 37.5,
+        "profit_factor": 3.65,
+        "final_equity": 1.2913,
+        "name": "sma20/200"
+      },
+      {
+        "total_return_pct": 22.16,
+        "max_drawdown_pct": -26.89,
+        "sharpe": 0.81,
+        "trades": 7,
+        "win_rate_pct": 42.9,
+        "profit_factor": 2.37,
+        "final_equity": 1.2216,
+        "name": "sma10/200"
+      },
+      {
+        "total_return_pct": 21.09,
+        "max_drawdown_pct": -17.48,
+        "sharpe": 0.8,
+        "trades": 5,
+        "win_rate_pct": 80.0,
+        "profit_factor": 3.52,
+        "final_equity": 1.2109,
+        "name": "sma50/200"
+      },
+      {
+        "total_return_pct": 15.61,
+        "max_drawdown_pct": -22.04,
+        "sharpe": 0.63,
+        "trades": 13,
+        "win_rate_pct": 53.8,
+        "profit_factor": 1.85,
+        "final_equity": 1.1561,
+        "name": "sma20/100"
+      },
+      {
+        "total_return_pct": -2.81,
+        "max_drawdown_pct": -27.54,
+        "sharpe": 0.09,
+        "trades": 16,
+        "win_rate_pct": 25.0,
+        "profit_factor": 0.96,
+        "final_equity": 0.9719,
+        "name": "sma10/100"
+      },
+      {
+        "total_return_pct": -7.36,
+        "max_drawdown_pct": -28.22,
+        "sharpe": -0.07,
+        "trades": 23,
+        "win_rate_pct": 39.1,
+        "profit_factor": 1.06,
+        "final_equity": 0.9264,
+        "name": "sma20/50"
+      },
+      {
+        "total_return_pct": -15.14,
+        "max_drawdown_pct": -24.21,
+        "sharpe": -0.58,
+        "trades": 27,
+        "win_rate_pct": 51.9,
+        "profit_factor": 0.65,
+        "final_equity": 0.8486,
+        "name": "mr50_z2.0_x0.0_h12"
+      },
+      {
+        "total_return_pct": -15.36,
+        "max_drawdown_pct": -24.21,
+        "sharpe": -0.59,
+        "trades": 27,
+        "win_rate_pct": 51.9,
+        "profit_factor": 0.64,
+        "final_equity": 0.8464,
+        "name": "mr50_z2.0_x0.5_h12"
+      },
+      {
+        "total_return_pct": -18.2,
+        "max_drawdown_pct": -35.09,
+        "sharpe": -0.53,
+        "trades": 39,
+        "win_rate_pct": 69.2,
+        "profit_factor": 0.73,
+        "final_equity": 0.818,
+        "name": "mr20_z2.0_x0.0_h24"
+      },
+      {
+        "total_return_pct": -18.64,
+        "max_drawdown_pct": -32.19,
+        "sharpe": -0.65,
+        "trades": 21,
+        "win_rate_pct": 52.4,
+        "profit_factor": 0.7,
+        "final_equity": 0.8136,
+        "name": "mr50_z2.0_x0.0_h24"
+      },
+      {
+        "total_return_pct": -20.35,
+        "max_drawdown_pct": -32.41,
+        "sharpe": -0.61,
+        "trades": 56,
+        "win_rate_pct": 48.2,
+        "profit_factor": 0.75,
+        "final_equity": 0.7965,
+        "name": "mr20_z1.5_x0.5_h12"
+      },
+      {
+        "total_return_pct": -20.85,
+        "max_drawdown_pct": -37.42,
+        "sharpe": -0.55,
+        "trades": 81,
+        "win_rate_pct": 51.9,
+        "profit_factor": 0.72,
+        "final_equity": 0.7915,
+        "name": "mr20_z1.0_x0.5_h12"
+      },
+      {
+        "total_return_pct": -21.38,
+        "max_drawdown_pct": -36.26,
+        "sharpe": -0.6,
+        "trades": 85,
+        "win_rate_pct": 54.1,
+        "profit_factor": 0.73,
+        "final_equity": 0.7862,
+        "name": "mr20_z1.0_x0.0_h12"
+      },
+      {
+        "total_return_pct": -22.33,
+        "max_drawdown_pct": -34.77,
+        "sharpe": -0.66,
+        "trades": 38,
+        "win_rate_pct": 60.5,
+        "profit_factor": 0.64,
+        "final_equity": 0.7767,
+        "name": "mr20_z2.0_x0.5_h24"
+      },
+      {
+        "total_return_pct": -24.27,
+        "max_drawdown_pct": -31.6,
+        "sharpe": -0.82,
+        "trades": 57,
+        "win_rate_pct": 52.6,
+        "profit_factor": 0.72,
+        "final_equity": 0.7573,
+        "name": "mr20_z1.5_x0.0_h12"
+      },
+      {
+        "total_return_pct": -24.79,
+        "max_drawdown_pct": -35.48,
+        "sharpe": -0.72,
+        "trades": 28,
+        "win_rate_pct": 32.1,
+        "profit_factor": 0.71,
+        "final_equity": 0.7521,
+        "name": "sma10/50"
+      },
+      {
+        "total_return_pct": -26.49,
+        "max_drawdown_pct": -34.43,
+        "sharpe": -1.01,
+        "trades": 21,
+        "win_rate_pct": 47.6,
+        "profit_factor": 0.56,
+        "final_equity": 0.7351,
+        "name": "mr50_z2.0_x0.5_h24"
+      },
+      {
+        "total_return_pct": -28.13,
+        "max_drawdown_pct": -38.28,
+        "sharpe": -1.14,
+        "trades": 42,
+        "win_rate_pct": 54.8,
+        "profit_factor": 0.51,
+        "final_equity": 0.7187,
+        "name": "mr20_z2.0_x0.0_h12"
+      },
+      {
+        "total_return_pct": -28.62,
+        "max_drawdown_pct": -39.91,
+        "sharpe": -0.87,
+        "trades": 45,
+        "win_rate_pct": 55.6,
+        "profit_factor": 0.6,
+        "final_equity": 0.7138,
+        "name": "mr20_z1.5_x0.5_h24"
+      },
+      {
+        "total_return_pct": -28.68,
+        "max_drawdown_pct": -38.6,
+        "sharpe": -0.92,
+        "trades": 49,
+        "win_rate_pct": 65.3,
+        "profit_factor": 0.64,
+        "final_equity": 0.7132,
+        "name": "mr20_z1.5_x0.0_h24"
+      },
+      {
+        "total_return_pct": -30.28,
+        "max_drawdown_pct": -40.71,
+        "sharpe": -1.18,
+        "trades": 20,
+        "win_rate_pct": 45.0,
+        "profit_factor": 0.34,
+        "final_equity": 0.6972,
+        "name": "mr100_z2.0_x0.5_h24"
+      },
+      {
+        "total_return_pct": -30.5,
+        "max_drawdown_pct": -40.89,
+        "sharpe": -1.19,
+        "trades": 20,
+        "win_rate_pct": 45.0,
+        "profit_factor": 0.33,
+        "final_equity": 0.695,
+        "name": "mr100_z2.0_x0.0_h24"
+      },
+      {
+        "total_return_pct": -31.28,
+        "max_drawdown_pct": -38.99,
+        "sharpe": -1.09,
+        "trades": 29,
+        "win_rate_pct": 55.2,
+        "profit_factor": 0.64,
+        "final_equity": 0.6872,
+        "name": "mr50_z1.5_x0.0_h24"
+      },
+      {
+        "total_return_pct": -32.25,
+        "max_drawdown_pct": -38.38,
+        "sharpe": -1.32,
+        "trades": 42,
+        "win_rate_pct": 47.6,
+        "profit_factor": 0.44,
+        "final_equity": 0.6775,
+        "name": "mr20_z2.0_x0.5_h12"
+      },
+      {
+        "total_return_pct": -32.31,
+        "max_drawdown_pct": -40.58,
+        "sharpe": -0.92,
+        "trades": 60,
+        "win_rate_pct": 51.7,
+        "profit_factor": 0.58,
+        "final_equity": 0.6769,
+        "name": "mr20_z1.0_x0.5_h24"
+      },
+      {
+        "total_return_pct": -32.49,
+        "max_drawdown_pct": -40.77,
+        "sharpe": -0.97,
+        "trades": 69,
+        "win_rate_pct": 58.0,
+        "profit_factor": 0.62,
+        "final_equity": 0.6751,
+        "name": "mr20_z1.0_x0.0_h24"
+      },
+      {
+        "total_return_pct": -32.94,
+        "max_drawdown_pct": -40.21,
+        "sharpe": -1.18,
+        "trades": 13,
+        "win_rate_pct": 46.2,
+        "profit_factor": 0.38,
+        "final_equity": 0.6706,
+        "name": "mr100_z2.0_x0.0_h48"
+      },
+      {
+        "total_return_pct": -34.23,
+        "max_drawdown_pct": -41.35,
+        "sharpe": -1.24,
+        "trades": 13,
+        "win_rate_pct": 46.2,
+        "profit_factor": 0.36,
+        "final_equity": 0.6577,
+        "name": "mr100_z2.0_x0.5_h48"
+      },
+      {
+        "total_return_pct": -35.09,
+        "max_drawdown_pct": -44.6,
+        "sharpe": -1.26,
+        "trades": 35,
+        "win_rate_pct": 71.4,
+        "profit_factor": 0.45,
+        "final_equity": 0.6491,
+        "name": "mr20_z2.0_x0.0_h48"
+      },
+      {
+        "total_return_pct": -36.99,
+        "max_drawdown_pct": -42.36,
+        "sharpe": -1.58,
+        "trades": 40,
+        "win_rate_pct": 52.5,
+        "profit_factor": 0.58,
+        "final_equity": 0.6301,
+        "name": "mr50_z1.5_x0.0_h12"
+      },
+      {
+        "total_return_pct": -37.95,
+        "max_drawdown_pct": -47.34,
+        "sharpe": -1.21,
+        "trades": 62,
+        "win_rate_pct": 59.7,
+        "profit_factor": 0.52,
+        "final_equity": 0.6205,
+        "name": "mr20_z1.0_x0.0_h48"
+      },
+      {
+        "total_return_pct": -38.19,
+        "max_drawdown_pct": -46.28,
+        "sharpe": -1.79,
+        "trades": 27,
+        "win_rate_pct": 40.7,
+        "profit_factor": 0.37,
+        "final_equity": 0.6181,
+        "name": "mr100_z2.0_x0.0_h12"
+      },
+      {
+        "total_return_pct": -38.19,
+        "max_drawdown_pct": -46.28,
+        "sharpe": -1.79,
+        "trades": 27,
+        "win_rate_pct": 40.7,
+        "profit_factor": 0.37,
+        "final_equity": 0.6181,
+        "name": "mr100_z2.0_x0.5_h12"
+      },
+      {
+        "total_return_pct": -38.43,
+        "max_drawdown_pct": -43.45,
+        "sharpe": -1.43,
+        "trades": 28,
+        "win_rate_pct": 53.6,
+        "profit_factor": 0.51,
+        "final_equity": 0.6157,
+        "name": "mr50_z1.5_x0.5_h24"
+      },
+      {
+        "total_return_pct": -38.7,
+        "max_drawdown_pct": -43.92,
+        "sharpe": -1.67,
+        "trades": 40,
+        "win_rate_pct": 50.0,
+        "profit_factor": 0.52,
+        "final_equity": 0.613,
+        "name": "mr50_z1.5_x0.5_h12"
+      },
+      {
+        "total_return_pct": -39.31,
+        "max_drawdown_pct": -45.93,
+        "sharpe": -1.39,
+        "trades": 45,
+        "win_rate_pct": 66.7,
+        "profit_factor": 0.47,
+        "final_equity": 0.6069,
+        "name": "mr20_z1.5_x0.0_h48"
+      },
+      {
+        "total_return_pct": -40.14,
+        "max_drawdown_pct": -46.04,
+        "sharpe": -1.3,
+        "trades": 46,
+        "win_rate_pct": 52.2,
+        "profit_factor": 0.54,
+        "final_equity": 0.5986,
+        "name": "mr50_z1.0_x0.0_h24"
+      },
+      {
+        "total_return_pct": -40.36,
+        "max_drawdown_pct": -48.85,
+        "sharpe": -1.28,
+        "trades": 52,
+        "win_rate_pct": 55.8,
+        "profit_factor": 0.48,
+        "final_equity": 0.5964,
+        "name": "mr20_z1.0_x0.5_h48"
+      },
+      {
+        "total_return_pct": -40.75,
+        "max_drawdown_pct": -48.47,
+        "sharpe": -1.21,
+        "trades": 53,
+        "win_rate_pct": 66.0,
+        "profit_factor": 0.58,
+        "final_equity": 0.5925,
+        "name": "mr50_z0.5_x0.0_h48"
+      },
+      {
+        "total_return_pct": -41.05,
+        "max_drawdown_pct": -47.39,
+        "sharpe": -1.31,
+        "trades": 43,
+        "win_rate_pct": 46.5,
+        "profit_factor": 0.53,
+        "final_equity": 0.5895,
+        "name": "mr50_z1.0_x0.5_h24"
+      },
+      {
+        "total_return_pct": -41.11,
+        "max_drawdown_pct": -48.19,
+        "sharpe": -1.42,
+        "trades": 39,
+        "win_rate_pct": 59.0,
+        "profit_factor": 0.43,
+        "final_equity": 0.5889,
+        "name": "mr20_z1.5_x0.5_h48"
+      },
+      {
+        "total_return_pct": -41.84,
+        "max_drawdown_pct": -47.0,
+        "sharpe": -1.54,
+        "trades": 32,
+        "win_rate_pct": 62.5,
+        "profit_factor": 0.37,
+        "final_equity": 0.5816,
+        "name": "mr20_z2.0_x0.5_h48"
+      },
+      {
+        "total_return_pct": -41.99,
+        "max_drawdown_pct": -47.89,
+        "sharpe": -1.73,
+        "trades": 43,
+        "win_rate_pct": 44.2,
+        "profit_factor": 0.54,
+        "final_equity": 0.5801,
+        "name": "mr100_z1.5_x0.0_h12"
+      },
+      {
+        "total_return_pct": -41.99,
+        "max_drawdown_pct": -47.89,
+        "sharpe": -1.73,
+        "trades": 43,
+        "win_rate_pct": 44.2,
+        "profit_factor": 0.54,
+        "final_equity": 0.5801,
+        "name": "mr100_z1.5_x0.5_h12"
+      },
+      {
+        "total_return_pct": -43.2,
+        "max_drawdown_pct": -49.87,
+        "sharpe": -1.7,
+        "trades": 18,
+        "win_rate_pct": 55.6,
+        "profit_factor": 0.39,
+        "final_equity": 0.568,
+        "name": "mr50_z2.0_x0.0_h48"
+      },
+      {
+        "total_return_pct": -43.81,
+        "max_drawdown_pct": -47.8,
+        "sharpe": -1.3,
+        "trades": 50,
+        "win_rate_pct": 54.0,
+        "profit_factor": 0.6,
+        "final_equity": 0.5619,
+        "name": "mr100_z0.5_x0.5_h24"
+      },
+      {
+        "total_return_pct": -44.03,
+        "max_drawdown_pct": -49.22,
+        "sharpe": -1.33,
+        "trades": 44,
+        "win_rate_pct": 65.9,
+        "profit_factor": 0.56,
+        "final_equity": 0.5597,
+        "name": "mr50_z0.5_x0.5_h48"
+      },
+      {
+        "total_return_pct": -44.04,
+        "max_drawdown_pct": -51.14,
+        "sharpe": -1.39,
+        "trades": 68,
+        "win_rate_pct": 58.8,
+        "profit_factor": 0.6,
+        "final_equity": 0.5596,
+        "name": "mr50_z0.5_x0.0_h24"
+      },
+      {
+        "total_return_pct": -44.06,
+        "max_drawdown_pct": -50.7,
+        "sharpe": -1.43,
+        "trades": 99,
+        "win_rate_pct": 50.5,
+        "profit_factor": 0.73,
+        "final_equity": 0.5594,
+        "name": "mr50_z0.5_x0.0_h12"
+      },
+      {
+        "total_return_pct": -44.15,
+        "max_drawdown_pct": -51.2,
+        "sharpe": -1.65,
+        "trades": 67,
+        "win_rate_pct": 50.7,
+        "profit_factor": 0.57,
+        "final_equity": 0.5585,
+        "name": "mr50_z1.0_x0.0_h12"
+      },
+      {
+        "total_return_pct": -44.21,
+        "max_drawdown_pct": -48.68,
+        "sharpe": -1.36,
+        "trades": 61,
+        "win_rate_pct": 55.7,
+        "profit_factor": 0.56,
+        "final_equity": 0.5579,
+        "name": "mr50_z0.5_x0.5_h24"
+      },
+      {
+        "total_return_pct": -44.29,
+        "max_drawdown_pct": -50.54,
+        "sharpe": -1.68,
+        "trades": 23,
+        "win_rate_pct": 65.2,
+        "profit_factor": 0.45,
+        "final_equity": 0.5571,
+        "name": "mr50_z1.5_x0.0_h48"
+      },
+      {
+        "total_return_pct": -44.95,
+        "max_drawdown_pct": -50.31,
+        "sharpe": -1.66,
+        "trades": 28,
+        "win_rate_pct": 39.3,
+        "profit_factor": 0.47,
+        "final_equity": 0.5505,
+        "name": "mr100_z1.5_x0.5_h24"
+      },
+      {
+        "total_return_pct": -45.35,
+        "max_drawdown_pct": -50.48,
+        "sharpe": -1.67,
+        "trades": 66,
+        "win_rate_pct": 47.0,
+        "profit_factor": 0.55,
+        "final_equity": 0.5465,
+        "name": "mr50_z1.0_x0.5_h12"
+      },
+      {
+        "total_return_pct": -45.58,
+        "max_drawdown_pct": -54.18,
+        "sharpe": -1.49,
+        "trades": 88,
+        "win_rate_pct": 53.4,
+        "profit_factor": 0.53,
+        "final_equity": 0.5442,
+        "name": "mr20_z0.5_x0.0_h48"
+      },
+      {
+        "total_return_pct": -45.84,
+        "max_drawdown_pct": -51.11,
+        "sharpe": -1.71,
+        "trades": 28,
+        "win_rate_pct": 39.3,
+        "profit_factor": 0.45,
+        "final_equity": 0.5416,
+        "name": "mr100_z1.5_x0.0_h24"
+      },
+      {
+        "total_return_pct": -46.73,
+        "max_drawdown_pct": -51.83,
+        "sharpe": -1.59,
+        "trades": 108,
+        "win_rate_pct": 50.9,
+        "profit_factor": 0.68,
+        "final_equity": 0.5327,
+        "name": "mr20_z0.5_x0.5_h12"
+      },
+      {
+        "total_return_pct": -46.9,
+        "max_drawdown_pct": -54.61,
+        "sharpe": -1.49,
+        "trades": 68,
+        "win_rate_pct": 57.4,
+        "profit_factor": 0.48,
+        "final_equity": 0.531,
+        "name": "mr20_z0.5_x0.5_h48"
+      },
+      {
+        "total_return_pct": -47.58,
+        "max_drawdown_pct": -56.51,
+        "sharpe": -1.62,
+        "trades": 94,
+        "win_rate_pct": 52.1,
+        "profit_factor": 0.56,
+        "final_equity": 0.5242,
+        "name": "mr20_z0.5_x0.0_h24"
+      },
+      {
+        "total_return_pct": -47.76,
+        "max_drawdown_pct": -51.62,
+        "sharpe": -1.95,
+        "trades": 16,
+        "win_rate_pct": 50.0,
+        "profit_factor": 0.3,
+        "final_equity": 0.5224,
+        "name": "mr50_z2.0_x0.5_h48"
+      },
+      {
+        "total_return_pct": -47.84,
+        "max_drawdown_pct": -51.7,
+        "sharpe": -1.73,
+        "trades": 19,
+        "win_rate_pct": 57.9,
+        "profit_factor": 0.47,
+        "final_equity": 0.5216,
+        "name": "mr100_z1.5_x0.0_h48"
+      },
+      {
+        "total_return_pct": -48.17,
+        "max_drawdown_pct": -53.08,
+        "sharpe": -1.66,
+        "trades": 34,
+        "win_rate_pct": 64.7,
+        "profit_factor": 0.45,
+        "final_equity": 0.5183,
+        "name": "mr50_z1.0_x0.0_h48"
+      },
+      {
+        "total_return_pct": -48.22,
+        "max_drawdown_pct": -53.12,
+        "sharpe": -1.7,
+        "trades": 123,
+        "win_rate_pct": 52.0,
+        "profit_factor": 0.67,
+        "final_equity": 0.5178,
+        "name": "mr20_z0.5_x0.0_h12"
+      },
+      {
+        "total_return_pct": -48.51,
+        "max_drawdown_pct": -57.14,
+        "sharpe": -1.61,
+        "trades": 76,
+        "win_rate_pct": 55.3,
+        "profit_factor": 0.52,
+        "final_equity": 0.5149,
+        "name": "mr20_z0.5_x0.5_h24"
+      },
+      {
+        "total_return_pct": -49.54,
+        "max_drawdown_pct": -52.72,
+        "sharpe": -1.64,
+        "trades": 50,
+        "win_rate_pct": 56.0,
+        "profit_factor": 0.56,
+        "final_equity": 0.5046,
+        "name": "mr100_z0.5_x0.0_h24"
+      },
+      {
+        "total_return_pct": -50.26,
+        "max_drawdown_pct": -53.94,
+        "sharpe": -1.84,
+        "trades": 19,
+        "win_rate_pct": 57.9,
+        "profit_factor": 0.43,
+        "final_equity": 0.4974,
+        "name": "mr100_z1.5_x0.5_h48"
+      },
+      {
+        "total_return_pct": -50.41,
+        "max_drawdown_pct": -54.11,
+        "sharpe": -1.61,
+        "trades": 32,
+        "win_rate_pct": 62.5,
+        "profit_factor": 0.54,
+        "final_equity": 0.4959,
+        "name": "mr100_z0.5_x0.5_h48"
+      },
+      {
+        "total_return_pct": -51.07,
+        "max_drawdown_pct": -54.15,
+        "sharpe": -1.85,
+        "trades": 39,
+        "win_rate_pct": 41.0,
+        "profit_factor": 0.48,
+        "final_equity": 0.4893,
+        "name": "mr100_z1.0_x0.0_h24"
+      },
+      {
+        "total_return_pct": -51.4,
+        "max_drawdown_pct": -54.64,
+        "sharpe": -1.82,
+        "trades": 23,
+        "win_rate_pct": 65.2,
+        "profit_factor": 0.46,
+        "final_equity": 0.486,
+        "name": "mr100_z1.0_x0.0_h48"
+      },
+      {
+        "total_return_pct": -52.1,
+        "max_drawdown_pct": -55.42,
+        "sharpe": -1.77,
+        "trades": 83,
+        "win_rate_pct": 45.8,
+        "profit_factor": 0.66,
+        "final_equity": 0.479,
+        "name": "mr100_z0.5_x0.5_h12"
+      },
+      {
+        "total_return_pct": -52.24,
+        "max_drawdown_pct": -56.1,
+        "sharpe": -1.84,
+        "trades": 90,
+        "win_rate_pct": 42.2,
+        "profit_factor": 0.58,
+        "final_equity": 0.4776,
+        "name": "mr50_z0.5_x0.5_h12"
+      },
+      {
+        "total_return_pct": -52.32,
+        "max_drawdown_pct": -55.58,
+        "sharpe": -2.14,
+        "trades": 19,
+        "win_rate_pct": 47.4,
+        "profit_factor": 0.27,
+        "final_equity": 0.4768,
+        "name": "mr50_z1.5_x0.5_h48"
+      },
+      {
+        "total_return_pct": -52.53,
+        "max_drawdown_pct": -57.46,
+        "sharpe": -1.85,
+        "trades": 31,
+        "win_rate_pct": 58.1,
+        "profit_factor": 0.46,
+        "final_equity": 0.4747,
+        "name": "mr50_z1.0_x0.5_h48"
+      },
+      {
+        "total_return_pct": -53.62,
+        "max_drawdown_pct": -56.71,
+        "sharpe": -1.92,
+        "trades": 23,
+        "win_rate_pct": 60.9,
+        "profit_factor": 0.43,
+        "final_equity": 0.4638,
+        "name": "mr100_z1.0_x0.5_h48"
+      },
+      {
+        "total_return_pct": -53.76,
+        "max_drawdown_pct": -56.58,
+        "sharpe": -2.06,
+        "trades": 63,
+        "win_rate_pct": 39.7,
+        "profit_factor": 0.53,
+        "final_equity": 0.4624,
+        "name": "mr100_z1.0_x0.0_h12"
+      },
+      {
+        "total_return_pct": -53.88,
+        "max_drawdown_pct": -56.69,
+        "sharpe": -1.92,
+        "trades": 83,
+        "win_rate_pct": 47.0,
+        "profit_factor": 0.59,
+        "final_equity": 0.4612,
+        "name": "mr100_z0.5_x0.0_h12"
+      },
+      {
+        "total_return_pct": -54.44,
+        "max_drawdown_pct": -57.47,
+        "sharpe": -1.89,
+        "trades": 33,
+        "win_rate_pct": 66.7,
+        "profit_factor": 0.5,
+        "final_equity": 0.4556,
+        "name": "mr100_z0.5_x0.0_h48"
+      },
+      {
+        "total_return_pct": -54.56,
+        "max_drawdown_pct": -57.42,
+        "sharpe": -2.03,
+        "trades": 38,
+        "win_rate_pct": 36.8,
+        "profit_factor": 0.44,
+        "final_equity": 0.4544,
+        "name": "mr100_z1.0_x0.5_h24"
+      },
+      {
+        "total_return_pct": -55.01,
+        "max_drawdown_pct": -57.75,
+        "sharpe": -2.14,
+        "trades": 63,
+        "win_rate_pct": 39.7,
+        "profit_factor": 0.51,
+        "final_equity": 0.4499,
+        "name": "mr100_z1.0_x0.5_h12"
+      }
+    ]
+  }
+}

@@ -21,6 +21,7 @@ import os
 import time
 
 from radar import FAPI, get
+import risk
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 STATE = os.path.join(HERE, "paper_carry_state.json")
@@ -32,6 +33,7 @@ MAX_POS = 3
 ENTRY_APR = 4.0      # ambang masuk: hanya level yang benar-benar bisa di-carry (punya pasar spot)
 EXIT_APR = 2.0
 MAX_DAYS = 60
+MODAL_BUKU = NOTIONAL * MAX_POS   # modal terkomit maksimum; dasar ukuran rugi harian
 CACHE = os.path.join(HERE, "data")
 
 
@@ -84,6 +86,18 @@ def mark(p):
     return p
 
 
+def keluar(st, sym, p, reason):
+    """Tutup posisi: catat ke CSV + tahan di riwayat. Satu jalur kode untuk semua alasan keluar."""
+    p["exit_reason"] = reason
+    p["closed_iso"] = time.strftime("%Y-%m-%d %H:%M", time.gmtime())
+    st["closed"].append(p)
+    with open(TRADES, "a", newline="") as f:
+        csv.writer(f).writerow([sym, p["opened_iso"], p["closed_iso"],
+                                f"{p['funding']*100:.3f}%", f"{p['net']*100:.3f}%", reason])
+    log(f"KELUAR {sym}: net {p['net']*100:.3f}% (funding {p['funding']*100:.3f}%) — {reason}")
+    del st["positions"][sym]
+
+
 def tick():
     st = load()
     rows = {r["symbol"]: r for r in radar_rows()}
@@ -106,15 +120,29 @@ def tick():
         elif age >= MAX_DAYS:
             reason = f"umur {age:.0f} hari"
         if reason:
-            p["exit_reason"] = reason
-            st["closed"].append(p)
-            with open(TRADES, "a", newline="") as f:
-                csv.writer(f).writerow([sym, p["opened_iso"], p["closed_iso"],
-                                        f"{p['funding']*100:.3f}%", f"{p['net']*100:.3f}%", reason])
-            log(f"KELUAR {sym}: net {p['net']*100:.3f}% (funding {p['funding']*100:.3f}%) — {reason}")
-            del st["positions"][sym]
+            keluar(st, sym, p, reason)
         else:
             log(f"TAHAN  {sym}: net {p['net']*100:.3f}% (funding {p['funding']*100:.3f}%) apr7d {apr}%")
+
+    # 1b. Kill switch harian — batas rugi dipaksa di kode, bukan di dokumen.
+    hari = time.strftime("%Y-%m-%d", time.gmtime())
+    pnl_now = sum(p["net"] * p["notional"] for p in st["positions"].values())
+    anchor = st.get("day") or {}
+    if anchor.get("date") != hari:
+        anchor = {"date": hari, "pnl": pnl_now, "halted": bool(anchor.get("halted"))}
+    st["day"] = anchor
+    terpicu, rugi = risk.cek_kill_switch(MODAL_BUKU + anchor["pnl"], MODAL_BUKU + pnl_now)
+    if terpicu and not anchor["halted"]:
+        anchor["halted"] = True
+        log(f"KILL SWITCH: rugi harian {rugi:.2f}% >= batas {risk.KILL_SWITCH_HARIAN_PCT}% "
+            f"-> tutup semua posisi, berhenti sampai direset manual")
+        for sym in list(st["positions"]):
+            keluar(st, sym, st["positions"][sym], f"kill switch harian ({rugi:.2f}%)")
+    if anchor["halted"]:
+        log(f"HENTI SEMENTARA (profitabilitas hari ini {rugi:+.2f}%): tidak buka posisi baru. "
+            f"Reset dengan: python3 paper_carry.py --reset-halt")
+        save(st)
+        return st
 
     # 2. buka posisi baru. Kandidat dipilih dengan aturan kualitas yang sama
     #    seperti gate radar, TAPI ambang APR sendiri (4%) — supaya jejak eksekusi
@@ -134,7 +162,7 @@ def tick():
             pp = perp_info(sym)["markPrice"]
             sp = spot_price(sym)
         except Exception as e:
-            log(f"gagal ambil harga {sym}: {e}")
+            log(f"gagal ambil harga {sym}: {type(e).__name__} {e}")
             continue
         hist = new_funding(sym, int(time.time() * 1000) - 8 * 3600 * 1000)
         st["positions"][sym] = {
@@ -200,9 +228,15 @@ if __name__ == "__main__":
     ap.add_argument("--tick", action="store_true")
     ap.add_argument("--loop", action="store_true")
     ap.add_argument("--status", action="store_true")
+    ap.add_argument("--reset-halt", action="store_true")
     a = ap.parse_args()
     if a.selftest:
         selfcheck()
+    elif a.reset_halt:
+        st = load()
+        st.get("day", {})["halted"] = False
+        save(st)
+        print("status henti direset; tick berikutnya boleh buka posisi baru")
     elif a.status:
         status()
     elif a.loop:

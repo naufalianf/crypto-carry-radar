@@ -205,8 +205,9 @@ def run(years=3):
         print(f"   {r['from']} → {r['to']} | rata funding 8h {r['avg_funding_8h_bps']} bps")
         for y, v in sorted(r["per_year"].items()):
             print(f"   {y}: net {v['ret_pct']:>7.2f}%  ({v['days']} hari)")
-    json.dump(rep, open(os.path.join(OUT, "carry_funding.json"), "w"), indent=2)
-    print(f"\nReport: {OUT}/carry_funding.json")
+    path = os.path.join(OUT, f"carry_funding_y{years}.json")
+    json.dump(rep, open(path, "w"), indent=2)
+    print(f"\nReport: {path}")
     print(f"Asumsi biaya masuk+keluar: {ROUND_TRIP_COST*100:.2f}% dari nominal")
     return rep
 

@@ -254,7 +254,13 @@ def sweep_oos(interval="4h", years=3, symbols=("BTCUSDT", "ETHUSDT")):
         print(f"  trade median: {st.median([r['trades'] for r in traded]) if traded else 0} "
               f"(min {min([r['trades'] for r in traded]) if traded else 0})")
         out[sym] = {"buyhold_oos": bh, "n": len(rows), "median_ret": st.median(rets),
-                    "beat_bh": beat, "rows": top}
+                    "median_sharpe": st.median(sh), "beat_bh": beat,
+                    "profit": sum(1 for r in rows if r["total_return_pct"] > 0),
+                    "rows": sorted(rows, key=lambda r: -r["total_return_pct"])}
+    os.makedirs(OUT, exist_ok=True)
+    path = os.path.join(OUT, f"sweep_{interval}.json")
+    json.dump(out, open(path, "w"), indent=2)
+    print(f"\nReport: {path}")
     return out
 
 

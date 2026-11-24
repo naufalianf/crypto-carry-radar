@@ -52,15 +52,17 @@ def load(years=4):
 
 
 def tsmom_weights(closes, L, R):
-    """Bobot target per bar (None = tidak rebalance di bar itu)."""
+    """Bobot target per bar (None = tidak rebalance di bar itu).
+    Sinyal memakai close bar i-1 dan dieksekusi di open bar i (anti look-ahead)."""
     n = len(next(iter(closes.values())))
     out = []
     for i in range(n):
-        if i % R != 0 or i < L:
+        if i % R != 0 or i < L + 1:
             out.append(None)
             continue
+        j = i - 1                                    # close yang sudah tutup sebelum open hari i
         picked = [s for s in SYMBOLS
-                  if closes[s][i - L] > 0 and closes[s][i] / closes[s][i - L] - 1 > 0]
+                  if closes[s][j - L] > 0 and closes[s][j] / closes[s][j - L] - 1 > 0]
         w = {s: 1.0 / len(picked) for s in picked} if picked else {}
         out.append(w)
     return out

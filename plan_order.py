@@ -16,6 +16,7 @@ import os
 import time
 
 import radar
+import risk
 
 CAPITAL = 1000.0      # nominal per posisi (USD)
 BOOK_USE = 0.10       # maksimal 10% kedalaman orderbook dalam pita 0,1%
@@ -59,10 +60,13 @@ def capacity(sym):
 
 
 def ukuran(sym, modal, cap):
-    """Ukuran posisi = modal, tapi tidak lebih dari BOOK_USE x kapasitas."""
+    """Ukuran posisi = modal, tapi tidak lebih dari BOOK_USE x kapasitas,
+    dan tidak lebih dari plafon risiko per posisi (risk.batas_notional)."""
+    plafon = risk.batas_notional(modal)
     batas_buku = cap["kapasitas"] * BOOK_USE
-    n = min(modal, batas_buku)
-    ikat = "modal" if modal <= batas_buku else "kedalaman orderbook"
+    n = min(modal, batas_buku, plafon)
+    ikat = ("kedalaman orderbook" if batas_buku == n and n < modal else
+            "plafon risiko" if plafon == n and n < modal else "modal")
     return n, ikat, batas_buku
 
 
@@ -106,13 +110,15 @@ def rencana(rows, modal=CAPITAL, max_pos=MAX_POS):
 def teks(plans, keluar, modal=CAPITAL, stamp=None):
     stamp = stamp or time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime())
     if not plans:
-        out = [f"RENCANA CARRY {stamp}", f"Modal per posisi: ${modal:,.0f}",
+        out = [f"RENCANA CARRY {stamp}", f"Modal total: ${modal:,.0f}",
                "", "Tidak ada yang layak dieksekusi sekarang."]
         if keluar:
             out += ["", "Gugur di pemeriksaan orderbook:"] + [f"  - {k}" for k in keluar]
         out += ["", "Bertahan. Syarat: punya pasar spot, kapasitas >= $20, APR 7d >= 4%."]
         return "\n".join(out)
-    out = [f"RENCANA CARRY {stamp}", f"Modal per posisi: ${modal:,.0f}", ""]
+    out = [f"RENCANA CARRY {stamp}", f"Modal total: ${modal:,.0f} | plafon per posisi: "
+           f"${risk.batas_notional(modal):,.0f} ({risk.MAX_NOTIONAL_PCT:.0f}% modal) | "
+           f"maks {risk.MAX_POSISI} posisi", ""]
     for i, p in enumerate(plans, 1):
         out += [
             f"{i}) {p['symbol']} — APR 7d {p['apr_7d']:.2f}% (30d {p['apr_30d']:.2f}%), "
@@ -139,6 +145,11 @@ def teks(plans, keluar, modal=CAPITAL, stamp=None):
         "Dua kaki sama besar. Kalau salah satu gagal, tutup yang sudah jalan.",
         f"Nominal ini dihitung dari kedalaman orderbook nyata, bukan dari modal. "
         f"Feenya {radar.ROUND_TRIP * 100:.1f}% sekali jalan.",
+        "",
+        f"Batas risiko (dipaksa di kode, lihat risk.py): leverage maks {risk.MAX_LEVERAGE:.0f}x | "
+        f"plafon {risk.MAX_NOTIONAL_PCT:.0f}% modal per posisi | maks {risk.MAX_POSISI} posisi terbuka.",
+        f"Kill switch harian: rugi >= {risk.KILL_SWITCH_HARIAN_PCT:.0f}% modal buku -> tutup semua. "
+        f"Basis stop {risk.BASIS_STOP_PCT}% | toleransi delta dua kaki {risk.DELTA_TOLERANSI_PCT:.0f}%.",
     ]
     return "\n".join(out)
 
@@ -156,8 +167,12 @@ def selfcheck():
     assert b2 == 100.0 and a2 == 100.0, f"pita tidak menyaring: {b2}, {a2}"
     n, ikat, batas = ukuran("X", 1000.0, {"kapasitas": 1000.0})
     assert (n, ikat) == (100.0, "kedalaman orderbook"), f"ukuran salah: {n}, {ikat}"
-    n2, ikat2, _ = ukuran("X", 50.0, {"kapasitas": 10000.0})
-    assert (n2, ikat2) == (50.0, "modal"), f"ukuran salah: {n2}, {ikat2}"
+    # plafon risiko 20% modal -> 200, lebih kecil dari batas buku 1000
+    n2, ikat2, _ = ukuran("X", 1000.0, {"kapasitas": 10000.0})
+    assert (n2, ikat2) == (200.0, "plafon risiko"), f"plafon salah: {n2}, {ikat2}"
+    # modal kecil: plafon 20% dari 50 = 10
+    n3, ikat3, _ = ukuran("X", 50.0, {"kapasitas": 10000.0})
+    assert (n3, ikat3) == (10.0, "plafon risiko"), f"ukuran salah: {n3}, {ikat3}"
     assert abs(0.3 / (20.0 / 365) - 5.475) < 0.01, "hari balik modal salah"
     print("selfcheck OK (pita 0,1%, ukuran posisi, hari balik modal)")
 

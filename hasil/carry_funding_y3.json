@@ -1,0 +1,84 @@
+{
+  "BTCUSDT": {
+    "symbol": "BTCUSDT",
+    "days": 1095,
+    "from": "2023-11-26",
+    "to": "2026-11-24",
+    "gross_pct": 24.39,
+    "net_pct": 24.01,
+    "apr_net_pct": 7.44,
+    "funding_pct": 21.87,
+    "basis_pct": -0.04,
+    "sharpe": 12.29,
+    "mdd_pct": -0.43,
+    "days_funding_pos_pct": 88.6,
+    "avg_funding_8h_bps": 0.667,
+    "per_year": {
+      "2023": {
+        "ret_pct": 1.72,
+        "days": 35,
+        "funding_pct": 1.81,
+        "basis_pct": -0.1
+      },
+      "2024": {
+        "ret_pct": 12.76,
+        "days": 366,
+        "funding_pct": 11.96,
+        "basis_pct": 0.06
+      },
+      "2025": {
+        "ret_pct": 5.26,
+        "days": 365,
+        "funding_pct": 5.13,
+        "basis_pct": -0.0
+      },
+      "2026": {
+        "ret_pct": 3.02,
+        "days": 328,
+        "funding_pct": 2.98,
+        "basis_pct": -0.0
+      }
+    }
+  },
+  "ETHUSDT": {
+    "symbol": "ETHUSDT",
+    "days": 1095,
+    "from": "2023-11-26",
+    "to": "2026-11-24",
+    "gross_pct": 24.19,
+    "net_pct": 23.81,
+    "apr_net_pct": 7.38,
+    "funding_pct": 21.79,
+    "basis_pct": -0.13,
+    "sharpe": 11.46,
+    "mdd_pct": -0.64,
+    "days_funding_pos_pct": 86.8,
+    "avg_funding_8h_bps": 0.664,
+    "per_year": {
+      "2023": {
+        "ret_pct": 1.86,
+        "days": 35,
+        "funding_pct": 1.96,
+        "basis_pct": -0.11
+      },
+      "2024": {
+        "ret_pct": 13.92,
+        "days": 366,
+        "funding_pct": 13.0,
+        "basis_pct": 0.04
+      },
+      "2025": {
+        "ret_pct": 5.0,
+        "days": 365,
+        "funding_pct": 4.93,
+        "basis_pct": -0.05
+      },
+      "2026": {
+        "ret_pct": 1.92,
+        "days": 328,
+        "funding_pct": 1.91,
+        "basis_pct": -0.01
+      }
+    }
+  }
+}

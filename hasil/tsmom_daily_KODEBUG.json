@@ -1,0 +1,128 @@
+{
+  "bench": {
+    "btc": {
+      "ret_pct": -37.42,
+      "sharpe": -0.32,
+      "mdd_pct": -52.97
+    },
+    "ew": {
+      "ret_pct": -60.57,
+      "sharpe": -0.42,
+      "mdd_pct": -69.14
+    }
+  },
+  "combos": {
+    "L30_R7": {
+      "ret_pct": -17.41,
+      "sharpe": 0.2,
+      "mdd_pct": -63.99,
+      "chunk_pos": "1/4",
+      "chained_pct": -17.41,
+      "turnover": 65.9,
+      "chunks": [
+        26.68,
+        -12.78,
+        -25.07,
+        -0.25
+      ]
+    },
+    "L30_R30": {
+      "ret_pct": -70.68,
+      "sharpe": -1.03,
+      "mdd_pct": -77.42,
+      "chunk_pos": "0/4",
+      "chained_pct": -70.68,
+      "turnover": 13.61,
+      "chunks": [
+        -9.24,
+        -43.84,
+        -35.28,
+        -11.1
+      ]
+    },
+    "L60_R7": {
+      "ret_pct": -56.25,
+      "sharpe": -0.38,
+      "mdd_pct": -58.8,
+      "chunk_pos": "0/4",
+      "chained_pct": -56.18,
+      "turnover": 25.76,
+      "chunks": [
+        -28.11,
+        -16.93,
+        -12.74,
+        -15.91
+      ]
+    },
+    "L60_R30": {
+      "ret_pct": -68.09,
+      "sharpe": -0.76,
+      "mdd_pct": -71.61,
+      "chunk_pos": "0/4",
+      "chained_pct": -68.09,
+      "turnover": 10.85,
+      "chunks": [
+        -29.0,
+        -19.34,
+        -38.56,
+        -9.32
+      ]
+    },
+    "L90_R7": {
+      "ret_pct": -68.36,
+      "sharpe": -0.9,
+      "mdd_pct": -73.18,
+      "chunk_pos": "0/4",
+      "chained_pct": -65.95,
+      "turnover": 25.75,
+      "chunks": [
+        -20.52,
+        -18.68,
+        -6.71,
+        -43.53
+      ]
+    },
+    "L90_R30": {
+      "ret_pct": -63.62,
+      "sharpe": -0.86,
+      "mdd_pct": -67.52,
+      "chunk_pos": "0/4",
+      "chained_pct": -61.94,
+      "turnover": 12.19,
+      "chunks": [
+        -16.82,
+        -20.98,
+        -8.39,
+        -36.79
+      ]
+    },
+    "L180_R7": {
+      "ret_pct": -39.08,
+      "sharpe": -0.4,
+      "mdd_pct": -60.63,
+      "chunk_pos": "0/4",
+      "chained_pct": -38.99,
+      "turnover": 24.71,
+      "chunks": [
+        0.0,
+        -3.44,
+        -28.96,
+        -11.06
+      ]
+    },
+    "L180_R30": {
+      "ret_pct": -50.08,
+      "sharpe": -0.65,
+      "mdd_pct": -56.47,
+      "chunk_pos": "1/4",
+      "chained_pct": -50.08,
+      "turnover": 10.22,
+      "chunks": [
+        -4.87,
+        -26.04,
+        -29.24,
+        0.27
+      ]
+    }
+  }
+}
