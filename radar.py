@@ -12,9 +12,11 @@ Yang TIDAK dilakukan: tidak menyentuh saldo, tidak pasang order, tidak butuh API
   python3 radar.py --top 15 --threshold 10
 """
 import argparse
+import html
 import json
 import math
 import os
+import re
 import time
 import urllib.parse
 import urllib.request
@@ -200,10 +202,12 @@ def _flush(tok, chat):
     sisa, terkirim = [], 0
     for l in baris:
         try:
-            data = urllib.parse.urlencode({"chat_id": chat,
-                                           "text": json.loads(l)["text"]}).encode()
+            item = json.loads(l)
+            q = {"chat_id": chat, "text": item["text"]}
+            if item.get("mode"):
+                q["parse_mode"] = item["mode"]     # HTML harus dikirim ulang sebagai HTML
             urllib.request.urlopen(f"https://api.telegram.org/bot{tok}/sendMessage",
-                                   data, timeout=20)
+                                   urllib.parse.urlencode(q).encode(), timeout=20)
             terkirim += 1
         except Exception:
             sisa.append(l)
@@ -212,37 +216,80 @@ def _flush(tok, chat):
     return terkirim
 
 
-def send(text):
+def send(text, html_mode=False):
     """Kirim pesan ke bot alert. Kredensial tidak pernah ditulis di kode/log."""
     tok = _cred("ALERT_BOT_TOKEN") or _cred("TELEGRAM_BOT_TOKEN")
     chat = _cred("ALERT_CHAT_ID") or _cred("TELEGRAM_CHAT_ID")
     if not tok or not chat:
         return "belum dikonfigurasi: isi ALERT_BOT_TOKEN dan ALERT_CHAT_ID di ~/home/.alertbot.env"
-    data = urllib.parse.urlencode({"chat_id": chat, "text": text}).encode()
+    q = {"chat_id": chat, "text": text}
+    if html_mode:
+        q["parse_mode"] = "HTML"
+    data = urllib.parse.urlencode(q).encode()
     try:
         urllib.request.urlopen(f"https://api.telegram.org/bot{tok}/sendMessage", data, timeout=20)
     except Exception as e:
         # jangan buang alert: simpan ke antrian supaya bisa dikirim ulang
         with open(QUEUE, "a") as f:
-            f.write(json.dumps({"ts": time.time(), "text": text}) + "\n")
+            f.write(json.dumps({"ts": time.time(), "text": text,
+                                "mode": "HTML" if html_mode else None}) + "\n")
         return f"gagal kirim ({e}); disimpan ke antrian"
     # pengiriman berhasil = kesempatan kirim ulang antrian lama
     n = _flush(tok, chat)
     return f"terkirim ({n} antrian tertunda ikut dikirim)" if n else "terkirim"
 
 
+def _kap(v):
+    """Kapasitas ringkas supaya kolom tabel tidak melebar di layar HP."""
+    if not v:
+        return "—"
+    return f"${v/1e6:.1f}jt" if v >= 1e6 else f"${v/1e3:.0f}rb"
+
+
+def _bar(pct, ambang, lebar=8):
+    """Bar blok sebagai pengganti warna — Telegram tidak mendukung warna teks.
+
+    Skala: ambang = separuh bar. Jadi bar penuh berarti APR dua kali ambang,
+    bukan "APR tertinggi hari ini" (yang bisa saja cuma 5,3% dan menyesatkan).
+    """
+    n = 0 if ambang <= 0 else min(lebar, round(pct / (ambang * 2) * lebar))
+    return "█" * n + "░" * (lebar - n)
+
+
+def _bentuk(payload):
+    """Susun isi alert sebagai mini-UI.
+
+    Telegram tidak punya warna, jadi hirarki dibangun dari: garis pemisah,
+    blok monospace rata kolom, dan bar blok untuk jarak APR dari ambang.
+    """
+    rows = sorted(payload["passed"], key=lambda r: -r["apr_7d"])
+    amb = payload["threshold"]
+    baris = [f"{'SIMBOL':<10}{'APR7d':>6}  {'':<8} {'Δ':>6} {'BALIK':>6} {'KAPASITAS':>10}"]
+    for r in rows[:8]:
+        balik = f"{r['breakeven_days']:.0f}h" if r.get("breakeven_days") else "—"
+        baris.append(f"{r['symbol']:<10}{r['apr_7d']:>5.2f}%  {_bar(r['apr_7d'], amb)} "
+                     f"{r['apr_7d'] - amb:>+6.2f} {balik:>6} {_kap(r.get('depth_usd')):>10}")
+    tabel = "<pre>" + html.escape("\n".join(baris)) + "</pre>"
+
+    gagal = len(payload.get("rejected") or []) or len(payload["rows"]) - len(rows)
+    ekor = [f"🚫 {gagal} koin APR tinggi gagal gate"] if gagal else []
+    ekor.append("⚠️ lolos gate ≠ layak pasang modal.")
+
+    return ("🔍 <b>RADAR FUNDING</b>\n"
+            "━━━━━━━━━━━━━━━━━━━━\n"
+            f"🕐 <code>{html.escape(payload['generated_at'])}</code>\n"
+            f"🎯 ambang <b>{payload['threshold']}%</b>\n"
+            "\n"
+            f"✅ <b>{len(rows)} koin lolos gate</b>\n"
+            f"{tabel}\n"
+            + "\n".join(ekor))
+
+
 def notify(payload, dry=False):
     if not payload["alerts"]:
         return "tidak ada yang lolos ambang; tidak ada alert dikirim"
-    baris = "\n".join(
-        f"{r['symbol']}: APR {r['apr_7d']}% | balik modal {r['breakeven_days']:.0f}h | "
-        f"kapasitas ${r['depth_usd']:,}" if r["depth_usd"] else
-        f"{r['symbol']}: APR {r['apr_7d']}% | balik modal {r['breakeven_days']:.0f}h"
-        for r in payload["passed"])
-    teks = (f"RADAR FUNDING {payload['generated_at']}\n"
-            f"Lolos gate (ambang {payload['threshold']}%): {', '.join(payload['alerts'])}\n"
-            f"{baris}\n\nCek koin ini punya pasar spot + kapasitas cukup sebelum dianggap layak.")
-    return teks if dry else send(teks)
+    teks = _bentuk(payload)
+    return teks if dry else send(teks, html_mode=True)
 
 
 def rows_layak(threshold=ENTRY_APR, max_age=1800):
@@ -320,7 +367,9 @@ if __name__ == "__main__":
     ap.add_argument("--loop", action="store_true")
     ap.add_argument("--test-alert", action="store_true")
     ap.add_argument("--preview-alert", type=float, metavar="AMBANG",
-                    help="cetak bentuk pesan alert untuk AMANG (tidak dikirim), pakai snapshot terakhir")
+                    help="cetak bentuk pesan alert untuk AMBANG (tidak dikirim), pakai snapshot terakhir")
+    ap.add_argument("--send", type=float, metavar="AMBANG",
+                    help="KIRIM pesan alert sungguhan untuk AMBANG, pakai snapshot terakhir")
     ap.add_argument("--top", type=int, default=TOPN)
     ap.add_argument("--threshold", type=float, default=10.0)
     a = ap.parse_args()
@@ -329,9 +378,9 @@ if __name__ == "__main__":
     elif a.test_alert:
         print("uji alert:", send("Uji alert dari radar funding. Kalau pesan ini masuk, "
                                  "bot alert sudah tersambung."))
-    elif a.preview_alert is not None:
+    elif a.preview_alert is not None or a.send is not None:
+        th = a.preview_alert if a.preview_alert is not None else a.send
         p = json.load(open(os.path.join(HERE, "web", "radar.json")))
-        th = a.preview_alert
         p["threshold"] = th
         for r in p["rows"]:
             bad = gate(r, th)
@@ -342,7 +391,7 @@ if __name__ == "__main__":
         if not p["alerts"]:
             print(f"(ambang {th}%: tidak ada yang lolos. Pesan tidak akan dikirim.)")
         else:
-            print(notify(p, dry=True))
+            print(notify(p, dry=a.send is None))
     elif a.run:
         show(scan(a.top, a.threshold), top=a.top)
     else:
