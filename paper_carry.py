@@ -65,6 +65,37 @@ def log(msg):
         f.write(line + "\n")
 
 
+def _kirim_telegram(teks):
+    import radar
+    return radar.send(teks)
+
+
+NOTIF = _kirim_telegram     # diganti di tes; tidak boleh pernah membuat tick gagal
+
+
+def notif(teks):
+    """Kirim kejadian penting ke Telegram. Gagal kirim hanya dicatat, tidak pernah melempar."""
+    try:
+        hasil = NOTIF("[paper carry] " + teks)
+        if hasil and not str(hasil).startswith("terkirim"):
+            log(f"notif: {hasil}")
+    except Exception as e:
+        log(f"notif gagal: {type(e).__name__} {e}")
+
+
+def notif_sekali(st, kunci, teks, pulih=None):
+    """Kirim hanya saat kondisi `kunci` BERUBAH (teks=None berarti kondisi normal).
+    Mencegah spam tiap 4 jam selama kondisi buruk bertahan."""
+    kini = st.setdefault("notif_state", {})
+    if teks and kini.get(kunci) != teks:
+        kini[kunci] = teks
+        notif(teks)
+    elif not teks and kunci in kini:
+        del kini[kunci]
+        if pulih:
+            notif(pulih)
+
+
 def load():
     """State hilang = mulai baru. State ADA tapi rusak = berhenti (fail closed).
 
@@ -186,6 +217,7 @@ def keluar(st, sym, p, reason, now=None, apr_exit=None):
                     f"{p['net']*100:.3f}", reason])
     log(f"KELUAR {sym}: net {p['net']*100:.3f}% (funding {p['funding']*100:.3f}%, "
         f"dijanjikan APR masuk {harapan:.3f}%) — {reason}")
+    notif(f"KELUAR {sym}: net {p['net']*100:.3f}% setelah {hari:.1f} hari. Alasan: {reason}")
     del st["positions"][sym]
 
 
@@ -302,6 +334,12 @@ def _tick(now):
             log(f"GAGAL NILAI {sym}: {type(e).__name__} {e} — posisi ditahan dengan angka terakhir")
             continue
         p["ticks"] = p["events"] = p.get("ticks", p.get("events", 0)) + 1
+        lvl, jarak, liq = risk.cek_margin(p["perp_entry"], p.get("perp_now", p["perp_entry"]))
+        notif_sekali(st, f"margin_{sym}",
+                     None if lvl is None else
+                     f"MARGIN {lvl.upper()} {sym}: harga perp tinggal {jarak:.0f}% lagi ke likuidasi "
+                     f"(~{liq:.4g}). Tambah margin di akun futures atau kurangi posisi.",
+                     pulih=f"Margin {sym} kembali aman.")
         age = (now - p["opened"]) / 86400
         # Tidak ada data = tidak bisa dinilai, dan itu dicatat (bukan jatuh ke angka konstan).
         apr = rows[sym].get("apr_7d") if sym in rows else None
@@ -310,7 +348,9 @@ def _tick(now):
                                                      p.get("basis_entry_pct", 0.0))
         keluar_net, _alasan_net = risk.cek_net(p["net"] * 100)
         keluar_fund, _alasan_fund = risk.cek_funding(p["funding"] * 100)
-        if keluar_fund:
+        if lvl == "darurat":
+            reason = f"jarak likuidasi darurat ({jarak:.0f}%)"
+        elif keluar_fund:
             reason = _alasan_fund
         elif keluar_net:
             reason = _alasan_net
@@ -339,6 +379,8 @@ def _tick(now):
         halt = st["halt"] = {"level": level, "rugi": rugi, "batas": batas, "sejak": iso(now)}
         log(f"KILL SWITCH {level}: rugi {rugi:.2f}% >= batas {batas}% -> tutup semua posisi, "
             f"berhenti sampai direset manual")
+        notif(f"KILL SWITCH {level}: rugi {rugi:.2f}% >= batas {batas}%. Semua posisi ditutup, "
+              f"bot berhenti. Reset manual: python3 paper_carry.py --reset-halt")
         for sym in list(st["positions"]):
             keluar(st, sym, st["positions"][sym], f"kill switch {level} ({rugi:.2f}%)", now)
     catat_pnl(st, now, total_pnl(st))
@@ -349,6 +391,8 @@ def _tick(now):
         return st
 
     # 2. buka posisi baru — hanya kalau semua penjaga lolos.
+    notif_sekali(st, "radar", None if snap_ok else f"TIDAK BUKA POSISI: {snap_alasan}",
+                 pulih="Radar kembali normal, bot boleh membuka posisi lagi.")
     if not snap_ok:
         log(f"TIDAK BUKA POSISI BARU: {snap_alasan}")
         save(st)
@@ -398,6 +442,7 @@ def _tick(now):
         dibuka += 1
         log(f"MASUK  {sym}: APR {r['apr_7d']}% biaya {r['carry_cost_pct']}% "
             f"kapasitas ${r.get('depth_usd') or 0:,}")
+        notif(f"MASUK {sym}: APR {r['apr_7d']}%, biaya {r['carry_cost_pct']}%, notional ${NOTIONAL:,.0f}")
     save(st)
     return st
 
@@ -434,6 +479,7 @@ def loop():
             tick()
         except Exception as e:
             log(f"ERROR tick: {e}")
+            notif(f"ERROR tick: {type(e).__name__} {e}")
         time.sleep(4 * 3600)
 
 
