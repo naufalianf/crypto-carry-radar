@@ -34,8 +34,9 @@ Bahasa: Indonesia. Tanggal: 2026-11-24.
 5. Buat kunci testnet (spot: testnet.binance.vision, futures: testnet.binancefuture.com, keduanya terpisah),
    isi env, lalu **smoke test**: `python3 binance_testnet.py --smoke BTCUSDT`
    (buka lalu tutup sekitar 120 USDT, mencatat slippage ke `execution_fills.csv`).
-6. **Laporkan hasil smoke test ke Naufal/Claude apa adanya**, termasuk galat. Format respons dan kode galat
-   ditulis dari dokumentasi dan belum pernah menyentuh testnet sungguhan, jadi penyesuaian itu normal.
+6. **Tulis hasil smoke test di bagian "Hasil smoke test" di bawah file ini, apa adanya**, termasuk galat, lalu
+   commit dan push. Format respons dan kode galat ditulis dari dokumentasi dan belum pernah menyentuh testnet
+   sungguhan, jadi penyesuaian itu normal.
 7. Hanya kalau smoke test bersih: jalankan `python3 paper_carry.py --loop --testnet`
    (nominal order `EXEC_NOTIONAL` = 150 USDT per posisi, maksimum 3 posisi).
 
@@ -67,3 +68,27 @@ Bahasa: Indonesia. Tanggal: 2026-11-24.
 ## Syarat sebelum live (belum terpenuhi, jangan dilompati)
 Smoke test bersih, 2 minggu testnet tanpa HALT yang tak terjelaskan, slippage terukur dan masuk akal terhadap
 asumsi biaya 0,3%, kunci live hanya izin trade (withdraw mati, IP whitelist), dan persetujuan eksplisit Naufal.
+
+## Hasil smoke test (diisi Hermes, jangan diisi Claude)
+Aturan mengisi:
+- **Jangan menulis kunci API, secret, atau signature.** Kalau ada galat yang memuat URL bertanda tangan, hapus bagian `signature=...`.
+- Tempel keluaran asli, jangan diringkas. Galat yang tampak sepele sering justru petunjuk utama.
+- Satu entri per percobaan. Tambahkan di bawah entri terakhir, jangan menimpa entri lama.
+- Setelah mengisi: `git pull --rebase origin main`, commit, push.
+
+Format entri (salin, lalu isi):
+```
+### Percobaan N, <tanggal dan jam>
+- Commit yang dijalankan: <git rev-parse --short HEAD>
+- Perintah: python3 binance_testnet.py --smoke BTCUSDT
+- Selftest 4 modul: OK / GAGAL (tulis yang gagal)
+- Hasil: BERSIH / GALAT / TERISI SEBAGIAN
+- Keluaran asli perintah di atas:
+  <tempel di sini>
+- Isi execution_fills.csv (baris baru saja): <tempel>
+- Saldo akun testnet setelahnya: spot BTC = ?, posisi perp BTCUSDT = ?  (harus sama-sama 0)
+- Ada file execution_halt.json? ya / tidak
+- Catatan: <apa pun yang terasa janggal>
+```
+
+(belum ada percobaan)
