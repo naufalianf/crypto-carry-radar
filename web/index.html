@@ -34,8 +34,9 @@
     border-radius:999px;padding:6px 14px;font-size:13px;cursor:pointer}
   button:hover{border-color:#33404f}
   button.on{border-color:var(--acc);color:var(--acc)}
-  table{width:100%;border-collapse:collapse;background:var(--panel);
-    border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .tscroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;
+    -webkit-overflow-scrolling:touch}
+  table{width:100%;border-collapse:collapse;background:var(--panel)}
   th,td{padding:9px 11px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
   th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);
     font-weight:600;cursor:pointer;user-select:none}
@@ -96,16 +97,17 @@
     <button id="btn-scan" style="margin-left:auto">scan ulang</button>
   </div>
 
+  <div class="tscroll">
   <table>
     <thead>
       <tr>
-        <th data-k="rank">#</th>
+        <th data-k="rank" class="hide-sm">#</th>
         <th data-k="symbol">simbol</th>
         <th data-k="volume_musd" class="hide-sm">vol (jt$)</th>
         <th data-k="bond_days" class="hide-sm">umur</th>
         <th data-k="spread_bps" class="hide-sm">spread</th>
         <th data-k="apr_7d">APR 7d</th>
-        <th data-k="apr_30d">APR 30d</th>
+        <th data-k="apr_30d" class="hide-sm">APR 30d</th>
         <th data-k="pos_pct" class="hide-sm">fund+</th>
         <th data-k="carry_cost_pct" class="hide-sm">biaya</th>
         <th data-k="breakeven_days">balik modal</th>
@@ -115,6 +117,7 @@
     </thead>
     <tbody id="rows"></tbody>
   </table>
+  </div>
 
   <h2 id="rej-h">APR tinggi tapi gagal gate</h2>
   <div class="rej" id="rej"></div>
@@ -176,19 +179,19 @@ function render() {
 
   document.getElementById("rows").innerHTML = rows.map(r => `
     <tr>
-      <td>${r.rank}</td>
+      <td class="hide-sm">${r.rank}</td>
       <td class="sym">${r.symbol}</td>
       <td class="hide-sm">${r.volume_musd.toFixed(0)}</td>
       <td class="hide-sm">${r.bond_days}h</td>
       <td class="hide-sm">${r.spread_bps === null ? "—" : r.spread_bps.toFixed(1)}</td>
       <td class="${cls(r.apr_7d)}">${fmt(r.apr_7d)}</td>
-      <td class="${cls(r.apr_30d)}">${fmt(r.apr_30d)}</td>
+      <td class="hide-sm ${cls(r.apr_30d)}">${fmt(r.apr_30d)}</td>
       <td class="hide-sm">${r.pos_pct.toFixed(0)}%</td>
       <td class="hide-sm">${r.carry_cost_pct.toFixed(2)}%</td>
       <td>${r.breakeven_days ? r.breakeven_days.toFixed(0) + " hari" : "—"}</td>
       <td class="hide-sm">${usd(r.depth_usd)}</td>
       <td>${r.status ? '<span class="pill hot">lolos</span>' : '<span class="pill">pantau</span>'}</td>
-    </tr>`).join("") || `<tr><td colspan="12" style="text-align:center;color:var(--mut)">
+    </tr>`).join("") || `<tr><td colspan="6" style="text-align:center;color:var(--mut)">
       tidak ada baris untuk filter ini</td></tr>`;
 
   const rej = data.rejected || [];
