@@ -42,6 +42,9 @@ setelah persetujuan.
 5. `paper spot` (runner.py): selisih equity vs backtest **< 5%**.
 6. Ada dan lulus: mode **dry-run** (menyusun order tanpa mengirim), **kill switch**,
    batas notional dan batas rugi harian **dipaksa di kode**, bukan cuma di dokumen.
+   *Koreksi 2026-11-24: sebelumnya ditandai lulus padahal plafon 20% hanya dipakai `plan_order`;
+   `paper_carry` memakai 1000/posisi (167% plafon). Sekarang `NOTIONAL = risk.batas_notional(MODAL_BUKU)`
+   = 600 dan ada `assert` saat modul dimuat. Posisi lama (1000) tetap tercatat apa adanya.*
 7. Rekonsiliasi posisi otomatis: kalau dua kaki tidak seimbang, bot menutup dan memberi tahu.
    *Status: logikanya sudah ada di `execution.py` (urutan spot lalu perp, unwind kaki yatim,
    status order tak jelas -> HALT, tutup perp dulu baru spot), 19 tes lulus dengan exchange
