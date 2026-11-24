@@ -1,0 +1,30 @@
+RENCANA CARRY 2026-11-24 03:18 UTC (kode b790be1)
+Modal total: $1,000 | plafon per posisi: $200 (20% modal) | maks 3 posisi
+
+1) ZECUSDT — APR 7d 5.63% (30d 6.48%), funding positif 91% hari
+   BELI spot  : ~751.36 (ask)
+   SHORT perp : ~751.08 (bid, 1x)
+   Ukuran     : $200 (dibatasi: plafon risiko; kapasitas $164,239, pakai 10%)
+   Basis saat ini: -0.037% (perp vs spot)
+   Biaya masuk+keluar: 0.30% = $0.61
+   Balik modal: ~20 hari funding (APR 5.63% -> ~$0.94/bulan)
+   Siapkan margin di futures: ~$240 (1x + buffer 20%)
+   Keluar kalau: APR 7d < 2%, basis melebar 0,5% melawan, funding 3 hari negatif, atau lewat 60 hari
+
+2) QNTUSDT — APR 7d 5.38% (30d 1.84%), funding positif 74% hari
+   BELI spot  : ~152.27 (ask)
+   SHORT perp : ~152.12 (bid, 1x)
+   Ukuran     : $200 (dibatasi: plafon risiko; kapasitas $9,289, pakai 10%)
+   Basis saat ini: -0.099% (perp vs spot)
+   Biaya masuk+keluar: 0.36% = $0.72
+   Balik modal: ~24 hari funding (APR 5.38% -> ~$0.90/bulan)
+   Siapkan margin di futures: ~$240 (1x + buffer 20%)
+   Keluar kalau: APR 7d < 2%, basis melebar 0,5% melawan, funding 3 hari negatif, atau lewat 60 hari
+
+Cara eksekusi: beli spot lebih dulu, baru short perp dengan nominal yang sama.
+Batal kalau harga sudah bergeser > 0,3% dari angka di atas.
+Dua kaki sama besar. Kalau salah satu gagal, tutup yang sudah jalan.
+Nominal ini dihitung dari kedalaman orderbook nyata, bukan dari modal. Feenya 0.3% sekali jalan.
+
+Batas risiko (dipaksa di kode, lihat risk.py): leverage maks 1x | plafon 20% modal per posisi | maks 3 posisi terbuka.
+Kill switch harian: rugi >= 3% modal buku -> tutup semua. Basis stop 0.5% | toleransi delta dua kaki 5%.
