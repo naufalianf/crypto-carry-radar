@@ -114,12 +114,29 @@ def selftest():
     print("watchdog selftest: OK")
 
 
+def loop(jeda=1800.0):
+    """Jalankan pemeriksaan berulang tanpa cron. Jeda bawaan 30 menit, sama
+    dengan jadwal cron yang disarankan di docstring. Periksa langsung sekali
+    saat naik (kalau daemon sudah mati, jangan tunggu 30 menit), lalu berulang."""
+    print(f"[{time.strftime('%Y-%m-%d %H:%M UTC', time.gmtime())}] watchdog mulai: "
+          f"periksa tiap {jeda/60:.0f} menit, batas {BATAS_JAM:.0f} jam", flush=True)
+    while True:
+        try:
+            for m in jalankan():
+                print(f"[{time.strftime('%Y-%m-%d %H:%M UTC', time.gmtime())}] {m}", flush=True)
+        except Exception as e:              # jangan biarkan satu putaran mematikan pemantau
+            print(f"putaran gagal: {e}", flush=True)
+        time.sleep(jeda)
+
+
 if __name__ == "__main__":
     if "--selftest" in sys.argv:
         selftest()
     elif "--status" in sys.argv:
         for n, (mati, u) in periksa(time.time()).items():
             print(f"{n:<14} {'MATI' if mati else 'hidup':<6} umur {'-' if u is None else f'{u:.1f} jam'}")
+    elif "--loop" in sys.argv:
+        loop()
     else:
         for m in jalankan():
             print(m)
