@@ -94,7 +94,7 @@
     <button id="f-all" class="on">semua</button>
     <button id="f-hot">lolos gate</button>
     <button id="f-pos">APR positif</button>
-    <button id="btn-scan" style="margin-left:auto">scan ulang</button>
+    <button id="btn-scan" style="margin-left:auto">muat ulang</button>
   </div>
 
   <div class="tscroll">
@@ -150,6 +150,12 @@ const usd = v => v === null || v === undefined ? "—"
 
 function render() {
   if (!data) return;
+  if (data.error) {
+    const b = document.getElementById("banner");
+    b.className = "banner warn";
+    b.textContent = "data gagal dimuat: " + data.error;
+    return;
+  }
   document.getElementById("gen").textContent = data.generated_at || "—";
   document.getElementById("c-univ").textContent = data.universe ?? "—";
   document.getElementById("c-alert").textContent = (data.alerts || []).length;
@@ -159,14 +165,21 @@ function render() {
 
   const b = document.getElementById("banner");
   const n = (data.alerts || []).length;
+  const amb = data.threshold ?? "—";
+  // Umur snapshot: format "YYYY-MM-DD HH:MM UTC"
+  const t = Date.parse((data.generated_at || "").replace(" UTC", "Z").replace(" ", "T"));
+  const umur_min = isNaN(t) ? null : Math.round((Date.now() - t) / 60000);
+  const basi = umur_min !== null && umur_min > 360
+    ? " <b>· data basi " + Math.round(umur_min / 60) + " jam</b> — snapshot terakhir gagal diperbarui."
+    : "";
   if (n) {
     b.className = "banner";
     b.innerHTML = "<b>" + n + " koin lolos gate</b> — " + data.alerts.join(", ") +
-      ". Tetap cek kapasitas: lolos gate belum berarti muat modal besar.";
+      ". Tetap cek kapasitas: lolos gate belum berarti muat modal besar." + basi;
   } else {
     b.className = "banner warn";
-    b.innerHTML = "<b>Belum ada yang lolos gate ambang " + data.threshold +
-      "%</b> — hari ini carry tidak layak dibuka.";
+    b.innerHTML = "<b>Belum ada yang lolos gate ambang " + amb +
+      "%</b> — hari ini carry tidak layak dibuka." + basi;
   }
 
   let rows = (data.rows || []).map((r, i) => ({...r, rank: i + 1, status: r.alert ? 1 : 0}));
@@ -202,9 +215,16 @@ function render() {
      <span>${r.flags.join(" · ")}</span></div>`).join("");
 }
 
+const RADAR_JSON_URL =
+  "https://raw.githubusercontent.com/naufalianf/crypto-carry-radar/main/web/radar.json";
+
 async function load() {
   try {
-    data = await (await fetch("/api/radar")).json();
+    // no-store: raw.githubusercontent menyimpan cache 5 menit; tanpa ini browser
+    // bisa memegang snapshot lama walau repo sudah di-push.
+    const r = await fetch(RADAR_JSON_URL + "?t=" + Date.now(), {cache: "no-store"});
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    data = await r.json();
     render();
   } catch (e) {
     const b = document.getElementById("banner");
@@ -228,9 +248,9 @@ document.getElementById("f-all").onclick = () => setFilter("f-all", "all");
 document.getElementById("f-hot").onclick = () => setFilter("f-hot", "hot");
 document.getElementById("f-pos").onclick = () => setFilter("f-pos", "pos");
 document.getElementById("btn-scan").onclick = async (e) => {
-  e.target.textContent = "memindai…"; e.target.disabled = true;
-  try { await fetch("/api/scan", {method: "POST"}); await load(); }
-  finally { e.target.textContent = "scan ulang"; e.target.disabled = false; }
+  e.target.textContent = "memuat…"; e.target.disabled = true;
+  try { await load(); }  // tarik snapshot terbaru, bukan scan baru
+  finally { e.target.textContent = "muat ulang"; e.target.disabled = false; }
 };
 
 load();
