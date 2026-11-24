@@ -43,6 +43,10 @@ setelah persetujuan.
 6. Ada dan lulus: mode **dry-run** (menyusun order tanpa mengirim), **kill switch**,
    batas notional dan batas rugi harian **dipaksa di kode**, bukan cuma di dokumen.
 7. Rekonsiliasi posisi otomatis: kalau dua kaki tidak seimbang, bot menutup dan memberi tahu.
+   *Status: logikanya sudah ada di `execution.py` (urutan spot lalu perp, unwind kaki yatim,
+   status order tak jelas -> HALT, tutup perp dulu baru spot), 19 tes lulus dengan exchange
+   tiruan dan uji mutasi. BELUM ada adapter Binance. Adapter nanti wajib memenuhi syarat 9
+   (limit order) dan lolos uji di testnet sebelum menyentuh uang sungguhan.*
 8. Kredensial: API key **hanya izin trade, withdraw dimatikan**, IP whitelist, disimpan di
    env/file terpisah, tidak pernah masuk kode atau log.
 9. **Limit order saja.** Tidak ada market order di koin tipis.
