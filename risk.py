@@ -51,7 +51,9 @@ def cek_basis(basis_now_pct, basis_entry_pct, batas_pct=BASIS_STOP_PCT):
     apakah basis sekarang negatif. Basis negatif yang stabil tidak merugikan.
     """
     geser = basis_now_pct - basis_entry_pct
-    if geser >= batas_pct:
+    # toleransi 1e-9: tanpa ini, geser tepat di ambang (0.5%) lolos karena
+    # pembulatan float (0.5-0.4999999...), padahal PnL dua kaki sudah rugi penuh.
+    if geser >= batas_pct - 1e-9:
         return True, (f"basis melebar {geser:+.3f}% melawan "
                       f"({basis_entry_pct:.3f}% -> {basis_now_pct:.3f}%, batas {batas_pct}%)")
     return False, ""
@@ -76,6 +78,8 @@ def selfcheck():
     assert cek_basis(-0.6, -0.1)[0] is False, "basis negatif stabil tidak boleh keluar"
     assert cek_basis(+0.2, +0.1)[0] is False, "geser 0.1% masih di dalam batas"
     assert cek_basis(+0.7, +0.1)[0] is True, "basis naik 0.6% harus keluar"
+    # tepi: geser tepat di ambang harus memicu (bug float 0.5-0.4999...)
+    assert cek_basis(+0.40, -0.10)[0] is True, "geser tepat 0.50% harus memicu"
     # arah tanda: basis turun menguntungkan short perp -> jangan keluar
     assert cek_basis(-0.9, -0.1)[0] is False, "basis turun menguntungkan, jangan keluar"
     # risiko 1% modal, stop 2% -> 500 diminta, dipotong plafon 200
