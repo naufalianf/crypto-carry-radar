@@ -41,12 +41,19 @@ def cek_delta(notional_spot, notional_perp, toleransi_pct=DELTA_TOLERANSI_PCT):
     return selisih > toleransi_pct, selisih
 
 
-def cek_basis(basis_pct, batas_pct=BASIS_STOP_PCT):
+def cek_basis(basis_now_pct, basis_entry_pct, batas_pct=BASIS_STOP_PCT):
     """(keluar, alasan). Basis = perp/spot - 1, dalam persen.
-    Basis positif besar = perp mahal (menguntungkan short perp).
-    Basis negatif besar = perp murah -> short perp rugi harga tanpa kompensasi funding."""
-    if basis_pct <= -batas_pct:
-        return True, f"basis {basis_pct:.3f}% melawan (batas -{batas_pct}%)"
+
+    Posisi carry = long spot + short perp. PnL dari basis kira-kira MINUS
+    perubahan basis: basis NAIK berarti perp jadi relatif lebih mahal,
+    short perp rugi harga lebih besar daripada untung di spot.
+    Jadi yang dipantau adalah PERUBAHAN basis dari basis entry, bukan
+    apakah basis sekarang negatif. Basis negatif yang stabil tidak merugikan.
+    """
+    geser = basis_now_pct - basis_entry_pct
+    if geser >= batas_pct:
+        return True, (f"basis melebar {geser:+.3f}% melawan "
+                      f"({basis_entry_pct:.3f}% -> {basis_now_pct:.3f}%, batas {batas_pct}%)")
     return False, ""
 
 
@@ -66,8 +73,11 @@ def selfcheck():
     assert abs(cek_kill_switch(1000, 970)[1] + 3.0) < 1e-9, "hitung rugi salah"
     assert cek_delta(1000, 1030)[0] is False, "selisih 3% masih diterima"
     assert cek_delta(1000, 1060)[0] is True, "selisih 6% harus bocor"
-    assert cek_basis(-0.6)[0] is True, "basis -0.6% harus keluar"
-    assert cek_basis(+1.0)[0] is False, "basis positif menguntungkan, jangan keluar"
+    assert cek_basis(-0.6, -0.1)[0] is False, "basis negatif stabil tidak boleh keluar"
+    assert cek_basis(+0.2, +0.1)[0] is False, "geser 0.1% masih di dalam batas"
+    assert cek_basis(+0.7, +0.1)[0] is True, "basis naik 0.6% harus keluar"
+    # arah tanda: basis turun menguntungkan short perp -> jangan keluar
+    assert cek_basis(-0.9, -0.1)[0] is False, "basis turun menguntungkan, jangan keluar"
     # risiko 1% modal, stop 2% -> 500 diminta, dipotong plafon 200
     assert abs(sizing_dari_risiko(1000, 1.0, 2.0) - 200.0) < 1e-9, "potong plafon gagal"
     # risiko 1% modal, stop 10% -> 100 diminta, di bawah plafon

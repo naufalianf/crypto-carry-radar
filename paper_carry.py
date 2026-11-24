@@ -81,6 +81,7 @@ def mark(p):
     p_leg = pp / p["perp_entry"] - 1
     gross = s_leg - p_leg + p["funding"]
     p["spot_now"], p["perp_now"] = sp, pp
+    p["basis_pct"] = (pp / sp - 1) * 100          # basis sekarang, % dari spot
     p["gross"] = gross
     p["net"] = gross - p["cost"]
     return p
@@ -106,6 +107,8 @@ def tick():
     # 1. kelola posisi terbuka
     for sym in list(st["positions"]):
         p = st["positions"][sym]
+        # posisi lama (sebelum basis stop ada) belum punya basis entry — hitung dari harga entry
+        p.setdefault("basis_entry_pct", (p["perp_entry"] / p["spot_entry"] - 1) * 100)
         for ts, rate in new_funding(sym, p["last_funding_ms"]):
             p["funding"] += rate
             p["last_funding_ms"] = ts
@@ -115,14 +118,19 @@ def tick():
         r = rows.get(sym, {})
         apr = r.get("apr_7d", p["apr_entry"])
         reason = None
+        keluar_basis, _alasan_basis = risk.cek_basis(p.get("basis_pct", 0.0),
+                                                     p.get("basis_entry_pct", 0.0))
         if apr < EXIT_APR:
             reason = f"APR turun ke {apr}%"
+        elif keluar_basis:
+            reason = _alasan_basis
         elif age >= MAX_DAYS:
             reason = f"umur {age:.0f} hari"
         if reason:
             keluar(st, sym, p, reason)
         else:
-            log(f"TAHAN  {sym}: net {p['net']*100:.3f}% (funding {p['funding']*100:.3f}%) apr7d {apr}%")
+            log(f"TAHAN  {sym}: net {p['net']*100:.3f}% (funding {p['funding']*100:.3f}%) "
+                f"basis {p.get('basis_pct', 0.0):.3f}% apr7d {apr}%")
 
     # 1b. Kill switch harian — batas rugi dipaksa di kode, bukan di dokumen.
     hari = time.strftime("%Y-%m-%d", time.gmtime())
@@ -169,6 +177,7 @@ def tick():
             "symbol": sym, "opened": time.time(),
             "opened_iso": time.strftime("%Y-%m-%d %H:%M", time.gmtime()),
             "spot_entry": sp, "perp_entry": float(pp),
+            "basis_entry_pct": (float(pp) / sp - 1) * 100,
             "cost": r["carry_cost_pct"] / 100, "funding": 0.0,
             "last_funding_ms": hist[-1][0] if hist else int(time.time() * 1000),
             "apr_entry": r["apr_7d"], "notional": NOTIONAL, "events": 0}

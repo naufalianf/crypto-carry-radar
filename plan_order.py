@@ -10,6 +10,7 @@ Pakai:
   python3 plan_order.py --run --capital 1000        # cetak ke layar
   python3 plan_order.py --run --capital 1000 --send # kirim ke bot alert (Telegram)
 """
+import subprocess
 import argparse
 import json
 import os
@@ -107,16 +108,26 @@ def rencana(rows, modal=CAPITAL, max_pos=MAX_POS):
     return plans, keluar
 
 
+def _commit():
+    """Hash commit kode saat arsip dibuat — supaya arsip basi langsung kelihatan."""
+    try:
+        return subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=HERE,
+                              capture_output=True, text=True, timeout=10).stdout.strip() or "?"
+    except Exception:
+        return "?"
+
+
 def teks(plans, keluar, modal=CAPITAL, stamp=None):
     stamp = stamp or time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime())
+    versi = f"kode {_commit()}"
     if not plans:
-        out = [f"RENCANA CARRY {stamp}", f"Modal total: ${modal:,.0f}",
+        out = [f"RENCANA CARRY {stamp} ({versi})", f"Modal total: ${modal:,.0f}",
                "", "Tidak ada yang layak dieksekusi sekarang."]
         if keluar:
             out += ["", "Gugur di pemeriksaan orderbook:"] + [f"  - {k}" for k in keluar]
         out += ["", "Bertahan. Syarat: punya pasar spot, kapasitas >= $20, APR 7d >= 4%."]
         return "\n".join(out)
-    out = [f"RENCANA CARRY {stamp}", f"Modal total: ${modal:,.0f} | plafon per posisi: "
+    out = [f"RENCANA CARRY {stamp} ({versi})", f"Modal total: ${modal:,.0f} | plafon per posisi: "
            f"${risk.batas_notional(modal):,.0f} ({risk.MAX_NOTIONAL_PCT:.0f}% modal) | "
            f"maks {risk.MAX_POSISI} posisi", ""]
     for i, p in enumerate(plans, 1):
@@ -132,7 +143,8 @@ def teks(plans, keluar, modal=CAPITAL, stamp=None):
             f"   Balik modal: ~{p['balik_modal_hari']:.0f} hari funding "
             f"(APR {p['apr_7d']:.2f}% -> ~${p['hasil_bulan']:,.2f}/bulan)",
             f"   Siapkan margin di futures: ~${p['margin_perp_usd']:,.0f} (1x + buffer 20%)",
-            "   Keluar kalau: APR 7d < 2%, funding 3 hari negatif, atau lewat 60 hari",
+            "   Keluar kalau: APR 7d < 2%, basis melebar 0,5% melawan, funding 3 hari negatif, "
+            "atau lewat 60 hari",
         ]
         if p["flags"]:
             out.append(f"   Catatan: {'; '.join(p['flags'])}")

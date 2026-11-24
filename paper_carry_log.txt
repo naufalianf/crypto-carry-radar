@@ -24,3 +24,6 @@
 [2026-11-24 02:55 UTC] tick: 60 koin di radar, 2 posisi terbuka
 [2026-11-24 02:55 UTC] TAHAN  ZECUSDT: net -0.266% (funding 0.004%) apr7d 5.63%
 [2026-11-24 02:55 UTC] TAHAN  QNTUSDT: net -0.303% (funding 0.009%) apr7d 5.38%
+[2026-11-24 03:17 UTC] tick: 60 koin di radar, 2 posisi terbuka
+[2026-11-24 03:17 UTC] TAHAN  ZECUSDT: net -0.310% (funding 0.004%) basis -0.025% apr7d 5.63%
+[2026-11-24 03:17 UTC] TAHAN  QNTUSDT: net -0.264% (funding 0.009%) basis -0.092% apr7d 5.38%

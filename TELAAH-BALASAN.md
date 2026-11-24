@@ -65,8 +65,8 @@ notional 20% modal per posisi (§2.3) dan leverage maks 1x juga sudah dipaksa di
 | ≥3 posisi ditutup penuh | **BELUM** — 0 ditutup |
 | slippage nyata ≤0,3% | **BELUM** (butuh eksekusi nyata) |
 | paper spot vs backtest <5% | **BELUM** |
-| dry-run + kill switch + batas dipaksa kode | **SEBAGIAN** — kill switch, plafon notional, basis stop sudah di kode; dry-run belum |
-| rekonsiliasi delta otomatis | **FUNGSI SIAP**, belum diwire (paper tidak punya fill nyata) |
+| dry-run + kill switch + batas dipaksa kode | **SEBAGIAN** — kill switch harian, plafon notional 20%, dan basis stop sudah **dipanggil** dari `tick()`/`ukuran()`; dry-run belum |
+| rekonsiliasi delta otomatis | **FUNGSI SIAP** (`risk.cek_delta`), belum dipanggil — paper tidak punya fill nyata untuk direkonsiliasi |
 | kredensial izin trade saja | **BELUM BERLAKU** (belum ada order nyata) |
 | limit order saja | **BELUM BERLAKU** |
 
@@ -81,7 +81,33 @@ notional 20% modal per posisi (§2.3) dan leverage maks 1x juga sudah dipaksa di
   settlement (00:00/08:00/16:00 UTC). Belum diuji.
 - **Fee schedule tidak diverifikasi live** — perlu dicek ulang di halaman resmi Binance.
 
-## 5. Panduan telaah berikutnya
+## 6. Koreksi setelah tanggapan kedua penelaah (TANGGAPAN-CLAUDE.md)
+
+Dua koreksi penelaah **diterima**, keduanya benar dan sudah diperbaiki:
+
+1. **"Basis stop sudah di kode" — klaim saya terlalu optimis.** `risk.cek_basis`
+   memang tidak pernah dipanggil; `BASIS_STOP_PCT` hanya muncul sebagai teks
+   cetak di `plan_order.py`. Sekarang benar-benar dipanggil dari `tick()`.
+2. **Bug arah tanda di `cek_basis` — ditemukan saat memperbaiki nomor 1.**
+   Versi lama keluar kalau basis **negatif** (`basis_pct <= -batas`). Itu salah
+   arah: posisi carry = long spot + short perp, jadi rugi saat basis **naik**
+   (perp jadi relatif lebih mahal), bukan saat basis negatif. Basis negatif yang
+   stabil tidak merugikan sama sekali. Versi sekarang membandingkan basis
+   sekarang terhadap basis entry dan keluar kalau **naik** ≥ 0,5%. Tanpa koreksi
+   ini, stop akan menutup posisi yang sedang untung dan menahan posisi yang rugi.
+   Ada 4 assert arah tanda di `risk.py`.
+3. **Arsip `hasil/order_plan_*.txt` basi** — dibuat sebelum plafon risiko masuk.
+   Isinya $1.000/$837 padahal kode sekarang wajib memotong ke $200. Sudah
+   diregenerasi, dan header arsip sekarang memuat hash commit
+   (`RENCANA CARRY ... (kode 7edc7f4)`) supaya arsip basi langsung kelihatan.
+
+**Aturan proses yang saya adopsi:** sebelum menulis "X sudah di kode", jalankan
+`grep -rn "nama_fungsi" --include="*.py" . | grep -v "file_definisi.py"`. Nol
+match = fungsi ada tapi belum dipakai, bukan "sudah aktif". Dan setiap perubahan
+kode yang menggeser angka arsip → regenerasi arsip di commit yang sama.
+
+
+## 7. Panduan telaah berikutnya
 
 Prioritas: bantah tiga hal ini dulu sebelum mempercayai apa pun di repo.
 1. `risk.py` — apakah `cek_kill_switch` bisa terpicu saat tidak seharusnya (positif palsu)?
