@@ -1,9 +1,0 @@
-{
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "functions": { "api/radar.py": { "maxDuration": 60, "memory": 512 } },
-  "headers": [
-    { "source": "/api/radar", "headers": [
-      { "key": "Cache-Control", "value": "public, s-maxage=300, stale-while-revalidate=600" }
-    ] }
-  ]
-}

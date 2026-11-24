@@ -1,71 +1,64 @@
 # Radar Funding — versi Vercel
 
-Dashboard pemantau peluang **carry funding** (delta-neutral). Tidak menyentuh saldo,
-tidak butuh API key, tidak ada proses yang harus hidup terus.
+Halaman statis untuk memantau peluang carry delta-neutral (beli spot + short
+perpetual) dari data publik Binance. Tidak menyentuh saldo, tidak butuh API key.
 
-## Kenapa versi ini ada
+## Arsitektur — Vercel TIDAK memanggil Binance
 
-Versi lama (`../web/server.py`) butuh server Python hidup + tunnel + keepalive cron —
-tiga titik gagal. Kalau salah satu mati, panel tidak bisa dibuka. Versi ini:
+`fapi.binance.com` membalas **HTTP 451 Unavailable For Legal Reasons** untuk IP
+cloud (AWS/GCP/Vercel), apa pun region yang dipilih. Futures API juga tidak punya
+domain publik pengganti seperti `data-api.binance.vision` di Spot API. Fungsi
+serverless di sini tidak akan pernah berhasil memanggil Binance Futures.
 
-- **Halaman statis** (`index.html`) — Vercel yang melayani, tidak bisa mati.
-- **Satu fungsi serverless** (`api/radar.py`) — memindai Binance dari sisi server,
-  jadi tidak terpengaruh blokir ISP di sisi HP Bro.
-- Data di-cache di edge Vercel **5 menit**, jadi request berikutnya instan dan
-  Binance tidak dipanggil berlebihan.
+Pembagiannya:
 
-Waktu pindai terukur: **60 koin ≈ 1,4 detik** (16 thread), jauh di bawah batas 10 detik.
-
-## Deploy — cara paling gampang (tanpa install apa pun)
-
-1. Taruh folder ini di sebuah repo GitHub (upload lewat web GitHub juga bisa).
-2. Buka vercel.com → **Add New → Project → Import** repo tadi.
-3. **Framework Preset: Other**. Kalau folder ini ada di dalam repo, set
-   **Root Directory = web_vercel**.
-4. **Deploy**. Selesai — dapat URL `https://<nama>.vercel.app`.
-
-## Deploy — cara CLI
-
-```bash
-cd web_vercel
-npx vercel --prod
+```
+mesin lokal (bisa akses Binance)          Vercel (statis)
+  scan_and_push.py                          index.html
+    → radar.scan()                          → fetch radar.json dari
+    → web/radar.json                          raw.githubusercontent.com
+    → git commit + push                       → render tabel
 ```
 
-## Variabel opsional
+## Deploy
 
-| Nama | Default | Arti |
-| --- | --- | --- |
-| `RADAR_TOP` | 60 | jumlah koin yang dipindai (dari perp kripto paling likuid) |
-| `RADAR_THRESHOLD` | 8 | ambang APR (%) supaya koin ditandai "lolos gate" |
+1. Vercel → **Add New Project** → import repo `naufalianf/crypto-carry-radar`
+2. **Root Directory: `web_vercel`** — wajib, kalau tidak build gagal
+3. Framework Preset: **Other**, tanpa build command, tanpa env var
+4. Deploy
 
-Set di Vercel → Settings → Environment Variables.
+Repo harus **public** supaya `raw.githubusercontent.com` bisa dibaca browser.
+
+## Pipeline data
+
+Di mesin yang bisa akses Binance:
+
+```bash
+python3 scan_and_push.py --run      # sekali: scan + commit + push
+python3 scan_and_push.py --loop     # tiap 4 jam
+```
+
+Snapshot lebih dari 6 jam memunculkan peringatan "data basi" di banner.
 
 ## Uji lokal
 
 ```bash
-cd web_vercel
-python3 -c "
-import sys, threading, time, urllib.request, json
-sys.path.insert(0,'.')
-from api import radar as m
-from http.server import ThreadingHTTPServer
-srv = ThreadingHTTPServer(('127.0.0.1', 8899), m.handler)
-threading.Thread(target=srv.serve_forever, daemon=True).start()
-time.sleep(0.5)
-print(json.load(urllib.request.urlopen('http://127.0.0.1:8899/api/radar'))['alerts'])
-srv.shutdown()"
+python3 preview_vercel.py --port 8901
 ```
 
-Lalu buka `http://127.0.0.1:8899` lewat server statis (`python3 -m http.server 8898`)
-untuk melihat halamannya.
+Menyajikan `web_vercel/index.html` apa adanya. Data tetap diambil dari GitHub,
+jadi yang diuji sama persis dengan yang nanti tampil di Vercel.
 
 ## Batas yang perlu diingat
 
-- Vercel **tidak menyimpan state**. Paper trading dan backtest tetap dijalankan di
+- Data **setelat snapshot terakhir** (4 jam), bukan real-time per request.
+  Untuk funding carry berhorizon hari, ini tidak signifikan.
+- Kalau mesin pemindai mati, panel menampilkan data basi + peringatan.
+- Tombol "muat ulang" hanya menarik snapshot terbaru; tidak memicu pemindaian baru.
+- Vercel **tidak menyimpan state**. Paper trading dan backtest tetap di
   host/VPS (`../paper_carry.py`, `../runner.py`, `../bot.py`).
-- Aturan gate di `api/radar.py` adalah **salinan** dari `../radar.py`. Kalau salah satu
-  diubah, ubah dua-duanya.
-- Fungsi ini hanya membaca data publik. Tidak ada order, tidak ada API key.
+- Aturan gate hanya ada di `../radar.py`. Folder ini tidak menyimpan salinan,
+  jadi tidak ada risiko dua versi berbeda.
 
 ## Isi gate
 
@@ -75,4 +68,5 @@ Koin ditandai "lolos" hanya kalau semua ini benar:
 - umur listing ≥ 30 hari,
 - spread perp ≤ 15 bps,
 - volume 24 jam ≥ $50jt,
+- APR 7d ≥ ambang (default 8%),
 - "balik modal" > 3 hari (APR tidak liar).
