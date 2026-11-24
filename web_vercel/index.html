@@ -362,9 +362,9 @@ function renderPaper(p) {
   }
   html += '<div class="sum">' +
     card("PnL total", p.pnl.total, "terbuka " + sgn(p.pnl.terbuka) + "$") +
-    card("24 jam", p.pnl.d1, jendela("d1", p.limits.harian)) +
-    card("7 hari", p.pnl.d7, jendela("d7", p.limits.mingguan)) +
-    card("30 hari", p.pnl.d30, jendela("d30", p.limits.bulanan)) + "</div>";
+    card("24 jam", p.pnl.d1, jendela("d1", p.limits.harian, 1)) +
+    card("7 hari", p.pnl.d7, jendela("d7", p.limits.mingguan, 7)) +
+    card("30 hari", p.pnl.d30, jendela("d30", p.limits.bulanan, 30)) + "</div>";
   if ((p.positions || []).length) {
     html += '<div class="tscroll"><table class="ptable"><tr><th>simbol</th><th>umur (hari)</th><th>APR masuk</th>' +
       "<th>funding</th><th>basis geser</th><th>net</th></tr>" +
