@@ -62,6 +62,7 @@
   .pos{color:var(--acc)} .neg{color:var(--bad)} .mid{color:var(--warn)}
   .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;
     border:1px solid #2f3b4a;color:#b9c4d0;background:#161c25}
+  .pill.nospot{color:var(--bad);border-color:rgba(255,138,138,.4);background:rgba(255,138,138,.07)}
   .pill.hot{color:var(--acc);border-color:rgba(61,220,151,.4);background:rgba(61,220,151,.08)}
   .rej{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:2px 14px}
   .rej div{display:flex;justify-content:space-between;gap:12px;padding:8px 0;
@@ -91,12 +92,19 @@
     border-radius:999px;padding:6px 14px;font-size:13px;width:150px}
   input#q:focus{outline:none;border-color:var(--acc)}
   input#q::placeholder{color:var(--mut)}
-  footer{margin-top:20px;color:var(--mut);font-size:12px;line-height:1.7}
-  .foot{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .more{color:var(--mut);font-size:12px;margin:8px 2px 0}
+  .guide{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:26px}
+  .gbox{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-size:13px;line-height:1.65;color:#c3cdd8}
+  .gbox h3{margin:0 0 8px;font-size:13px;color:var(--txt)}
+  .gbox ol,.gbox ul{margin:0;padding-left:18px}
+  .gbox li{margin-bottom:5px}
+  .gbox b{color:var(--txt)}
+  .gbox .note{margin-top:10px;color:var(--mut);font-size:12px}
+  th:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:-2px}
   @media(max-width:820px){
     body{padding:16px 12px 32px}
     .cards{grid-template-columns:1fr 1fr}
-    .foot{grid-template-columns:1fr}
+    .guide{grid-template-columns:1fr}
     .meta{text-align:left}
     th,td{padding:8px 5px}
     .hide-sm{display:none}
@@ -119,7 +127,7 @@
     </div>
     <div class="meta">
       <span id="dot" class="dot"></span>dipindai: <span id="gen">—</span><br>
-      gate: umur ≥30h · spread ≤15bps · vol ≥50jt
+      gate: <span id="gate-txt">—</span>
     </div>
   </header>
 
@@ -133,10 +141,11 @@
   <div class="banner" id="banner">memuat…</div>
 
   <div class="chips">
-    <button id="f-all" class="on">semua</button>
-    <button id="f-hot">lolos gate</button>
-    <button id="f-pos">APR positif</button>
-    <input id="q" placeholder="cari simbol…">
+    <button id="f-all" class="on" aria-pressed="true">semua</button>
+    <button id="f-hot" aria-pressed="false">lolos gate</button>
+    <button id="f-pos" aria-pressed="false">APR positif</button>
+    <button id="f-lim" class="on" aria-pressed="true">top 20</button>
+    <input id="q" placeholder="cari simbol…" aria-label="cari simbol">
     <button id="btn-scan" style="margin-left:auto">muat ulang</button>
   </div>
 
@@ -147,7 +156,7 @@
         <th data-k="rank" class="hide-sm">#<span class="arrow"></span></th>
         <th data-k="symbol">simbol<span class="arrow"></span></th>
         <th data-k="volume_musd" class="hide-sm" title="Volume dagang 24 jam">vol (jt$)<span class="arrow"></span></th>
-        <th data-k="bond_days" class="hide-sm" title="Umur listing — koin di bawah 30 hari funding-nya liar">umur<span class="arrow"></span></th>
+        <th data-k="bond_days" class="hide-sm" title="Umur listing perpetual, dalam hari — koin di bawah 30 hari funding-nya liar">umur (hari)<span class="arrow"></span></th>
         <th data-k="spread_bps" class="hide-sm" title="Spread bid-ask perpetual dalam bps (100 bps = 1%)">spread<span class="arrow"></span></th>
         <th data-k="apr_7d" title="Funding 7 hari terakhir, disetahunkan">APR 7d<span class="arrow"></span></th>
         <th data-k="apr_30d" class="hide-sm" title="Funding 30 hari terakhir, disetahunkan">APR 30d<span class="arrow"></span></th>
@@ -161,33 +170,39 @@
     <tbody id="rows"></tbody>
   </table>
   </div>
+  <div class="more" id="more"></div>
 
   <details id="rej-wrap">
     <summary id="rej-h">APR tinggi tapi gagal gate</summary>
     <div class="rej" id="rej"></div>
   </details>
 
-  <footer>
-    <div class="foot">
-      <div>
-        <b>Cara baca.</b> Carry delta-neutral = beli spot + short perpetual, nominal sama;
-        hasilnya funding yang dibayar ke posisi short, di-annualize jadi kolom APR.
-        "biaya" = fee masuk+keluar + menyeberang spread di dua kaki.
-        "balik modal" = hari yang dibutuhkan funding untuk menutup biaya itu.
-        "kapasitas" = nilai orderbook 20 level — batas kasar ukuran posisi yang tidak menggerakkan harga.
-      </div>
-      <div>
-        <b>Kenapa ada gate.</b> APR 50% di koin umur seminggu berspread lebar bukan peluang, itu jebakan:
-        spread dan biaya masuk-keluar menghabiskan hasil, dan funding di koin baru gampang berbalik negatif.
-        Gate menyaring yang kelihatan besar tapi tidak bisa dieksekusi. Modal riil &gt; nominal karena kaki
-        short butuh margin. Ini alat pantau, bukan ajakan pasang modal.
-      </div>
+  <section class="guide">
+    <div class="gbox">
+      <h3>Cara baca tabel</h3>
+      <ol>
+        <li>Cari baris bergaris hijau berstatus <b>lolos</b>. Hanya itu kandidat. Sisanya cuma dipantau.</li>
+        <li>Bandingkan <b>APR 7d</b> dengan <b>APR 30d</b>. Kalau 7d jauh di atas 30d, itu lonjakan baru-baru ini dan belum tentu bertahan.</li>
+        <li><b>Balik modal</b> = hari yang dibutuhkan funding untuk menutup biaya masuk-keluar. Makin kecil makin baik, tapi di bawah 3 hari malah mencurigakan (APR tidak stabil).</li>
+        <li><b>Kapasitas</b> = nilai orderbook 20 level, batas kasar ukuran posisi yang tidak menggerakkan harga.</li>
+        <li>Pill merah <b>tanpa spot</b> = koin tidak punya pasar spot, jadi carry tidak bisa dibuat walau APR tinggi.</li>
+      </ol>
+      <div class="note">Carry = beli spot + short perpetual dengan nominal sama. Hasilnya funding yang dibayar ke posisi short, disetahunkan jadi APR. Biaya = fee dua kaki + menyeberang spread.</div>
     </div>
-  </footer>
+    <div class="gbox">
+      <h3>Kenapa ada gate</h3>
+      <p style="margin:0 0 8px">APR 50% di koin baru dengan spread lebar itu jebakan, bukan peluang. Gate membuang yang kelihatan besar tapi tidak bisa dieksekusi:</p>
+      <ul id="gate-list"><li>memuat…</li></ul>
+      <div class="note">Modal riil lebih besar dari nominal karena kaki short butuh margin. Ini alat pantau, bukan ajakan pasang modal.</div>
+    </div>
+  </section>
 </div>
 
 <script>
-let data = null, filter = "all", sortKey = "apr_7d", sortDir = -1, searchQ = "";
+let data = null, filter = "all", sortKey = "apr_7d", sortDir = -1, searchQ = "", limited = true;
+const TOP_N = 20;
+const ESC = {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"};
+const esc = v => String(v).replace(/[&<>"']/g, c => ESC[c]);
 const fmt = (v, s = "%") => v === null || v === undefined ? "—" : v.toFixed(2) + s;
 const cls = v => v === null ? "" : v >= 8 ? "pos" : v > 0 ? "mid" : "neg";
 const usd = v => v === null || v === undefined ? "—"
@@ -214,6 +229,17 @@ function render() {
     return;
   }
   document.getElementById("gen").textContent = data.generated_at || "—";
+  const g = data.gate || {};
+  if (g.min_bond_days !== undefined) {
+    document.getElementById("gate-txt").textContent =
+      "umur ≥" + g.min_bond_days + " hari · spread ≤" + g.max_spread_bps + "bps · vol ≥" + g.min_volume_musd + "jt$";
+    document.getElementById("gate-list").innerHTML =
+      "<li><b>Umur ≥ " + g.min_bond_days + " hari</b>: funding koin baru liar dan gampang berbalik negatif.</li>" +
+      "<li><b>Spread ≤ " + g.max_spread_bps + " bps</b>: spread lebar memakan hasil di dua kaki, saat masuk dan saat keluar.</li>" +
+      "<li><b>Volume ≥ $" + g.min_volume_musd + " jt/hari</b>: volume tipis berarti sulit keluar tanpa menggeser harga.</li>" +
+      "<li><b>Ada pasar spot</b>: tanpa spot tidak ada kaki long, jadi bukan carry.</li>" +
+      "<li><b>APR 7d ≥ " + (data.threshold ?? "—") + "%</b>: di bawah itu funding tidak sepadan dengan risikonya.</li>";
+  }
   document.getElementById("c-univ").textContent = data.universe ?? "—";
   document.getElementById("c-alert").textContent = (data.alerts || []).length;
   document.getElementById("c-rej").textContent = (data.rejected || []).length;
@@ -227,17 +253,17 @@ function render() {
   const t = Date.parse((data.generated_at || "").replace(" UTC", "Z").replace(" ", "T"));
   const umur_min = isNaN(t) ? null : Math.round((Date.now() - t) / 60000);
   const dot = document.getElementById("dot");
-  dot.className = "dot " + (umur_min === null ? "" : umur_min > 360 ? "stale"
-    : umur_min > 60 ? "aging" : "fresh");
+  dot.className = "dot " + (umur_min === null ? "" : umur_min > 480 ? "stale"
+    : umur_min > 270 ? "aging" : "fresh");
   dot.title = umur_min === null ? "umur snapshot tidak diketahui"
     : "snapshot berumur " + (umur_min < 60 ? umur_min + " menit"
       : Math.round(umur_min / 60) + " jam");
-  const basi = umur_min !== null && umur_min > 360
+  const basi = umur_min !== null && umur_min > 480
     ? " <b>· data basi " + Math.round(umur_min / 60) + " jam</b> — snapshot terakhir gagal diperbarui."
     : "";
   if (n) {
     b.className = "banner";
-    b.innerHTML = "<b>" + n + " koin lolos gate</b> — " + data.alerts.join(", ") +
+    b.innerHTML = "<b>" + n + " koin lolos gate</b> — " + data.alerts.map(esc).join(", ") +
       ". Tetap cek kapasitas: lolos gate belum berarti muat modal besar." + basi;
   } else {
     b.className = "banner warn";
@@ -254,12 +280,22 @@ function render() {
     return (typeof x === "string" ? x.localeCompare(y) : x - y) * sortDir;
   });
 
+  const total = rows.length;
+  const lim = limited && !searchQ && total > TOP_N;
+  if (lim) rows = rows.slice(0, TOP_N);
+  document.getElementById("more").textContent = lim
+    ? "menampilkan " + TOP_N + " teratas dari " + total + " (urut sesuai kolom yang dipilih)"
+    : "menampilkan " + total + " baris";
+  const lb = document.getElementById("f-lim");
+  lb.textContent = limited ? "top " + TOP_N : "semua " + (data.rows || []).length;
+  lb.classList.toggle("on", limited);
+  lb.setAttribute("aria-pressed", limited);
   document.getElementById("rows").innerHTML = rows.map(r => `
     <tr class="${r.status ? "lolos" : ""}">
       <td class="hide-sm">${r.rank}</td>
-      <td class="sym"><a href="https://www.binance.com/en/futures/${encodeURIComponent(r.symbol)}" target="_blank" rel="noopener">${r.symbol}</a></td>
+      <td class="sym"><a href="https://www.binance.com/en/futures/${encodeURIComponent(r.symbol)}" target="_blank" rel="noopener">${esc(r.symbol)}</a></td>
       <td class="hide-sm">${r.volume_musd.toFixed(0)}</td>
-      <td class="hide-sm">${r.bond_days}h</td>
+      <td class="hide-sm">${r.bond_days}</td>
       <td class="hide-sm">${r.spread_bps === null ? "—" : r.spread_bps.toFixed(1)}</td>
       <td class="${cls(r.apr_7d)}">${sign(r.apr_7d)} ${fmt(r.apr_7d)}</td>
       <td class="hide-sm ${cls(r.apr_30d)}">${sign(r.apr_30d)} ${fmt(r.apr_30d)}</td>
@@ -267,15 +303,15 @@ function render() {
       <td class="hide-sm">${r.carry_cost_pct.toFixed(2)}%</td>
       <td>${r.breakeven_days ? r.breakeven_days.toFixed(0) + " hari" : "—"}</td>
       <td class="hide-sm">${usd(r.depth_usd)}</td>
-      <td>${r.status ? '<span class="pill hot">lolos</span>' : '<span class="pill">pantau</span>'}</td>
-    </tr>`).join("") || `<tr><td colspan="6" style="text-align:center;color:var(--mut)">
+      <td>${r.status ? '<span class="pill hot">lolos</span>' : r.has_spot === false ? '<span class="pill nospot">tanpa spot</span>' : '<span class="pill">pantau</span>'}</td>
+    </tr>`).join("") || `<tr><td colspan="12" style="text-align:center;color:var(--mut)">
       tidak ada baris untuk filter ini</td></tr>`;
 
   const rej = data.rejected || [];
   document.getElementById("rej-wrap").style.display = rej.length ? "block" : "none";
   document.getElementById("rej").innerHTML = rej.map(r =>
-    `<div><span class="sym">${r.symbol} <span class="pos">${r.apr_7d.toFixed(2)}%</span></span>
-     <span>${r.flags.join(" · ")}</span></div>`).join("");
+    `<div><span class="sym">${esc(r.symbol)} <span class="pos">${r.apr_7d.toFixed(2)}%</span></span>
+     <span>${r.flags.map(esc).join(" · ")}</span></div>`).join("");
 }
 
 const RADAR_JSON_URL =
@@ -293,18 +329,27 @@ async function load() {
     const b = document.getElementById("banner");
     b.className = "banner warn";
     b.textContent = "gagal memuat data: " + e;
+    document.querySelectorAll(".cards b").forEach(x => x.classList.remove("skel"));
   }
 }
 
-document.querySelectorAll("thead th").forEach(th => th.onclick = () => {
-  const k = th.dataset.k;
-  if (sortKey === k) sortDir *= -1; else { sortKey = k; sortDir = -1; }
-  render();
+document.querySelectorAll("thead th").forEach(th => {
+  const sortBy = () => {
+    const k = th.dataset.k;
+    if (sortKey === k) sortDir *= -1; else { sortKey = k; sortDir = -1; }
+    render();
+  };
+  th.tabIndex = 0;
+  th.onclick = sortBy;
+  th.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); sortBy(); } };
 });
 const setFilter = (id, val) => {
   filter = val;
-  ["f-all", "f-hot", "f-pos"].forEach(x =>
-    document.getElementById(x).classList.toggle("on", x === id));
+  ["f-all", "f-hot", "f-pos"].forEach(x => {
+    const el = document.getElementById(x);
+    el.classList.toggle("on", x === id);
+    el.setAttribute("aria-pressed", x === id);
+  });
   render();
 };
 document.getElementById("f-all").onclick = () => setFilter("f-all", "all");
@@ -316,6 +361,7 @@ document.getElementById("btn-scan").onclick = async (e) => {
   finally { e.target.textContent = "muat ulang"; e.target.disabled = false; }
 };
 
+document.getElementById("f-lim").onclick = () => { limited = !limited; render(); };
 document.getElementById("q").oninput = e => {
   searchQ = e.target.value.trim().toUpperCase();
   render();
