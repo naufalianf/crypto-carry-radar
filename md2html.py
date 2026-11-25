@@ -31,6 +31,16 @@ def convert(md):
             i += 1
             continue
 
+        if st.startswith("```"):
+            i += 1
+            buf = []
+            while i < len(lines) and not lines[i].strip().startswith("```"):
+                buf.append(html.escape(lines[i], quote=False))
+                i += 1
+            i += 1
+            out.append("<pre>" + chr(10).join(buf) + "</pre>")
+            continue
+
         m = re.match(r"^(#{1,6})\s+(.*)$", st)
         if m:
             n = len(m.group(1))
@@ -117,6 +127,7 @@ h2 { font-size: 14pt; margin-top: 22px; color: #1e3a8a; border-bottom: 1px solid
      padding-bottom: 3px; page-break-after: avoid; }
 h3 { font-size: 11.5pt; margin-top: 16px; color: #1f2937; page-break-after: avoid; }
 p { margin: 7px 0; }
+pre { background: #f3f4f6; border: 1px solid #e5e7eb; padding: 8px 10px; font-size: 8pt; line-height: 1.3; white-space: pre; page-break-inside: avoid; }
 ul, ol { margin: 7px 0; padding-left: 22px; }
 li { margin: 3px 0; }
 code { background: #f1f5f9; padding: 1px 4px; border-radius: 3px;
