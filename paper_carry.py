@@ -53,7 +53,8 @@ MAX_POS = 3
 ENTRY_APR = 4.0      # ambang masuk: hanya level yang benar-benar bisa di-carry (punya pasar spot)
 EXIT_APR = 2.0
 MAX_DAYS = 60
-assert NOTIONAL <= risk.batas_notional(MODAL_BUKU) and NOTIONAL * MAX_POS <= MODAL_BUKU
+if not (NOTIONAL <= risk.batas_notional(MODAL_BUKU) and NOTIONAL * MAX_POS <= MODAL_BUKU):
+    raise SystemExit("plafon notional dilanggar: NOTIONAL/MAX_POS tidak sesuai risk.py")  # bukan assert: tetap jalan di python -O
 CACHE = os.path.join(HERE, "data")
 LOCK_STALE_S = 600
 TRADES_HEADER = ["simbol", "masuk", "keluar", "hari", "apr_masuk_pct", "apr_keluar_pct",
