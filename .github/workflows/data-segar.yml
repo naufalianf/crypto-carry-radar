@@ -1,0 +1,32 @@
+# Pemeriksa kesegaran data. Berjalan di server GitHub, bukan di mesin Hermes,
+# jadi tetap hidup walau mesin itu mati total. Kalau paper.json atau radar.json
+# lebih tua dari batas, job gagal dan GitHub mengirim email ke pemilik repo.
+# Tidak memakai secret apa pun.
+name: data-segar
+on:
+  schedule:
+    - cron: "17 */2 * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  cek:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Periksa umur generated_at
+        run: |
+          python3 - <<'PY'
+          import json, sys, datetime as dt
+          BATAS_JAM = 6
+          gagal = []
+          for f in ("web/paper.json", "web/radar.json"):
+              d = json.load(open(f))
+              t = dt.datetime.strptime(d["generated_at"], "%Y-%m-%d %H:%M UTC").replace(tzinfo=dt.timezone.utc)
+              jam = (dt.datetime.now(dt.timezone.utc) - t).total_seconds() / 3600
+              print(f"{f}: {d['generated_at']} ({jam:.1f} jam)")
+              if jam > BATAS_JAM:
+                  gagal.append(f"{f} berumur {jam:.1f} jam")
+          if gagal:
+              print("DATA BASI: " + "; ".join(gagal)); sys.exit(1)
+          PY
