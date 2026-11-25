@@ -65,8 +65,9 @@ Bahasa: Indonesia. Tanggal: 2026-11-24.
 - Belum dimodelkan: saldo spot yang tertahan, delisting saat posisi terbuka, funding yang dibayar saat perp ditutup lebih awal.
 - PDF panduan masih berisi angka lama.
 - Nominal posisi turun dari 1000 ke 600 pada 2026-11-24. Posisi lama tetap 1000 di pembukuan; PnL sebelum dan sesudah tanggal itu tidak sebanding dalam dolar. Hitungan 30 hari tidak di-reset (`started` dipertahankan saat restart).
-- `paper_carry_state.json` masih di-track git dan berubah tiap tick, jadi `git pull --rebase` bisa konflik. Belum dilepas dari git karena pull yang menghapus file itu akan menghapus posisi terbuka di mesin Hermes. Kalau mau: cadangkan dulu file itu, baru `git rm --cached`.
-- `execution_fills.csv` sengaja TIDAK di-ignore: itu bukti slippage. Commit bersama hasil smoke test.
+- `paper_carry_state.json` sudah di-untrack git (`.gitignore`) sejak 2026-11-25: state memuat `exec.trade_id`/`exec.qty` posisi nyata, rollback git = kehilangan jejak posisi di exchange. Sama untuk `paper_state.json` dan `*_log.txt`.
+- `execution_fills.csv` di-ignore (berubah tiap order, risiko konflik sama dengan state).
+  Bukti slippage dirangkum ke laporan berkala, bukan hidup di git.
 
 ## Syarat sebelum live (belum terpenuhi, jangan dilompati)
 Smoke test bersih, 2 minggu testnet tanpa HALT yang tak terjelaskan, slippage terukur dan masuk akal terhadap
