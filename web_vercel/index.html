@@ -59,7 +59,7 @@
   details[open] summary::before{content:"▾ "}
   summary:hover{color:var(--txt)}
   details .rej{margin-top:8px}
-  .pos{color:var(--acc)} .neg{color:var(--bad)} .mid{color:var(--warn)}
+  .pos{color:var(--acc)} .neg{color:var(--bad)} .mid{color:var(--warn)} b.warn{color:var(--warn)}
   .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;
     border:1px solid #2f3b4a;color:#b9c4d0;background:#161c25}
   .pill.nospot{color:var(--bad);border-color:rgba(255,138,138,.4);background:rgba(255,138,138,.07)}
@@ -381,7 +381,7 @@ function renderPaper(p) {
         `(${c.hari.toFixed(1)} hari, ${esc(c.alasan)})`).join(" · ") + "</div>";
   }
   html += '<div class="plist">Net dihitung setelah biaya masuk-keluar. Posisi baru langsung tercatat minus sebesar biaya itu, ' +
-    "dan baru impas setelah funding menutupnya. Nominal 1000 per posisi, modal buku " + m + "$.</div>";
+    "dan baru impas setelah funding menutupnya. " + (p.notional ? "Nominal " + p.notional + "$ per posisi (maks " + (p.max_pos || "—") + " posisi), " : "") + "modal buku " + m + "$.</div>";
   document.getElementById("paper-body").innerHTML = html;
   sec.hidden = false;
 }

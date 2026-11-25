@@ -318,6 +318,8 @@ def export_web(st, now):
         "generated_at": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime(now)),
         "started_ms": int(st.get("started", now) * 1000),
         "modal_buku": MODAL_BUKU,
+        "notional": NOTIONAL,
+        "max_pos": MAX_POS,
         "limits": {"harian": risk.KILL_SWITCH_HARIAN_PCT, "mingguan": risk.KILL_SWITCH_MINGGUAN_PCT,
                    "bulanan": risk.KILL_SWITCH_BULANAN_PCT},
         "halt": ({"level": h["level"], "sejak": h.get("sejak", "")} if h else None),
