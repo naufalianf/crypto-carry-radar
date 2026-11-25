@@ -314,8 +314,13 @@ def export_web(st, now):
     d1, d7, d30 = perubahan_pnl(st, now, total_pnl(st))
     h = halt_aktif(st)
     terbuka = sum(p.get("net", 0.0) * p["notional"] for p in st["positions"].values())
+    hist = st.get("pnl_hist", [])
+    step = max(1, len(hist) // 240)                  # maks ~240 titik: JSON tetap kecil
+    kurva = [[int(h["t"]), round(h["pnl"], 2)] for h in hist[::step]]
+    kurva.append([int(now), round(total_pnl(st), 2)])
     out = {
         "generated_at": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime(now)),
+        "curve": kurva,
         "started_ms": int(st.get("started", now) * 1000),
         "modal_buku": MODAL_BUKU,
         "notional": NOTIONAL,
