@@ -67,12 +67,6 @@ def batas_notional(modal, max_pct=MAX_NOTIONAL_PCT):
     return modal * max_pct / 100.0
 
 
-def cek_kill_switch(equity_awal, equity_sekarang, batas_pct=KILL_SWITCH_HARIAN_PCT):
-    """(terpicu, rugi_pct). Terpicu kalau rugi harian >= batas."""
-    rugi = (equity_sekarang / equity_awal - 1) * 100 if equity_awal > 0 else 0.0
-    return rugi <= -batas_pct, rugi
-
-
 def cek_drawdown(modal, pnl_1d, pnl_7d, pnl_30d):
     """(level, rugi_pct, batas_pct). level None = aman; selain itu 'harian'/'mingguan'/'bulanan'.
 
@@ -205,9 +199,6 @@ def selfcheck():
     assert cek_margin(0, 100)[0] == "darurat" and cek_margin(100, 0)[0] == "darurat", "fail closed"
     assert cek_margin(100, 90)[1] > cek_margin(100, 100)[1], "harga turun menjauhkan likuidasi"
     assert batas_notional(1000) == 200.0, "plafon notional salah"
-    assert cek_kill_switch(1000, 970, 3.0)[0] is True, "rugi 3% harus memicu"
-    assert cek_kill_switch(1000, 971, 3.0)[0] is False, "rugi 2.9% tidak boleh memicu"
-    assert abs(cek_kill_switch(1000, 970, 3.0)[1] + 3.0) < 1e-9, "hitung rugi salah"
     # kill switch berlapis (modal 3000): harian 1% = $30, mingguan 2% = $60, bulanan 3% = $90
     assert cek_drawdown(3000, -30, -30, -30)[0] == "harian"
     assert cek_drawdown(3000, -29, -29, -29)[0] is None

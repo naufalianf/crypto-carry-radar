@@ -39,7 +39,6 @@ import risk
 
 # Eksekusi nyata (opt-in, hanya testnet): None = paper murni. Diisi oleh `--testnet`.
 EXCHANGE = None
-EXEC_NOTIONAL = 150.0      # nominal order testnet per posisi (minimum order exchange ~100)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 STATE = os.path.join(HERE, "paper_carry_state.json")
@@ -47,12 +46,14 @@ TRADES = os.path.join(HERE, "paper_carry_trades.csv")
 LOG = os.path.join(HERE, "paper_carry_log.txt")
 RADAR_JSON = os.path.join(HERE, "web", "radar.json")
 PAPER_JSON = os.path.join(HERE, "web", "paper.json")   # ringkasan publik untuk dashboard
-NOTIONAL = 1000.0
+MODAL_BUKU = 3000.0                       # modal buku tetap; dasar plafon dan ukuran rugi
+NOTIONAL = risk.batas_notional(MODAL_BUKU)  # plafon 20% modal per posisi = 600 (dipaksa, bukan konstanta lepas)
+EXEC_NOTIONAL = NOTIONAL                  # order testnet sama besar dengan paper, supaya slippage sebanding
 MAX_POS = 3
 ENTRY_APR = 4.0      # ambang masuk: hanya level yang benar-benar bisa di-carry (punya pasar spot)
 EXIT_APR = 2.0
 MAX_DAYS = 60
-MODAL_BUKU = NOTIONAL * MAX_POS   # modal terkomit maksimum; dasar ukuran rugi
+assert NOTIONAL <= risk.batas_notional(MODAL_BUKU) and NOTIONAL * MAX_POS <= MODAL_BUKU
 CACHE = os.path.join(HERE, "data")
 LOCK_STALE_S = 600
 TRADES_HEADER = ["simbol", "masuk", "keluar", "hari", "apr_masuk_pct", "apr_keluar_pct",
@@ -108,7 +109,7 @@ def load():
     Membuat state kosong saat file rusak akan menghapus posisi terbuka, riwayat rugi,
     dan status HALT tanpa jejak — persis kondisi yang paling tidak boleh terjadi."""
     if not os.path.exists(STATE):
-        return {"positions": {}, "closed": [], "equity": NOTIONAL, "started": time.time()}
+        return {"positions": {}, "closed": [], "started": time.time()}
     try:
         with open(STATE) as f:
             st = json.load(f)
@@ -516,7 +517,7 @@ def status():
         except Exception as e:
             print(f"{sym:<14}harga tak terjangkau ({type(e).__name__}); pakai angka terakhir")
         age_h = (time.time() - p["opened"]) / 3600
-        tot += p["net"]
+        tot += p["net"] * p["notional"]
         print(f"{sym:<14}{age_h:>5.1f}h{p['funding']*100:>9.3f}%"
               f"{(p['gross']-p['funding'])*100:>8.3f}%{p['net']*100:>8.3f}%{p['apr_entry']:>9.1f}%")
     if st["closed"]:
@@ -524,7 +525,7 @@ def status():
         for p in st["closed"]:
             print(f"  {p['symbol']:<14} net {p['net']*100:>7.3f}%  "
                   f"funding {p['funding']*100:>7.3f}%  {p['exit_reason']}")
-    print(f"\nPnL berjalan terbuka: {tot*NOTIONAL:+.2f} (nominal {NOTIONAL:.0f}/buku)")
+    print(f"\nPnL berjalan terbuka: {tot:+.2f} USD (posisi baru {NOTIONAL:.0f}/posisi)")
     return st
 
 
@@ -574,7 +575,11 @@ if __name__ == "__main__":
     a = ap.parse_args()
     if a.testnet:
         import binance_testnet
-        EXCHANGE = binance_testnet.BinanceTestnet()
+        try:
+            EXCHANGE = binance_testnet.BinanceTestnet()
+        except RuntimeError as e:
+            print(f"TIDAK BISA MULAI --testnet: {e}")
+            sys.exit(2)
         log("MODE TESTNET: order nyata ke Binance testnet, nominal "
             f"{EXEC_NOTIONAL:.0f} per posisi")
     if a.reset_exec_halt:

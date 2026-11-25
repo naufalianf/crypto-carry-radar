@@ -154,13 +154,13 @@ class TestKillSwitch(Base):
     def test_halt_mengunci_lalu_reset_membuka(self):
         self.radar([row("A", 10), row("B", 9)], T0)
         self.tick(T0)
-        # bangun rugi nyata: spot jatuh, perp tetap -> kaki spot rugi 1,3% + biaya 0,3% = net -1,6% per posisi
-        self.spot["A"] = self.spot["B"] = 98.7
+        # bangun rugi nyata: spot jatuh, perp tetap -> kaki spot rugi 2,5% + biaya 0,3% = net -2,8% per posisi ($16,8 dari 600)
+        self.spot["A"] = self.spot["B"] = 97.5
         self.perp["A"] = self.perp["B"] = 100.0
         self.radar([row("A", 10), row("B", 9), row("C", 8)], T0 + 4 * H)
         st = self.tick(T0 + 4 * H)
         self.assertEqual(st["positions"], {}, "kena net stop / kill switch, semua tertutup")
-        self.assertIsNotNone(st.get("halt"), "rugi 2 x $16 = $32 >= 1% dari 3000 harus mengunci")
+        self.assertIsNotNone(st.get("halt"), "rugi 2 x $16,8 = $33,6 >= 1% dari 3000 harus mengunci")
         self.assertEqual(st["halt"]["level"], "harian")
 
         self.spot.clear(), self.perp.clear()
@@ -209,7 +209,7 @@ class TestNotif(Base):
     def test_kill_switch_dikirim_sekali_dan_menyebut_cara_reset(self):
         self.radar([row("A", 10), row("B", 9)], T0)
         self.tick(T0)
-        self.spot["A"] = self.spot["B"] = 98.7
+        self.spot["A"] = self.spot["B"] = 97.5
         self.radar([row("A", 10), row("B", 9)], T0 + 4 * H)
         self.tick(T0 + 4 * H)
         self.radar([row("C", 8)], T0 + 8 * H)
@@ -271,7 +271,7 @@ class TestExportWeb(Base):
         self.assertEqual(d["n_closed"], 1)
         self.assertEqual(d["positions"], [])
         self.assertEqual(d["closed"][0]["symbol"], "A")
-        self.assertAlmostEqual(d["pnl"]["total"], -3.0, places=1, msg="biaya 0,3% x 1000")
+        self.assertAlmostEqual(d["pnl"]["total"], -1.8, places=1, msg="biaya 0,3% x 600")
         self.assertEqual(d["limits"]["harian"], risk.KILL_SWITCH_HARIAN_PCT)
         self.assertFalse(os.path.exists(pc.PAPER_JSON + ".tmp"))
 
@@ -336,8 +336,8 @@ class TestExec(Base):
     def test_masuk_membuka_dua_kaki_dan_menyimpan_exec(self):
         self.radar([row("A", 10)], T0)
         st = self.tick(T0)
-        self.assertEqual(st["positions"]["A"]["exec"]["qty"], 1.5)       # 150 / 100
-        self.assertEqual(self.fake.eksposur(), (1.5, 1.5))
+        self.assertEqual(st["positions"]["A"]["exec"]["qty"], 6.0)       # 600 / 100
+        self.assertEqual(self.fake.eksposur(), (6.0, 6.0))
 
     def test_tanpa_exchange_tidak_ada_order(self):
         pc.EXCHANGE = None
@@ -378,7 +378,7 @@ class TestExec(Base):
         self.radar([row("A", 1.0)], T0 + 48 * H)
         st = self.tick(T0 + 48 * H)
         self.assertIn("A", st["positions"], "kaki nyata masih terbuka, jangan dianggap tutup")
-        self.assertEqual(self.fake.eksposur(), (1.5, 1.5))
+        self.assertEqual(self.fake.eksposur(), (6.0, 6.0))
         self.assertTrue([m for m in self.pesan if "EXEC HALT" in m])
         self.radar([row("A", 1.0)], T0 + 52 * H)
         st = self.tick(T0 + 52 * H)               # percobaan kedua berhasil (cid baru)

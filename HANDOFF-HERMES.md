@@ -38,7 +38,8 @@ Bahasa: Indonesia. Tanggal: 2026-11-24.
    commit dan push. Format respons dan kode galat ditulis dari dokumentasi dan belum pernah menyentuh testnet
    sungguhan, jadi penyesuaian itu normal.
 7. Hanya kalau smoke test bersih: jalankan `python3 paper_carry.py --loop --testnet`
-   (nominal order `EXEC_NOTIONAL` = 150 USDT per posisi, maksimum 3 posisi).
+   (nominal order `EXEC_NOTIONAL` = `NOTIONAL` = 600 USDT per posisi = plafon 20% dari `MODAL_BUKU` 3000,
+   maksimum 3 posisi). Pastikan saldo testnet cukup: sekitar 3x600 di spot dan margin perp untuk 3x600.
 
 ## Cara kerja mode `--testnet`
 - Paper tetap jadi pembukuan utama. Order nyata hanya ikut saat paper memutuskan masuk/keluar.
@@ -63,7 +64,9 @@ Bahasa: Indonesia. Tanggal: 2026-11-24.
 - Watchdog berjalan di mesin yang sama dengan daemon. Kalau Hermes mati total, tidak ada yang memberi tahu.
 - Belum dimodelkan: saldo spot yang tertahan, delisting saat posisi terbuka, funding yang dibayar saat perp ditutup lebih awal.
 - PDF panduan masih berisi angka lama.
-- 30 hari paper baru dihitung sejak daemon di-restart dengan kode terbaru.
+- Nominal posisi turun dari 1000 ke 600 pada 2026-11-24. Posisi lama tetap 1000 di pembukuan; PnL sebelum dan sesudah tanggal itu tidak sebanding dalam dolar. Hitungan 30 hari tidak di-reset (`started` dipertahankan saat restart).
+- `paper_carry_state.json` masih di-track git dan berubah tiap tick, jadi `git pull --rebase` bisa konflik. Belum dilepas dari git karena pull yang menghapus file itu akan menghapus posisi terbuka di mesin Hermes. Kalau mau: cadangkan dulu file itu, baru `git rm --cached`.
+- `execution_fills.csv` sengaja TIDAK di-ignore: itu bukti slippage. Commit bersama hasil smoke test.
 
 ## Syarat sebelum live (belum terpenuhi, jangan dilompati)
 Smoke test bersih, 2 minggu testnet tanpa HALT yang tak terjelaskan, slippage terukur dan masuk akal terhadap
