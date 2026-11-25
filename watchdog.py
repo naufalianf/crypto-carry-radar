@@ -40,6 +40,44 @@ def periksa(now, target=None):
     return hasil
 
 
+PAPER_STATE = os.path.join(HERE, "paper_carry_state.json")
+TOL_QTY = 0.01           # selisih qty relatif yang dibiarkan (pembulatan step size)
+
+
+def selisih(posisi, di_bursa, tol=TOL_QTY):
+    """Bandingkan state dengan perp di bursa. Mengembalikan daftar kalimat; kosong = cocok.
+    posisi: dict state["positions"]; di_bursa: {simbol: qty short}.
+    Posisi paper murni (tanpa 'exec') harus NOL di bursa; posisi ber-exec harus sama qty-nya."""
+    msg = []
+    for sym in sorted(set(posisi) | set(di_bursa)):
+        harus = float((posisi.get(sym) or {}).get("exec", {}).get("qty") or 0)
+        ada = float(di_bursa.get(sym) or 0)
+        if abs(ada - harus) > max(harus, ada) * tol:
+            msg.append(f"{sym}: state {harus:g}, bursa {ada:g}")
+    return msg
+
+
+def cek_posisi(fetch=None, state_path=PAPER_STATE):
+    """(bermasalah?, daftar selisih) | None bila tak bisa diperiksa (tanpa kunci / bursa tak terjangkau).
+    Hanya membaca. None tidak mengubah status alert; kegagalan sementara tidak boleh membunyikan alarm."""
+    st = _muat(state_path)
+    if "positions" not in st:
+        return None
+    if fetch is None:
+        try:
+            import binance_testnet as bt
+            bt._muat_env()
+            fetch = bt.BinanceTestnet().perp_short_qty
+        except Exception:
+            return None                       # tanpa kunci = mode paper murni, tak ada yang direkonsiliasi
+    try:
+        bursa = fetch()
+    except Exception:
+        return None
+    d = selisih(st["positions"], bursa)
+    return (bool(d), d)
+
+
 def _muat(path):
     try:
         with open(path) as f:
@@ -48,7 +86,7 @@ def _muat(path):
         return {}
 
 
-def jalankan(now=None, kirim=None, target=None, state_path=STATE):
+def jalankan(now=None, kirim=None, target=None, state_path=STATE, cek=cek_posisi):
     """Kirim alert untuk perubahan status. Mengembalikan daftar pesan yang dicoba kirim."""
     now = now or time.time()
     if kirim is None:
@@ -64,6 +102,15 @@ def jalankan(now=None, kirim=None, target=None, state_path=STATE):
         elif not mati and lama.get(nama):
             pesan.append(f"{nama} berdetak lagi (umur {u:.1f} jam).")
         baru[nama] = mati
+    r = cek() if cek else None
+    if r is not None:
+        bad, detail = r
+        if bad and not lama.get("rekonsiliasi"):
+            pesan.append("POSISI TIDAK COCOK dengan bursa: " + "; ".join(detail) +
+                         ". Cek exchange manual; jangan hapus execution_halt.json sebelum itu.")
+        elif not bad and lama.get("rekonsiliasi"):
+            pesan.append("Posisi state dan bursa cocok lagi.")
+        baru["rekonsiliasi"] = bad
     for m in pesan:
         try:
             kirim(m)
@@ -90,14 +137,14 @@ def selftest():
             json.dump({"generated_at": gen}, f)
     kirim = []
     tulis("2026-01-01 11:00 UTC")                                   # umur 1 jam
-    assert jalankan(t0, kirim.append, tg, sp) == [], "sehat tidak mengirim"
-    assert jalankan(t0 + 7 * 3600, kirim.append, tg, sp)[0].startswith("DAEMON MATI"), "basi -> alert"
-    assert jalankan(t0 + 8 * 3600, kirim.append, tg, sp) == [], "tidak diulang selagi mati"
+    assert jalankan(t0, kirim.append, tg, sp, cek=None) == [], "sehat tidak mengirim"
+    assert jalankan(t0 + 7 * 3600, kirim.append, tg, sp, cek=None)[0].startswith("DAEMON MATI"), "basi -> alert"
+    assert jalankan(t0 + 8 * 3600, kirim.append, tg, sp, cek=None) == [], "tidak diulang selagi mati"
     tulis("2026-01-01 20:00 UTC")
-    assert "berdetak lagi" in jalankan(t0 + 8.5 * 3600, kirim.append, tg, sp)[0], "pulih -> kabar"
-    assert jalankan(t0 + 9 * 3600, kirim.append, tg, sp) == [], "pulih tidak diulang"
+    assert "berdetak lagi" in jalankan(t0 + 8.5 * 3600, kirim.append, tg, sp, cek=None)[0], "pulih -> kabar"
+    assert jalankan(t0 + 9 * 3600, kirim.append, tg, sp, cek=None) == [], "pulih tidak diulang"
     os.remove(p)
-    assert "hilang" in jalankan(t0 + 9 * 3600, kirim.append, tg, sp)[0], "file hilang dianggap mati"
+    assert "hilang" in jalankan(t0 + 9 * 3600, kirim.append, tg, sp, cek=None)[0], "file hilang dianggap mati"
     with open(p, "w") as f:
         f.write("{rusak")
     assert umur_jam(p, t0) is None
@@ -108,9 +155,29 @@ def selftest():
     tulis("2026-01-01 00:00 UTC")
     def gagal(_):
         raise OSError("down")
-    jalankan(t0, gagal, tg, sp2)
+    jalankan(t0, gagal, tg, sp2, cek=None)
     assert not os.path.exists(sp2), "state tidak boleh tersimpan bila kirim gagal"
-    assert len(jalankan(t0, kirim.append, tg, sp2)) == 1, "dicoba lagi di putaran berikutnya"
+    assert len(jalankan(t0, kirim.append, tg, sp2, cek=None)) == 1, "dicoba lagi di putaran berikutnya"
+    # rekonsiliasi posisi
+    pos = {"AAA": {"exec": {"qty": 2.0}}, "BBB": {}}              # BBB = paper murni
+    assert selisih(pos, {"AAA": 2.0}) == []
+    assert selisih(pos, {"AAA": 2.01}) == [], "pembulatan kecil dibiarkan"
+    assert len(selisih(pos, {"AAA": 2.0, "BBB": 1.0})) == 1, "paper murni tak boleh ada perp di bursa"
+    assert len(selisih(pos, {})) == 1, "state ber-exec tapi bursa kosong"
+    assert len(selisih(pos, {"AAA": 2.0, "CCC": 0.5})) == 1, "posisi yatim di bursa"
+    sp3, ps = os.path.join(d, "s3.json"), os.path.join(d, "ps.json")
+    with open(ps, "w") as f:
+        json.dump({"positions": pos}, f)
+    tulis("2026-01-01 11:00 UTC")
+    cocok = lambda: cek_posisi(lambda: {"AAA": 2.0}, ps)
+    salah = lambda: cek_posisi(lambda: {}, ps)
+    assert jalankan(t0, kirim.append, tg, sp3, cek=cocok) == []
+    assert "TIDAK COCOK" in jalankan(t0, kirim.append, tg, sp3, cek=salah)[0]
+    assert jalankan(t0, kirim.append, tg, sp3, cek=salah) == [], "tidak diulang selagi tidak cocok"
+    assert "cocok lagi" in jalankan(t0, kirim.append, tg, sp3, cek=cocok)[0]
+    def putus():
+        raise OSError("bursa tak terjangkau")
+    assert cek_posisi(putus, ps) is None, "bursa tak terjangkau bukan alarm"
     print("watchdog selftest: OK")
 
 

@@ -124,6 +124,11 @@ class BinanceTestnet(ex.Exchange):
             raise ex.Unknown(f"HTTP {st} kode {kode}")
         raise GalatBinance(kode, d.get("msg", ""))
 
+    def perp_short_qty(self):
+        """{simbol: qty short} dari positionRisk. Hanya baca. Sumber kebenaran posisi, bukan respons order."""
+        js = self._req(FUT, "/fapi/v2/positionRisk", {})
+        return {d["symbol"]: -float(d["positionAmt"]) for d in js if float(d["positionAmt"]) != 0}
+
     # ---- aturan simbol & harga ----
     def _aturan(self, sym):
         if sym in self._filter:
@@ -357,6 +362,9 @@ def selftest():
     assert _avg_harga("perp", {"executedQty": "2", "cumQuote": "200"}) == 100.0
     assert _avg_harga("spot", {"executedQty": "2", "cummulativeQuoteQty": "202"}) == 101.0
     assert _avg_harga("perp", {"executedQty": "0", "price": "99.9"}) == 0.0
+    hp = lambda m, u, p, hd: (200, [{"symbol": "AAAUSDT", "positionAmt": "-2.5"},
+                                    {"symbol": "BBBUSDT", "positionAmt": "0.000"}])
+    assert BinanceTestnet("k", "s", http=hp).perp_short_qty() == {"AAAUSDT": 2.5}, "positionRisk: hanya short berisi"
     print("binance_testnet selftest: OK")
 
 
