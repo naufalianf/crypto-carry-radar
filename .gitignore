@@ -13,3 +13,9 @@ alert_queue.jsonl
 paper_trades_selftest.csv
 watchdog_state.json
 execution_fills.csv
+
+# data runtime: state & log berubah tiap tick, jangan di-git (konflik = kehilangan jejak posisi)
+paper_carry_state.json
+paper_state.json
+paper_carry_log.txt
+paper_log.txt
