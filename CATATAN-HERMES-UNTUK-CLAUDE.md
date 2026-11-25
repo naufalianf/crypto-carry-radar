@@ -232,10 +232,93 @@ perilakunya benar, tapi adapter tidak bisa jalan sama sekali tanpa dua pasang ku
 Sudah saya tambal: `BINANCE_TESTNET_SPOT_KEY/SECRET` + `BINANCE_TESTNET_FUT_KEY/SECRET`,
 dipilih per host, dengan tes yang mengunci sifat itu. Commit `30b26be`.
 
+## Smoke test dua kaki: BERSIH — dan 3 bug yang hanya muncul di exchange sungguhan
+
+Kunci "Demo Trading API" sampai, smoke dua kaki lulus:
+
+```
+FUT host: https://demo-fapi.binance.com
+buka: {'status': 'ok', 'qty': 0.002, 'spot': (0.002, 59050.74), 'perp': (0.002, 59025.9)}
+tutup: {'status': 'ok'}
+PERP amt 0.0000 | SPOT BTC 1.00000000 | FUT wallet 4999.55857
+```
+
+Empat selftest lulus. Nol posisi menggantung, nol halt. Commit `53a446a`.
+Keluaran penuh ada di `HANDOFF-HERMES.md` Percobaan 3–4.
+
+### Bug 9 — kunci "Demo Trading API" ≠ kunci testnet lama
+
+```
+testnet.binancefuture.com/fapi/v2/account       -> -2015 Invalid API-key
+demo-fapi.binance.com/fapi/v2/account           -> OK, canTrade=True, wallet 5000
+```
+
+Binance punya dua testnet futures terpisah. Kunci yang dibuat lewat menu **Demo
+Trading API** hanya berlaku di host demo. `FUT` dipindah ke `demo-fapi.binance.com`,
+bisa ditimpa lewat env `BINANCE_TESTNET_FUT_HOST` supaya tidak perlu ubah kode untuk
+berpindah.
+
+### Bug 10 — futures tidak mengirim `avgPrice`, dan itu meninggalkan posisi menggantung
+
+`_hasil()` lama:
+
+```python
+harga = float(js["cummulativeQuoteQty"]) / q if pasar == "spot" else float(js["avgPrice"])
+```
+
+Dokumentasi Binance bilang `newOrderRespType=RESULT` memberi `avgPrice` untuk futures.
+Kenyataan di host demo: **tidak ada `avgPrice` sama sekali**. Respons mentah hanya
+punya `price` (harga limit), `executedQty`, `cumQty`. Jadi `KeyError` dilempar
+**setelah order FILLED**.
+
+Akibat nyata, bukan teoretis: smoke pertama membuka spot beli (terisi) lalu perp short
+(terisi), lalu `KeyError` membuat fungsi berhenti sebelum menutup apa pun. Posisi
+short 0,002 BTC menggantung di akun. Yang menemukan bukan respons order, tapi query
+`/fapi/v2/positionRisk`.
+
+```python
+def _avg_harga(pasar, js):
+    q = float(js.get("executedQty") or 0)
+    if q <= 0:
+        return 0.0
+    cq = js.get("cummulativeQuoteQty") or js.get("cumQuote")
+    if cq:
+        return float(cq) / q
+    if js.get("avgPrice"):
+        return float(js["avgPrice"])
+    return float(js.get("price") or 0.0)
+```
+
+**Aturan yang harus dipegang di `execution.py`:** respons order tidak pernah boleh
+dipakai sebagai bukti posisi. Setiap jalur yang membuka kaki harus bisa ditutup tanpa
+bergantung pada parsing respons. Pertimbangkan `positionRisk`/`openOrders` sebagai
+sumber kebenaran saat rekonsiliasi.
+
+### Bug 11 — `slip_bps` kaki perp diukur terhadap harga spot
+
+`smoke()` lama memanggil `buka_carry(..., ref, ref, tid)` — referensi spot dipakai untuk
+kedua kaki. Hasilnya di CSV:
+
+```
+perp,sell,ref 59166.67 fill 59137.30 slip +4.96
+perp,buy, ref 59166.67 fill 59305.40 slip +23.45
+```
+
+Itu **bukan slippage**, itu basis spot-perp yang tercampur. Setelah referensi perp
+diambil dari `fapi/v1/ticker/bookTicker`, angkanya masuk akal:
+
+```
+perp,sell,ref 59085.00 fill 59025.90 slip +10.00
+perp,buy, ref 59122.00 fill 59181.20 slip +10.01
+```
+
++10,00 bps = tepat `TOL_BPS`. Order limit IOC menyilang sebesar toleransi, jadi ini
+angka yang benar untuk buku demo — tetap **bukan** perkiraan biaya pasar asli.
+Jangan dipakai mengisi asumsi 0,3%.
+
 ## Yang belum saya kerjakan dan menunggu Naufal
 
-- Kunci testnet **futures**. Spot sudah ada dan sudah lulus smoke test (lihat
-  `HANDOFF-HERMES.md`, Percobaan 1). Futures terhalang Internet Positif karena login
-  lewat `accounts.binance.com`; Naufal sedang mencari jalan.
-- Keputusan celah A (posisi lama di notional 1000). Itu mengubah angka yang sudah
-  dilaporkan, jadi bukan keputusan saya.
+- Keputusan celah A (2 posisi lama di notional 1000 vs plafon 600). PnL yang tampil di
+  dashboard 40% lebih besar dari yang seharusnya menurut aturan baru.
+- Menyalakan `paper_carry.py --loop --testnet`. Order demo nyata 600/posisi, maks 3.
+  Saya tidak menyalakannya tanpa izin Naufal, dan sebaiknya setelah celah A beres.
