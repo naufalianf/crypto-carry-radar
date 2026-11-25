@@ -129,6 +129,13 @@ class BinanceTestnet(ex.Exchange):
         js = self._req(FUT, "/fapi/v2/positionRisk", {})
         return {d["symbol"]: -float(d["positionAmt"]) for d in js if float(d["positionAmt"]) != 0}
 
+    def spot_qty(self):
+        """{aset: free+locked} dari akun spot. Hanya baca. Akun testnet berisi saldo bawaan,
+        jadi pemakai hanya boleh memeriksa batas bawah (kaki spot ada), bukan kesamaan."""
+        js = self._req(SPOT, "/api/v3/account", {})
+        return {b["asset"]: float(b["free"]) + float(b["locked"]) for b in js.get("balances", [])
+                if float(b["free"]) + float(b["locked"]) > 0}
+
     # ---- aturan simbol & harga ----
     def _aturan(self, sym):
         if sym in self._filter:
@@ -362,6 +369,9 @@ def selftest():
     assert _avg_harga("perp", {"executedQty": "2", "cumQuote": "200"}) == 100.0
     assert _avg_harga("spot", {"executedQty": "2", "cummulativeQuoteQty": "202"}) == 101.0
     assert _avg_harga("perp", {"executedQty": "0", "price": "99.9"}) == 0.0
+    hs = lambda m, u, p, hd: (200, {"balances": [{"asset": "AAA", "free": "1.5", "locked": "0.5"},
+                                                {"asset": "ZZZ", "free": "0", "locked": "0"}]})
+    assert BinanceTestnet("k", "s", http=hs).spot_qty() == {"AAA": 2.0}, "saldo spot: free+locked, nol dibuang"
     hp = lambda m, u, p, hd: (200, [{"symbol": "AAAUSDT", "positionAmt": "-2.5"},
                                     {"symbol": "BBBUSDT", "positionAmt": "0.000"}])
     assert BinanceTestnet("k", "s", http=hp).perp_short_qty() == {"AAAUSDT": 2.5}, "positionRisk: hanya short berisi"

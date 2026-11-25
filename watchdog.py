@@ -57,7 +57,23 @@ def selisih(posisi, di_bursa, tol=TOL_QTY):
     return msg
 
 
-def cek_posisi(fetch=None, state_path=PAPER_STATE):
+def selisih_spot(posisi, saldo, tol=TOL_QTY):
+    """Kaki spot: tiap posisi ber-exec harus punya saldo aset dasar >= qty (dikurangi toleransi
+    pembulatan/fee). Satu arah saja: akun testnet punya saldo bawaan, jadi kelebihan tak dianggap salah.
+    Kaki spot hilang = short perp telanjang, itu yang dicari."""
+    msg = []
+    for sym, p in sorted(posisi.items()):
+        qty = float((p.get("exec") or {}).get("qty") or 0)
+        if qty <= 0:
+            continue
+        aset = sym[:-4] if sym.endswith("USDT") else sym
+        ada = float(saldo.get(aset) or 0)
+        if ada < qty * (1 - tol - 0.002):          # 0.2% = fee spot dibayar dalam aset dasar
+            msg.append(f"{sym} spot: state {qty:g}, saldo {aset} {ada:g}")
+    return msg
+
+
+def cek_posisi(fetch=None, state_path=PAPER_STATE, fetch_spot=None):
     """(bermasalah?, daftar selisih) | None bila tak bisa diperiksa (tanpa kunci / bursa tak terjangkau).
     Hanya membaca. None tidak mengubah status alert; kegagalan sementara tidak boleh membunyikan alarm."""
     st = _muat(state_path)
@@ -67,7 +83,9 @@ def cek_posisi(fetch=None, state_path=PAPER_STATE):
         try:
             import binance_testnet as bt
             bt._muat_env()
-            fetch = bt.BinanceTestnet().perp_short_qty
+            b = bt.BinanceTestnet()
+            fetch = b.perp_short_qty
+            fetch_spot = fetch_spot or b.spot_qty
         except Exception:
             return None                       # tanpa kunci = mode paper murni, tak ada yang direkonsiliasi
     try:
@@ -75,6 +93,11 @@ def cek_posisi(fetch=None, state_path=PAPER_STATE):
     except Exception:
         return None
     d = selisih(st["positions"], bursa)
+    if fetch_spot is not None:
+        try:
+            d += selisih_spot(st["positions"], fetch_spot())
+        except Exception:
+            pass                              # spot tak terjangkau: lewati, perp tetap dinilai
     return (bool(d), d)
 
 
@@ -165,9 +188,21 @@ def selftest():
     assert len(selisih(pos, {"AAA": 2.0, "BBB": 1.0})) == 1, "paper murni tak boleh ada perp di bursa"
     assert len(selisih(pos, {})) == 1, "state ber-exec tapi bursa kosong"
     assert len(selisih(pos, {"AAA": 2.0, "CCC": 0.5})) == 1, "posisi yatim di bursa"
+    # kaki spot: hanya batas bawah
+    assert selisih_spot(pos, {"AAA": 2.0, "USDT": 9}) == []
+    assert selisih_spot(pos, {"AAA": 1.996}) == [], "fee dalam aset dasar dibiarkan"
+    assert selisih_spot(pos, {"AAA": 50.0}) == [], "saldo bawaan testnet berlebih bukan salah"
+    assert len(selisih_spot(pos, {})) == 1, "short perp tanpa kaki spot = telanjang"
+    assert len(selisih_spot(pos, {"AAA": 1.0})) == 1
     sp3, ps = os.path.join(d, "s3.json"), os.path.join(d, "ps.json")
     with open(ps, "w") as f:
         json.dump({"positions": pos}, f)
+    assert cek_posisi(lambda: {"AAA": 2.0}, ps, lambda: {"AAA": 2.0})[0] is False
+    r = cek_posisi(lambda: {"AAA": 2.0}, ps, lambda: {})
+    assert r[0] is True and "spot" in r[1][0], "perp ada, spot hilang -> alarm"
+    def spot_putus():
+        raise OSError("down")
+    assert cek_posisi(lambda: {"AAA": 2.0}, ps, spot_putus) == (False, []), "spot tak terjangkau tak membunyikan alarm"
     tulis("2026-01-01 11:00 UTC")
     cocok = lambda: cek_posisi(lambda: {"AAA": 2.0}, ps)
     salah = lambda: cek_posisi(lambda: {}, ps)
