@@ -148,6 +148,33 @@ class Halt(Base):
         self.assertEqual(self.buka(ex.FakeExchange())["status"], "ok")
 
 
+class GalatTakTerduga(Base):
+    """Bug 10 (smoke 2026-11-25): parsing respons meledak padahal order sudah masuk."""
+    def test_bug_parsing_perp_order_masuk_tidak_menggantung(self):
+        f = ex.FakeExchange({"perp_short": ["bug"]})
+        r = self.buka(f)                      # _kirim tanya status -> order terbaca terisi
+        self.assertEqual(r["status"], "ok")
+        self.assertEqual(f.eksposur(), (10.0, 10.0))
+
+    def test_bug_parsing_dan_status_juga_meledak_halt(self):
+        f = ex.FakeExchange({"perp_short": ["bug"]})
+        f.order_status = lambda cid: (_ for _ in ()).throw(KeyError("x"))
+        r = self.buka(f)
+        self.assertEqual(r["status"], "halt")
+        self.assertIsNotNone(ex.halt_aktif(self.halt))
+
+    def test_galat_di_luar_kirim_tetap_halt(self):
+        f = ex.FakeExchange()
+        asli = ex._catat
+        ex._catat = lambda *a, **k: 1 / 0     # galat setelah spot terisi, di luar _kirim
+        try:
+            r = self.buka(f)
+        finally:
+            ex._catat = asli
+        self.assertEqual(r["status"], "halt")
+        self.assertIsNotNone(ex.halt_aktif(self.halt))
+
+
 class Penutupan(Base):
     def test_tutup_perp_gagal_spot_ditahan_dan_halt(self):
         f = ex.FakeExchange()

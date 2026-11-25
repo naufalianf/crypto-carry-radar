@@ -106,14 +106,16 @@ def _kirim(ex, fn, sym, qty, cid):
         return ("ok", q, p)
     except Rejected:
         return ("tolak",)
-    except Unknown:
+    except Exception:
+        # Unknown ATAU galat tak terduga (mis. KeyError saat parsing respons). Order mungkin sudah
+        # masuk di exchange, jadi jangan anggap gagal: tanya status dengan cid yang sama.
         pass
     # hasil tidak jelas: jangan kirim ulang buta, tanya status dengan cid yang sama
     for _ in range(STATUS_TRIES):
         try:
             q, p = ex.order_status(cid)
             return ("ok", q, p) if q > 0 else ("tolak",)
-        except Unknown:
+        except Exception:
             continue
     return ("hilang",)
 
@@ -135,7 +137,7 @@ def _unwind(ex, fn, sym, qty, cid_dasar, trade_id, ref, side, leg, fills_path):
     return False
 
 
-def buka_carry(ex, sym, notional, ref_spot, ref_perp, trade_id, halt_path=None, fills_path=None):
+def _buka_carry(ex, sym, notional, ref_spot, ref_perp, trade_id, halt_path=None, fills_path=None):
     """Buka satu posisi carry. Mengembalikan dict hasil:
        {"status": "ok"|"gagal_bersih"|"halt", "qty":..., "spot":(q,p), "perp":(q,p), "alasan":...}
     'gagal_bersih' = tidak ada eksposur tersisa. 'halt' = ada eksposur yang tidak bisa dipastikan,
@@ -186,7 +188,7 @@ def buka_carry(ex, sym, notional, ref_spot, ref_perp, trade_id, halt_path=None, 
     return {"status": "ok", "qty": pq, "spot": (pq, sp), "perp": (pq, pp), "parsial": True}
 
 
-def tutup_carry(ex, sym, qty, ref_spot, ref_perp, trade_id, halt_path=None, fills_path=None):
+def _tutup_carry(ex, sym, qty, ref_spot, ref_perp, trade_id, halt_path=None, fills_path=None):
     """Tutup posisi: beli balik perp dulu (hilangkan risiko likuidasi), lalu jual spot.
     Kalau perp gagal ditutup, spot DIPERTAHANKAN (tetap netral) dan HALT."""
     p = _kirim(ex, ex.perp_buy, sym, qty, f"{trade_id}-perp-close")
@@ -202,6 +204,27 @@ def tutup_carry(ex, sym, qty, ref_spot, ref_perp, trade_id, halt_path=None, fill
         return {"status": "halt", "alasan": "jual spot gagal setelah perp tertutup"}
     _catat(trade_id, "spot", "sell", s[1], ref_spot, s[2], "close", fills_path)
     return {"status": "ok"}
+
+
+def _jaga(fn, nama):
+    """Bungkus buka/tutup: galat tak terduga di mana pun = eksposur tidak dipastikan -> HALT.
+    Respons order tidak boleh jadi satu-satunya bukti posisi; lebih baik berhenti daripada menggantung."""
+    import inspect
+
+    def bungkus(*a, **kw):
+        try:
+            return fn(*a, **kw)
+        except Exception as e:
+            arg = inspect.signature(fn).bind_partial(*a, **kw).arguments
+            set_halt(f"galat tak terduga di {nama}; eksposur tidak dipastikan, cek exchange manual",
+                     {"sym": arg.get("sym"), "jenis": type(e).__name__}, arg.get("halt_path"))
+            return {"status": "halt", "alasan": f"galat tak terduga: {type(e).__name__}"}
+    bungkus.__doc__ = fn.__doc__
+    return bungkus
+
+
+buka_carry = _jaga(_buka_carry, "buka_carry")
+tutup_carry = _jaga(_tutup_carry, "tutup_carry")
 
 
 class FakeExchange(Exchange):
@@ -234,6 +257,8 @@ class FakeExchange(Exchange):
         self.orders[cid] = (qty, px)
         if a == "hilang":
             raise Unknown("timeout, order masuk")
+        if a == "bug":                              # order masuk, tetapi parsing respons meledak
+            raise KeyError("avgPrice")
         return self.orders[cid]
 
     def spot_buy(self, sym, qty, cid): return self._jalan("spot_buy", sym, qty, cid)
