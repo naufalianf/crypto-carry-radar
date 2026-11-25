@@ -172,6 +172,7 @@
         <th data-k="spread_bps" class="hide-sm" title="Spread bid-ask perpetual dalam bps (100 bps = 1%)">spread<span class="arrow"></span></th>
         <th data-k="apr_7d" title="Funding 7 hari terakhir, disetahunkan">APR 7d<span class="arrow"></span></th>
         <th data-k="apr_30d" class="hide-sm" title="Funding 30 hari terakhir, disetahunkan">APR 30d<span class="arrow"></span></th>
+        <th class="hide-sm" title="Funding harian 30 hari terakhir (APR per hari). Garis putus = nol; merah di bawahnya berarti funding negatif">tren 30h</th>
         <th data-k="pos_pct" class="hide-sm" title="Persentase hari dengan funding positif">fund+<span class="arrow"></span></th>
         <th data-k="carry_cost_pct" class="hide-sm" title="Fee masuk+keluar + menyeberang spread di dua kaki">biaya<span class="arrow"></span></th>
         <th data-k="breakeven_days" title="Hari yang dibutuhkan funding untuk menutup biaya">balik modal<span class="arrow"></span></th>
@@ -321,12 +322,13 @@ function render() {
       <td class="hide-sm">${r.spread_bps === null ? "—" : r.spread_bps.toFixed(1)}</td>
       <td class="${cls(r.apr_7d)}">${sign(r.apr_7d)} ${fmt(r.apr_7d)}</td>
       <td class="hide-sm ${cls(r.apr_30d)}">${sign(r.apr_30d)} ${fmt(r.apr_30d)}</td>
+      <td class="hide-sm">${sparkSvg(r.spark)}</td>
       <td class="hide-sm">${r.pos_pct.toFixed(0)}%</td>
       <td class="hide-sm">${r.carry_cost_pct.toFixed(2)}%</td>
       <td>${r.breakeven_days ? r.breakeven_days.toFixed(0) + " hari" : "—"}</td>
       <td class="hide-sm">${usd(r.depth_usd)}</td>
       <td>${r.status ? '<span class="pill hot">lolos</span>' : r.has_spot === false ? '<span class="pill nospot">tanpa spot</span>' : '<span class="pill">pantau</span>'}</td>
-    </tr>`).join("") || `<tr><td colspan="12" style="text-align:center;color:var(--mut)">
+    </tr>`).join("") || `<tr><td colspan="13" style="text-align:center;color:var(--mut)">
       tidak ada baris untuk filter ini</td></tr>`;
 
   const rej = data.rejected || [];
@@ -340,6 +342,16 @@ const PAPER_JSON_URL =
   "https://raw.githubusercontent.com/naufalianf/crypto-carry-radar/main/web/paper.json";
 const sgn = v => (v > 0 ? "+" : "") + v.toFixed(2);
 const pcls = v => v < 0 ? "pnl-neg" : v > 0 ? "pnl-pos" : "";
+
+function sparkSvg(a) {
+  if (!a || a.length < 2) return "—";
+  const W = 84, H = 24, lo = Math.min(...a, 0), hi = Math.max(...a, 0), sp = (hi - lo) || 1;
+  const X = i => (i / (a.length - 1) * W).toFixed(1), Y = v => (2 + (hi - v) / sp * (H - 4)).toFixed(1);
+  const pts = a.map((v, i) => X(i) + "," + Y(v)).join(" "), last = a[a.length - 1];
+  return `<svg class="spark" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Funding harian 30 hari, terakhir ${last.toFixed(1)} persen APR">` +
+    `<line x1="0" x2="${W}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--mut)" stroke-dasharray="2 2" opacity=".6"/>` +
+    `<polyline points="${pts}" fill="none" stroke="${last < 0 ? "var(--bad)" : "var(--acc)"}" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
+}
 
 function curveSvg(p) {
   const c = p.curve || [];

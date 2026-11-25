@@ -131,7 +131,11 @@ def scan(topn=TOPN, threshold=10.0):
         if perp_sp_read is not None and spot_sp_read is not None:
             cost += (perp_sp_read + spot_sp_read) / 100
         be = (cost / 100 / (a7 / 100 / 365)) if a7 > 0 else None
+        r90 = rates[-90:]
+        spark = [round(sum(r90[i:i + 3]) * 365 * 100, 1)
+                 for i in range(len(r90) % 3, len(r90), 3)]   # APR per hari (3 funding/hari)
         row = {"symbol": sym,
+               "spark": spark,
                "volume_musd": round(float(t["quoteVolume"]) / 1e6, 1),
                "apr_7d": round(a7, 2), "apr_30d": round(a30, 2),
                "last_bps": round(rates[-1] * 10000, 3),
