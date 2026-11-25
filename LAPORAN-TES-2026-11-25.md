@@ -135,9 +135,9 @@ buku demo tipis, spread pasar asli beberapa bps.
 - IP mesin Hermes sempat kena `-1003 IP banned` di host futures lama karena request
   diagnosis berlebihan (bukan dari kode bot). Endpoint publik tidak terpengaruh.
   Selftest dan smoke tidak terpengaruh.
-- Kunci tidak pernah masuk repo. Diverifikasi: `grep ayeY9ur0` di `binance_testnet.py`
-  dan `HANDOFF-HERMES.md` dari raw GitHub = **0 match**. Kunci tinggal di
-  `.testnet.env` mode 600, di luar repo.
+- Kunci tidak pernah masuk repo. Diverifikasi: grep potongan kunci futures di
+  `binance_testnet.py` dan `HANDOFF-HERMES.md` dari raw GitHub = **0 match**. Kunci
+  tinggal di `.testnet.env` mode 600, di luar repo.
 - Kunci sudah pernah lewat chat, jadi sebaiknya di-revoke + generate ulang setelah
   semua pengujian selesai.
 
