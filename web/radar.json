@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-24 22:44 UTC",
+  "generated_at": "2026-11-25 02:44 UTC",
   "universe": 60,
   "scanned_rank": 60,
   "threshold": 8.0,
@@ -14,67 +14,67 @@
   "rejected": [
     {
       "symbol": "BULLAUSDT",
-      "apr_7d": 74.21,
+      "apr_7d": 77.96,
       "flags": [
         "tidak ada pasar spot: carry mustahil",
-        "volume 44 jt",
+        "volume 40 jt",
         "balik modal <3 hari: APR tidak stabil"
       ]
     },
     {
       "symbol": "EVAAUSDT",
-      "apr_7d": 25.57,
-      "flags": [
-        "tidak ada pasar spot: carry mustahil"
-      ]
-    },
-    {
-      "symbol": "GUAUSDT",
-      "apr_7d": 24.28,
-      "flags": [
-        "tidak ada pasar spot: carry mustahil"
-      ]
-    },
-    {
-      "symbol": "ELSAUSDT",
-      "apr_7d": 21.17,
-      "flags": [
-        "tidak ada pasar spot: carry mustahil"
-      ]
-    },
-    {
-      "symbol": "PHAROSUSDT",
-      "apr_7d": 19.38,
-      "flags": [
-        "tidak ada pasar spot: carry mustahil",
-        "volume 38 jt"
-      ]
-    },
-    {
-      "symbol": "PIEVERSEUSDT",
-      "apr_7d": 17.88,
+      "apr_7d": 24.66,
       "flags": [
         "tidak ada pasar spot: carry mustahil"
       ]
     },
     {
       "symbol": "INXUSDT",
-      "apr_7d": 17.78,
+      "apr_7d": 21.02,
       "flags": [
         "tidak ada pasar spot: carry mustahil",
-        "volume 39 jt"
+        "volume 33 jt"
       ]
     },
     {
-      "symbol": "BLESSUSDT",
-      "apr_7d": 13.38,
+      "symbol": "ELSAUSDT",
+      "apr_7d": 20.92,
+      "flags": [
+        "tidak ada pasar spot: carry mustahil"
+      ]
+    },
+    {
+      "symbol": "PHAROSUSDT",
+      "apr_7d": 19.7,
+      "flags": [
+        "tidak ada pasar spot: carry mustahil",
+        "volume 45 jt"
+      ]
+    },
+    {
+      "symbol": "GUAUSDT",
+      "apr_7d": 19.65,
+      "flags": [
+        "tidak ada pasar spot: carry mustahil"
+      ]
+    },
+    {
+      "symbol": "PIEVERSEUSDT",
+      "apr_7d": 17.13,
       "flags": [
         "tidak ada pasar spot: carry mustahil"
       ]
     },
     {
       "symbol": "ARIAUSDT",
-      "apr_7d": 13.31,
+      "apr_7d": 14.39,
+      "flags": [
+        "tidak ada pasar spot: carry mustahil"
+      ]
+    },
+    {
+      "symbol": "BLESSUSDT",
+      "apr_7d": 13.49,
       "flags": [
         "tidak ada pasar spot: carry mustahil"
       ]
@@ -84,249 +84,249 @@
       "apr_7d": 12.0,
       "flags": [
         "tidak ada pasar spot: carry mustahil",
-        "volume 43 jt"
+        "volume 40 jt"
       ]
     }
   ],
   "rows": [
     {
       "symbol": "BULLAUSDT",
-      "volume_musd": 44.3,
-      "apr_7d": 74.21,
-      "apr_30d": 47.57,
-      "last_bps": 19.263,
+      "volume_musd": 40.5,
+      "apr_7d": 77.96,
+      "apr_30d": 48.66,
+      "last_bps": 9.502,
       "pos_pct": 97.8,
       "bond_days": 508,
       "has_spot": false,
-      "spread_bps": 4.16,
+      "spread_bps": 11.55,
       "spot_spread_bps": null,
-      "book_top_usd": 403,
+      "book_top_usd": 371,
       "carry_cost_pct": 0.3,
-      "breakeven_days": 1.5,
+      "breakeven_days": 1.4,
       "flags": [
         "tidak ada pasar spot: carry mustahil",
-        "volume 44 jt",
+        "volume 40 jt",
         "balik modal <3 hari: APR tidak stabil"
       ],
       "alert": false,
-      "depth_usd": 44726
+      "depth_usd": 41878
     },
     {
       "symbol": "EVAAUSDT",
-      "volume_musd": 404.2,
-      "apr_7d": 25.57,
-      "apr_30d": 29.5,
+      "volume_musd": 400.7,
+      "apr_7d": 24.66,
+      "apr_30d": 29.13,
       "last_bps": 0.5,
       "pos_pct": 100.0,
       "bond_days": 417,
       "has_spot": false,
-      "spread_bps": 3.25,
+      "spread_bps": 0.51,
       "spot_spread_bps": null,
-      "book_top_usd": 58,
+      "book_top_usd": 19,
       "carry_cost_pct": 0.3,
-      "breakeven_days": 4.3,
+      "breakeven_days": 4.4,
       "flags": [
         "tidak ada pasar spot: carry mustahil"
       ],
       "alert": false,
-      "depth_usd": 6692
+      "depth_usd": 11861
     },
     {
-      "symbol": "GUAUSDT",
-      "volume_musd": 83.8,
-      "apr_7d": 24.28,
-      "apr_30d": 23.96,
-      "last_bps": 7.776,
-      "pos_pct": 96.7,
-      "bond_days": 338,
+      "symbol": "INXUSDT",
+      "volume_musd": 32.6,
+      "apr_7d": 21.02,
+      "apr_30d": 12.19,
+      "last_bps": 6.695,
+      "pos_pct": 100.0,
+      "bond_days": 298,
       "has_spot": false,
-      "spread_bps": 2.55,
+      "spread_bps": 5.32,
       "spot_spread_bps": null,
-      "book_top_usd": 16,
+      "book_top_usd": 56,
       "carry_cost_pct": 0.3,
-      "breakeven_days": 4.5,
+      "breakeven_days": 5.2,
       "flags": [
-        "tidak ada pasar spot: carry mustahil"
+        "tidak ada pasar spot: carry mustahil",
+        "volume 33 jt"
       ],
       "alert": false,
-      "depth_usd": 18084
+      "depth_usd": 27171
     },
     {
       "symbol": "ELSAUSDT",
-      "volume_musd": 87.8,
-      "apr_7d": 21.17,
+      "volume_musd": 76.5,
+      "apr_7d": 20.92,
       "apr_30d": 11.93,
       "last_bps": 0.5,
       "pos_pct": 100.0,
       "bond_days": 306,
       "has_spot": false,
-      "spread_bps": 1.34,
+      "spread_bps": 4.02,
       "spot_spread_bps": null,
-      "book_top_usd": 682,
+      "book_top_usd": 101,
       "carry_cost_pct": 0.3,
       "breakeven_days": 5.2,
       "flags": [
         "tidak ada pasar spot: carry mustahil"
       ],
       "alert": false,
-      "depth_usd": 17183
+      "depth_usd": 14382
     },
     {
       "symbol": "PHAROSUSDT",
-      "volume_musd": 38.5,
-      "apr_7d": 19.38,
-      "apr_30d": 16.54,
-      "last_bps": 2.511,
+      "volume_musd": 44.6,
+      "apr_7d": 19.7,
+      "apr_30d": 16.69,
+      "last_bps": 1.716,
       "pos_pct": 100.0,
       "bond_days": 194,
       "has_spot": false,
-      "spread_bps": 2.97,
+      "spread_bps": 6.12,
       "spot_spread_bps": null,
-      "book_top_usd": 272,
+      "book_top_usd": 356,
       "carry_cost_pct": 0.3,
-      "breakeven_days": 5.7,
+      "breakeven_days": 5.6,
       "flags": [
         "tidak ada pasar spot: carry mustahil",
-        "volume 38 jt"
+        "volume 45 jt"
       ],
       "alert": false,
-      "depth_usd": 24648
+      "depth_usd": 31422
     },
     {
-      "symbol": "PIEVERSEUSDT",
-      "volume_musd": 98.3,
-      "apr_7d": 17.88,
-      "apr_30d": 17.0,
-      "last_bps": 0.585,
-      "pos_pct": 100.0,
-      "bond_days": 375,
+      "symbol": "GUAUSDT",
+      "volume_musd": 115.1,
+      "apr_7d": 19.65,
+      "apr_30d": 23.54,
+      "last_bps": 0.5,
+      "pos_pct": 96.7,
+      "bond_days": 338,
       "has_spot": false,
-      "spread_bps": 0.64,
+      "spread_bps": 5.39,
       "spot_spread_bps": null,
-      "book_top_usd": 112,
+      "book_top_usd": 204,
       "carry_cost_pct": 0.3,
-      "breakeven_days": 6.1,
+      "breakeven_days": 5.6,
       "flags": [
         "tidak ada pasar spot: carry mustahil"
       ],
       "alert": false,
-      "depth_usd": 4637
+      "depth_usd": 27438
     },
     {
-      "symbol": "INXUSDT",
-      "volume_musd": 38.6,
-      "apr_7d": 17.78,
-      "apr_30d": 11.44,
-      "last_bps": 2.263,
+      "symbol": "PIEVERSEUSDT",
+      "volume_musd": 96.6,
+      "apr_7d": 17.13,
+      "apr_30d": 16.7,
+      "last_bps": 0.5,
       "pos_pct": 100.0,
-      "bond_days": 298,
+      "bond_days": 375,
       "has_spot": false,
-      "spread_bps": 5.16,
+      "spread_bps": 0.34,
       "spot_spread_bps": null,
-      "book_top_usd": 126,
+      "book_top_usd": 649,
       "carry_cost_pct": 0.3,
-      "breakeven_days": 6.2,
+      "breakeven_days": 6.4,
       "flags": [
-        "tidak ada pasar spot: carry mustahil",
-        "volume 39 jt"
+        "tidak ada pasar spot: carry mustahil"
       ],
       "alert": false,
-      "depth_usd": 30360
+      "depth_usd": 9000
+    },
+    {
+      "symbol": "ARIAUSDT",
+      "volume_musd": 58.4,
+      "apr_7d": 14.39,
+      "apr_30d": 16.15,
+      "last_bps": 2.579,
+      "pos_pct": 100.0,
+      "bond_days": 447,
+      "has_spot": false,
+      "spread_bps": 2.67,
+      "spot_spread_bps": null,
+      "book_top_usd": 65,
+      "carry_cost_pct": 0.3,
+      "breakeven_days": 7.6,
+      "flags": [
+        "tidak ada pasar spot: carry mustahil"
+      ],
+      "alert": false,
+      "depth_usd": 2698
     },
     {
       "symbol": "BLESSUSDT",
-      "volume_musd": 296.8,
-      "apr_7d": 13.38,
-      "apr_30d": 14.63,
+      "volume_musd": 276.8,
+      "apr_7d": 13.49,
+      "apr_30d": 14.48,
       "last_bps": 0.5,
       "pos_pct": 98.9,
       "bond_days": 427,
       "has_spot": false,
-      "spread_bps": 2.87,
+      "spread_bps": 1.71,
       "spot_spread_bps": null,
-      "book_top_usd": 78,
+      "book_top_usd": 121,
       "carry_cost_pct": 0.3,
-      "breakeven_days": 8.2,
+      "breakeven_days": 8.1,
       "flags": [
         "tidak ada pasar spot: carry mustahil"
       ],
       "alert": false,
-      "depth_usd": 21640
-    },
-    {
-      "symbol": "ARIAUSDT",
-      "volume_musd": 63.7,
-      "apr_7d": 13.31,
-      "apr_30d": 16.54,
-      "last_bps": 1.259,
-      "pos_pct": 100.0,
-      "bond_days": 447,
-      "has_spot": false,
-      "spread_bps": 3.68,
-      "spot_spread_bps": null,
-      "book_top_usd": 415,
-      "carry_cost_pct": 0.3,
-      "breakeven_days": 8.2,
-      "flags": [
-        "tidak ada pasar spot: carry mustahil"
-      ],
-      "alert": false,
-      "depth_usd": 8557
+      "depth_usd": 23235
     },
     {
       "symbol": "XMRUSDT",
-      "volume_musd": 42.6,
+      "volume_musd": 40.0,
       "apr_7d": 12.0,
       "apr_30d": 20.61,
       "last_bps": 1.0,
       "pos_pct": 100.0,
       "bond_days": 2486,
       "has_spot": false,
-      "spread_bps": 0.2,
+      "spread_bps": 0.59,
       "spot_spread_bps": null,
-      "book_top_usd": 1642,
+      "book_top_usd": 257,
       "carry_cost_pct": 0.3,
       "breakeven_days": 9.1,
       "flags": [
         "tidak ada pasar spot: carry mustahil",
-        "volume 43 jt"
+        "volume 40 jt"
       ],
       "alert": false,
-      "depth_usd": 12117
+      "depth_usd": 12997
     },
     {
       "symbol": "AIOTUSDT",
-      "volume_musd": 167.0,
-      "apr_7d": 6.83,
-      "apr_30d": 17.8,
-      "last_bps": 0.5,
+      "volume_musd": 173.1,
+      "apr_7d": 6.64,
+      "apr_30d": 17.75,
+      "last_bps": 0.135,
       "pos_pct": 87.8,
       "bond_days": 573,
       "has_spot": false,
-      "spread_bps": 2.34,
+      "spread_bps": 1.11,
       "spot_spread_bps": null,
-      "book_top_usd": 182,
+      "book_top_usd": 254,
       "carry_cost_pct": 0.3,
-      "breakeven_days": 16.0,
+      "breakeven_days": 16.5,
       "flags": [
         "tidak ada pasar spot: carry mustahil",
         "APR di bawah ambang"
       ],
       "alert": false,
-      "depth_usd": 21880
+      "depth_usd": 23073
     },
     {
       "symbol": "VVVUSDT",
-      "volume_musd": 58.9,
+      "volume_musd": 56.8,
       "apr_7d": 6.4,
       "apr_30d": 4.5,
       "last_bps": 0.5,
       "pos_pct": 88.9,
       "bond_days": 664,
       "has_spot": false,
-      "spread_bps": 0.4,
+      "spread_bps": 0.41,
       "spot_spread_bps": null,
-      "book_top_usd": 579,
+      "book_top_usd": 158,
       "carry_cost_pct": 0.3,
       "breakeven_days": 17.1,
       "flags": [
@@ -334,250 +334,188 @@
         "APR di bawah ambang"
       ],
       "alert": false,
-      "depth_usd": 21585
+      "depth_usd": 20812
     },
     {
       "symbol": "CYSUSDT",
-      "volume_musd": 85.8,
-      "apr_7d": 5.91,
+      "volume_musd": 60.2,
+      "apr_7d": 5.86,
       "apr_30d": 8.52,
       "last_bps": 0.5,
       "pos_pct": 100.0,
       "bond_days": 347,
       "has_spot": false,
-      "spread_bps": 2.03,
+      "spread_bps": 2.05,
       "spot_spread_bps": null,
-      "book_top_usd": 106,
+      "book_top_usd": 34,
       "carry_cost_pct": 0.3,
-      "breakeven_days": 18.5,
+      "breakeven_days": 18.7,
       "flags": [
         "tidak ada pasar spot: carry mustahil",
         "APR di bawah ambang"
       ],
       "alert": false,
-      "depth_usd": 32733
+      "depth_usd": 33673
+    },
+    {
+      "symbol": "OPGUSDT",
+      "volume_musd": 34.9,
+      "apr_7d": 5.48,
+      "apr_30d": 5.48,
+      "last_bps": 0.5,
+      "pos_pct": 100.0,
+      "bond_days": 216,
+      "has_spot": true,
+      "spread_bps": 11.84,
+      "spot_spread_bps": 11.83,
+      "book_top_usd": 2101,
+      "carry_cost_pct": 0.537,
+      "breakeven_days": 35.8,
+      "flags": [
+        "APR di bawah ambang",
+        "volume 35 jt"
+      ],
+      "alert": false,
+      "depth_usd": 151518
     },
     {
       "symbol": "ZECUSDT",
-      "volume_musd": 1368.9,
-      "apr_7d": 5.35,
-      "apr_30d": 6.45,
-      "last_bps": 0.959,
-      "pos_pct": 90.0,
+      "volume_musd": 1266.3,
+      "apr_7d": 5.03,
+      "apr_30d": 6.35,
+      "last_bps": -0.228,
+      "pos_pct": 88.9,
       "bond_days": 2484,
       "has_spot": true,
-      "spread_bps": 0.13,
-      "spot_spread_bps": 0.13,
-      "book_top_usd": 8730,
-      "carry_cost_pct": 0.303,
-      "breakeven_days": 20.7,
+      "spread_bps": 0.14,
+      "spot_spread_bps": 0.69,
+      "book_top_usd": 2835,
+      "carry_cost_pct": 0.308,
+      "breakeven_days": 22.4,
       "flags": [
         "APR di bawah ambang"
       ],
       "alert": false,
-      "depth_usd": 136902
+      "depth_usd": 109368
     },
     {
       "symbol": "WLFIUSDT",
-      "volume_musd": 38.8,
+      "volume_musd": 30.8,
       "apr_7d": 4.96,
       "apr_30d": 5.03,
       "last_bps": 0.5,
       "pos_pct": 95.6,
       "bond_days": 458,
       "has_spot": true,
-      "spread_bps": 2.49,
-      "spot_spread_bps": 24.91,
-      "book_top_usd": 1235,
-      "carry_cost_pct": 0.574,
-      "breakeven_days": 42.2,
+      "spread_bps": 2.5,
+      "spot_spread_bps": 24.97,
+      "book_top_usd": 4628,
+      "carry_cost_pct": 0.575,
+      "breakeven_days": 42.3,
       "flags": [
         "APR di bawah ambang",
-        "volume 39 jt"
+        "volume 31 jt"
       ],
       "alert": false,
-      "depth_usd": 386700
+      "depth_usd": 634288
     },
     {
       "symbol": "QNTUSDT",
-      "volume_musd": 36.4,
-      "apr_7d": 4.88,
-      "apr_30d": 1.86,
-      "last_bps": 0.093,
-      "pos_pct": 74.4,
+      "volume_musd": 33.8,
+      "apr_7d": 4.26,
+      "apr_30d": 1.78,
+      "last_bps": -0.196,
+      "pos_pct": 73.3,
       "bond_days": 1498,
       "has_spot": true,
-      "spread_bps": 0.68,
-      "spot_spread_bps": 0.67,
-      "book_top_usd": 652,
-      "carry_cost_pct": 0.313,
-      "breakeven_days": 23.5,
+      "spread_bps": 1.4,
+      "spot_spread_bps": 2.79,
+      "book_top_usd": 558,
+      "carry_cost_pct": 0.342,
+      "breakeven_days": 29.3,
       "flags": [
         "APR di bawah ambang",
-        "volume 36 jt"
+        "volume 34 jt"
       ],
       "alert": false,
-      "depth_usd": 86669
+      "depth_usd": 115537
     },
     {
       "symbol": "MONUSDT",
-      "volume_musd": 55.9,
-      "apr_7d": 4.86,
-      "apr_30d": 0.24,
-      "last_bps": 0.5,
-      "pos_pct": 67.8,
+      "volume_musd": 56.2,
+      "apr_7d": 4.18,
+      "apr_30d": 0.08,
+      "last_bps": -0.814,
+      "pos_pct": 66.7,
       "bond_days": 410,
       "has_spot": false,
-      "spread_bps": 10.51,
+      "spread_bps": 10.52,
       "spot_spread_bps": null,
-      "book_top_usd": 4777,
+      "book_top_usd": 1612,
       "carry_cost_pct": 0.3,
-      "breakeven_days": 22.5,
+      "breakeven_days": 26.2,
       "flags": [
         "tidak ada pasar spot: carry mustahil",
         "APR di bawah ambang"
       ],
       "alert": false,
-      "depth_usd": 506589
-    },
-    {
-      "symbol": "MUBARAKUSDT",
-      "volume_musd": 28.7,
-      "apr_7d": 3.59,
-      "apr_30d": 4.53,
-      "last_bps": -0.009,
-      "pos_pct": 92.2,
-      "bond_days": 617,
-      "has_spot": true,
-      "spread_bps": 4.44,
-      "spot_spread_bps": 4.44,
-      "book_top_usd": 705,
-      "carry_cost_pct": 0.389,
-      "breakeven_days": 39.5,
-      "flags": [
-        "APR di bawah ambang",
-        "volume 29 jt"
-      ],
-      "alert": false,
-      "depth_usd": 106047
+      "depth_usd": 501465
     },
     {
       "symbol": "HYPEUSDT",
-      "volume_musd": 573.2,
+      "volume_musd": 574.9,
       "apr_7d": 3.56,
-      "apr_30d": 3.72,
+      "apr_30d": 3.75,
       "last_bps": 0.5,
       "pos_pct": 93.3,
       "bond_days": 543,
       "has_spot": true,
       "spread_bps": 0.17,
-      "spot_spread_bps": 1.66,
-      "book_top_usd": 19573,
-      "carry_cost_pct": 0.318,
-      "breakeven_days": 32.6,
+      "spot_spread_bps": 1.7,
+      "book_top_usd": 6030,
+      "carry_cost_pct": 0.319,
+      "breakeven_days": 32.7,
       "flags": [
         "APR di bawah ambang"
       ],
       "alert": false,
-      "depth_usd": 110714
+      "depth_usd": 94995
     },
     {
       "symbol": "ZROUSDT",
-      "volume_musd": 41.0,
-      "apr_7d": 3.16,
-      "apr_30d": 3.44,
-      "last_bps": -0.01,
-      "pos_pct": 83.3,
+      "volume_musd": 40.1,
+      "apr_7d": 3.26,
+      "apr_30d": 3.58,
+      "last_bps": 0.5,
+      "pos_pct": 84.4,
       "bond_days": 887,
       "has_spot": true,
-      "spread_bps": 4.74,
-      "spot_spread_bps": 9.47,
-      "book_top_usd": 676,
-      "carry_cost_pct": 0.442,
-      "breakeven_days": 51.1,
+      "spread_bps": 0.98,
+      "spot_spread_bps": 9.77,
+      "book_top_usd": 852,
+      "carry_cost_pct": 0.407,
+      "breakeven_days": 45.6,
       "flags": [
         "APR di bawah ambang",
-        "volume 41 jt"
+        "volume 40 jt"
       ],
       "alert": false,
-      "depth_usd": 49708
-    },
-    {
-      "symbol": "DOSUSDT",
-      "volume_musd": 32.4,
-      "apr_7d": 3.04,
-      "apr_30d": 6.6,
-      "last_bps": 0.5,
-      "pos_pct": 96.7,
-      "bond_days": 105,
-      "has_spot": false,
-      "spread_bps": 9.81,
-      "spot_spread_bps": null,
-      "book_top_usd": 1353,
-      "carry_cost_pct": 0.3,
-      "breakeven_days": 36.0,
-      "flags": [
-        "tidak ada pasar spot: carry mustahil",
-        "APR di bawah ambang",
-        "volume 32 jt"
-      ],
-      "alert": false,
-      "depth_usd": null
+      "depth_usd": 58787
     },
     {
       "symbol": "BTCUSDT",
-      "volume_musd": 14388.0,
-      "apr_7d": 3.02,
-      "apr_30d": 6.43,
-      "last_bps": 0.223,
+      "volume_musd": 13913.6,
+      "apr_7d": 3.08,
+      "apr_30d": 6.49,
+      "last_bps": 0.729,
       "pos_pct": 92.2,
       "bond_days": 2634,
       "has_spot": true,
       "spread_bps": 0.02,
       "spot_spread_bps": 0.0,
-      "book_top_usd": 505140,
+      "book_top_usd": 281276,
       "carry_cost_pct": 0.3,
-      "breakeven_days": 36.3,
-      "flags": [
-        "APR di bawah ambang"
-      ],
-      "alert": false,
-      "depth_usd": null
-    },
-    {
-      "symbol": "NEARUSDT",
-      "volume_musd": 356.3,
-      "apr_7d": 2.63,
-      "apr_30d": 7.66,
-      "last_bps": -0.119,
-      "pos_pct": 88.9,
-      "bond_days": 2231,
-      "has_spot": true,
-      "spread_bps": 3.47,
-      "spot_spread_bps": 3.47,
-      "book_top_usd": 17282,
-      "carry_cost_pct": 0.369,
-      "breakeven_days": 51.2,
-      "flags": [
-        "APR di bawah ambang"
-      ],
-      "alert": false,
-      "depth_usd": null
-    },
-    {
-      "symbol": "AAVEUSDT",
-      "volume_musd": 80.7,
-      "apr_7d": 2.58,
-      "apr_30d": 4.59,
-      "last_bps": 0.318,
-      "pos_pct": 83.3,
-      "bond_days": 2230,
-      "has_spot": true,
-      "spread_bps": 1.06,
-      "spot_spread_bps": 1.06,
-      "book_top_usd": 5049,
-      "carry_cost_pct": 0.321,
-      "breakeven_days": 45.5,
+      "breakeven_days": 35.6,
       "flags": [
         "APR di bawah ambang"
       ],
@@ -586,18 +524,18 @@
     },
     {
       "symbol": "TAOUSDT",
-      "volume_musd": 73.6,
-      "apr_7d": 2.45,
+      "volume_musd": 72.5,
+      "apr_7d": 2.79,
       "apr_30d": 2.29,
-      "last_bps": 0.164,
+      "last_bps": 0.5,
       "pos_pct": 77.8,
       "bond_days": 957,
       "has_spot": true,
-      "spread_bps": 0.55,
-      "spot_spread_bps": 5.53,
-      "book_top_usd": 1243,
-      "carry_cost_pct": 0.361,
-      "breakeven_days": 53.7,
+      "spread_bps": 0.56,
+      "spot_spread_bps": 5.64,
+      "book_top_usd": 1616,
+      "carry_cost_pct": 0.362,
+      "breakeven_days": 47.4,
       "flags": [
         "APR di bawah ambang"
       ],
@@ -605,19 +543,61 @@
       "depth_usd": null
     },
     {
-      "symbol": "PAXGUSDT",
-      "volume_musd": 76.8,
-      "apr_7d": 2.3,
-      "apr_30d": 3.1,
-      "last_bps": 0.5,
-      "pos_pct": 88.9,
-      "bond_days": 607,
+      "symbol": "NEARUSDT",
+      "volume_musd": 347.1,
+      "apr_7d": 2.65,
+      "apr_30d": 7.8,
+      "last_bps": 1.0,
+      "pos_pct": 90.0,
+      "bond_days": 2231,
       "has_spot": true,
-      "spread_bps": 0.03,
-      "spot_spread_bps": 0.03,
-      "book_top_usd": 18854,
-      "carry_cost_pct": 0.301,
-      "breakeven_days": 47.7,
+      "spread_bps": 3.54,
+      "spot_spread_bps": 3.54,
+      "book_top_usd": 34931,
+      "carry_cost_pct": 0.371,
+      "breakeven_days": 51.0,
+      "flags": [
+        "APR di bawah ambang"
+      ],
+      "alert": false,
+      "depth_usd": null
+    },
+    {
+      "symbol": "DOSUSDT",
+      "volume_musd": 36.5,
+      "apr_7d": 2.58,
+      "apr_30d": 6.49,
+      "last_bps": -0.4,
+      "pos_pct": 95.6,
+      "bond_days": 105,
+      "has_spot": false,
+      "spread_bps": 10.26,
+      "spot_spread_bps": null,
+      "book_top_usd": 668,
+      "carry_cost_pct": 0.3,
+      "breakeven_days": 42.5,
+      "flags": [
+        "tidak ada pasar spot: carry mustahil",
+        "APR di bawah ambang",
+        "volume 36 jt"
+      ],
+      "alert": false,
+      "depth_usd": null
+    },
+    {
+      "symbol": "AAVEUSDT",
+      "volume_musd": 76.0,
+      "apr_7d": 2.48,
+      "apr_30d": 4.6,
+      "last_bps": 0.5,
+      "pos_pct": 83.3,
+      "bond_days": 2230,
+      "has_spot": true,
+      "spread_bps": 1.08,
+      "spot_spread_bps": 2.15,
+      "book_top_usd": 2134,
+      "carry_cost_pct": 0.332,
+      "breakeven_days": 48.9,
       "flags": [
         "APR di bawah ambang"
       ],
@@ -626,18 +606,18 @@
     },
     {
       "symbol": "UNIUSDT",
-      "volume_musd": 107.3,
-      "apr_7d": 2.17,
-      "apr_30d": 5.72,
-      "last_bps": 0.728,
+      "volume_musd": 111.2,
+      "apr_7d": 2.27,
+      "apr_30d": 5.73,
+      "last_bps": 0.807,
       "pos_pct": 87.8,
       "bond_days": 2258,
       "has_spot": true,
-      "spread_bps": 2.11,
-      "spot_spread_bps": 2.11,
-      "book_top_usd": 1291,
-      "carry_cost_pct": 0.342,
-      "breakeven_days": 57.5,
+      "spread_bps": 2.18,
+      "spot_spread_bps": 2.18,
+      "book_top_usd": 25555,
+      "carry_cost_pct": 0.344,
+      "breakeven_days": 55.3,
       "flags": [
         "APR di bawah ambang"
       ],
@@ -646,18 +626,38 @@
     },
     {
       "symbol": "LINKUSDT",
-      "volume_musd": 107.4,
-      "apr_7d": 2.11,
-      "apr_30d": 5.91,
-      "last_bps": -0.427,
+      "volume_musd": 102.5,
+      "apr_7d": 2.1,
+      "apr_30d": 5.88,
+      "last_bps": 0.774,
       "pos_pct": 81.1,
       "bond_days": 2503,
       "has_spot": true,
-      "spread_bps": 1.13,
-      "spot_spread_bps": 2.25,
-      "book_top_usd": 4985,
-      "carry_cost_pct": 0.334,
-      "breakeven_days": 57.7,
+      "spread_bps": 1.15,
+      "spot_spread_bps": 1.14,
+      "book_top_usd": 8682,
+      "carry_cost_pct": 0.323,
+      "breakeven_days": 56.0,
+      "flags": [
+        "APR di bawah ambang"
+      ],
+      "alert": false,
+      "depth_usd": null
+    },
+    {
+      "symbol": "PAXGUSDT",
+      "volume_musd": 74.9,
+      "apr_7d": 1.81,
+      "apr_30d": 2.99,
+      "last_bps": -0.446,
+      "pos_pct": 87.8,
+      "bond_days": 607,
+      "has_spot": true,
+      "spread_bps": 0.03,
+      "spot_spread_bps": 0.03,
+      "book_top_usd": 29563,
+      "carry_cost_pct": 0.301,
+      "breakeven_days": 60.7,
       "flags": [
         "APR di bawah ambang"
       ],
@@ -666,200 +666,18 @@
     },
     {
       "symbol": "XAUTUSDT",
-      "volume_musd": 32.5,
-      "apr_7d": 1.88,
-      "apr_30d": 3.51,
-      "last_bps": -0.123,
+      "volume_musd": 32.7,
+      "apr_7d": 1.63,
+      "apr_30d": 3.45,
+      "last_bps": 0.017,
       "pos_pct": 86.7,
       "bond_days": 243,
       "has_spot": true,
       "spread_bps": 0.03,
       "spot_spread_bps": 0.03,
-      "book_top_usd": 3184,
+      "book_top_usd": 12029,
       "carry_cost_pct": 0.301,
-      "breakeven_days": 58.3,
-      "flags": [
-        "APR di bawah ambang",
-        "volume 32 jt"
-      ],
-      "alert": false,
-      "depth_usd": null
-    },
-    {
-      "symbol": "PUMPUSDT",
-      "volume_musd": 69.0,
-      "apr_7d": 1.56,
-      "apr_30d": 2.43,
-      "last_bps": 0.447,
-      "pos_pct": 82.2,
-      "bond_days": 502,
-      "has_spot": true,
-      "spread_bps": 4.07,
-      "spot_spread_bps": 4.07,
-      "book_top_usd": 14739,
-      "carry_cost_pct": 0.381,
-      "breakeven_days": 89.5,
-      "flags": [
-        "APR di bawah ambang"
-      ],
-      "alert": false,
-      "depth_usd": null
-    },
-    {
-      "symbol": "ENAUSDT",
-      "volume_musd": 140.7,
-      "apr_7d": 1.51,
-      "apr_30d": 2.11,
-      "last_bps": 0.312,
-      "pos_pct": 70.0,
-      "bond_days": 966,
-      "has_spot": true,
-      "spread_bps": 1.02,
-      "spot_spread_bps": 10.17,
-      "book_top_usd": 4827,
-      "carry_cost_pct": 0.412,
-      "breakeven_days": 99.9,
-      "flags": [
-        "APR di bawah ambang"
-      ],
-      "alert": false,
-      "depth_usd": null
-    },
-    {
-      "symbol": "ETHUSDT",
-      "volume_musd": 7600.6,
-      "apr_7d": 1.32,
-      "apr_30d": 2.87,
-      "last_bps": -0.121,
-      "pos_pct": 68.9,
-      "bond_days": 2554,
-      "has_spot": true,
-      "spread_bps": 0.06,
-      "spot_spread_bps": 0.06,
-      "book_top_usd": 157594,
-      "carry_cost_pct": 0.301,
-      "breakeven_days": 83.1,
-      "flags": [
-        "APR di bawah ambang"
-      ],
-      "alert": false,
-      "depth_usd": null
-    },
-    {
-      "symbol": "BNBUSDT",
-      "volume_musd": 279.1,
-      "apr_7d": 0.86,
-      "apr_30d": 3.3,
-      "last_bps": 0.0,
-      "pos_pct": 46.7,
-      "bond_days": 2479,
-      "has_spot": true,
-      "spread_bps": 0.18,
-      "spot_spread_bps": 0.18,
-      "book_top_usd": 28954,
-      "carry_cost_pct": 0.304,
-      "breakeven_days": 129.6,
-      "flags": [
-        "APR di bawah ambang"
-      ],
-      "alert": false,
-      "depth_usd": null
-    },
-    {
-      "symbol": "MMTUSDT",
-      "volume_musd": 226.0,
-      "apr_7d": 0.68,
-      "apr_30d": 2.06,
-      "last_bps": 0.326,
-      "pos_pct": 74.4,
-      "bond_days": 385,
-      "has_spot": true,
-      "spread_bps": 4.6,
-      "spot_spread_bps": 9.19,
-      "book_top_usd": 1535,
-      "carry_cost_pct": 0.438,
-      "breakeven_days": 236.4,
-      "flags": [
-        "APR di bawah ambang"
-      ],
-      "alert": false,
-      "depth_usd": null
-    },
-    {
-      "symbol": "DOGEUSDT",
-      "volume_musd": 274.5,
-      "apr_7d": 0.62,
-      "apr_30d": 4.22,
-      "last_bps": -0.653,
-      "pos_pct": 74.4,
-      "bond_days": 2328,
-      "has_spot": true,
-      "spread_bps": 1.8,
-      "spot_spread_bps": 1.8,
-      "book_top_usd": 26091,
-      "carry_cost_pct": 0.336,
-      "breakeven_days": 198.0,
-      "flags": [
-        "APR di bawah ambang"
-      ],
-      "alert": false,
-      "depth_usd": null
-    },
-    {
-      "symbol": "PROMUSDT",
-      "volume_musd": 38.9,
-      "apr_7d": 0.37,
-      "apr_30d": 3.94,
-      "last_bps": -0.962,
-      "pos_pct": 87.8,
-      "bond_days": 678,
-      "has_spot": true,
-      "spread_bps": 2.16,
-      "spot_spread_bps": 4.32,
-      "book_top_usd": 1388,
-      "carry_cost_pct": 0.365,
-      "breakeven_days": 362.9,
-      "flags": [
-        "APR di bawah ambang",
-        "volume 39 jt"
-      ],
-      "alert": false,
-      "depth_usd": null
-    },
-    {
-      "symbol": "XRPUSDT",
-      "volume_musd": 589.4,
-      "apr_7d": 0.2,
-      "apr_30d": 5.87,
-      "last_bps": -0.52,
-      "pos_pct": 80.0,
-      "bond_days": 2514,
-      "has_spot": true,
-      "spread_bps": 1.08,
-      "spot_spread_bps": 1.08,
-      "book_top_usd": 56583,
-      "carry_cost_pct": 0.322,
-      "breakeven_days": 583.7,
-      "flags": [
-        "APR di bawah ambang"
-      ],
-      "alert": false,
-      "depth_usd": null
-    },
-    {
-      "symbol": "ONDOUSDT",
-      "volume_musd": 32.7,
-      "apr_7d": -0.53,
-      "apr_30d": 0.23,
-      "last_bps": 0.082,
-      "pos_pct": 56.7,
-      "bond_days": 1039,
-      "has_spot": true,
-      "spread_bps": 3.59,
-      "spot_spread_bps": 3.59,
-      "book_top_usd": 5493,
-      "carry_cost_pct": 0.372,
-      "breakeven_days": null,
+      "breakeven_days": 67.3,
       "flags": [
         "APR di bawah ambang",
         "volume 33 jt"
@@ -868,19 +686,119 @@
       "depth_usd": null
     },
     {
-      "symbol": "FILUSDT",
-      "volume_musd": 56.9,
-      "apr_7d": -1.02,
-      "apr_30d": 2.75,
-      "last_bps": 0.065,
+      "symbol": "PUMPUSDT",
+      "volume_musd": 66.4,
+      "apr_7d": 1.51,
+      "apr_30d": 2.44,
+      "last_bps": 0.319,
+      "pos_pct": 82.2,
+      "bond_days": 502,
+      "has_spot": true,
+      "spread_bps": 4.16,
+      "spot_spread_bps": 4.16,
+      "book_top_usd": 10888,
+      "carry_cost_pct": 0.383,
+      "breakeven_days": 92.5,
+      "flags": [
+        "APR di bawah ambang"
+      ],
+      "alert": false,
+      "depth_usd": null
+    },
+    {
+      "symbol": "ETHUSDT",
+      "volume_musd": 7002.3,
+      "apr_7d": 1.38,
+      "apr_30d": 2.89,
+      "last_bps": 0.956,
       "pos_pct": 68.9,
-      "bond_days": 2230,
+      "bond_days": 2554,
       "has_spot": true,
-      "spread_bps": 1.85,
-      "spot_spread_bps": 1.85,
-      "book_top_usd": 3925,
+      "spread_bps": 0.06,
+      "spot_spread_bps": 0.06,
+      "book_top_usd": 362088,
+      "carry_cost_pct": 0.301,
+      "breakeven_days": 79.4,
+      "flags": [
+        "APR di bawah ambang"
+      ],
+      "alert": false,
+      "depth_usd": null
+    },
+    {
+      "symbol": "ENAUSDT",
+      "volume_musd": 133.6,
+      "apr_7d": 1.31,
+      "apr_30d": 2.06,
+      "last_bps": 0.053,
+      "pos_pct": 70.0,
+      "bond_days": 966,
+      "has_spot": true,
+      "spread_bps": 1.04,
+      "spot_spread_bps": 10.38,
+      "book_top_usd": 852,
+      "carry_cost_pct": 0.414,
+      "breakeven_days": 115.6,
+      "flags": [
+        "APR di bawah ambang"
+      ],
+      "alert": false,
+      "depth_usd": null
+    },
+    {
+      "symbol": "BNBUSDT",
+      "volume_musd": 269.1,
+      "apr_7d": 0.72,
+      "apr_30d": 3.36,
+      "last_bps": 0.517,
+      "pos_pct": 47.8,
+      "bond_days": 2479,
+      "has_spot": true,
+      "spread_bps": 0.18,
+      "spot_spread_bps": 0.18,
+      "book_top_usd": 23645,
+      "carry_cost_pct": 0.304,
+      "breakeven_days": 154.5,
+      "flags": [
+        "APR di bawah ambang"
+      ],
+      "alert": false,
+      "depth_usd": null
+    },
+    {
+      "symbol": "MMTUSDT",
+      "volume_musd": 216.2,
+      "apr_7d": 0.68,
+      "apr_30d": 2.06,
+      "last_bps": 0.5,
+      "pos_pct": 74.4,
+      "bond_days": 385,
+      "has_spot": true,
+      "spread_bps": 4.48,
+      "spot_spread_bps": 8.95,
+      "book_top_usd": 2492,
+      "carry_cost_pct": 0.434,
+      "breakeven_days": 234.4,
+      "flags": [
+        "APR di bawah ambang"
+      ],
+      "alert": false,
+      "depth_usd": null
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "volume_musd": 261.7,
+      "apr_7d": 0.43,
+      "apr_30d": 4.25,
+      "last_bps": 0.285,
+      "pos_pct": 74.4,
+      "bond_days": 2328,
+      "has_spot": true,
+      "spread_bps": 1.84,
+      "spot_spread_bps": 1.83,
+      "book_top_usd": 33331,
       "carry_cost_pct": 0.337,
-      "breakeven_days": null,
+      "breakeven_days": 287.8,
       "flags": [
         "APR di bawah ambang"
       ],
@@ -888,19 +806,19 @@
       "depth_usd": null
     },
     {
-      "symbol": "LTCUSDT",
-      "volume_musd": 57.7,
-      "apr_7d": -2.63,
-      "apr_30d": 3.21,
-      "last_bps": 0.312,
-      "pos_pct": 67.8,
-      "bond_days": 2511,
+      "symbol": "XRPUSDT",
+      "volume_musd": 556.8,
+      "apr_7d": 0.36,
+      "apr_30d": 5.84,
+      "last_bps": 0.76,
+      "pos_pct": 80.0,
+      "bond_days": 2514,
       "has_spot": true,
-      "spread_bps": 2.44,
-      "spot_spread_bps": 2.44,
-      "book_top_usd": 3628,
-      "carry_cost_pct": 0.349,
-      "breakeven_days": null,
+      "spread_bps": 1.09,
+      "spot_spread_bps": 1.09,
+      "book_top_usd": 38184,
+      "carry_cost_pct": 0.322,
+      "breakeven_days": 325.2,
       "flags": [
         "APR di bawah ambang"
       ],
@@ -908,182 +826,18 @@
       "depth_usd": null
     },
     {
-      "symbol": "SOLUSDT",
-      "volume_musd": 1607.5,
-      "apr_7d": -2.98,
-      "apr_30d": 3.09,
-      "last_bps": -0.155,
-      "pos_pct": 72.2,
-      "bond_days": 2262,
-      "has_spot": true,
-      "spread_bps": 1.43,
-      "spot_spread_bps": 1.43,
-      "book_top_usd": 135840,
-      "carry_cost_pct": 0.329,
-      "breakeven_days": null,
-      "flags": [
-        "APR di bawah ambang"
-      ],
-      "alert": false,
-      "depth_usd": null
-    },
-    {
-      "symbol": "SUIUSDT",
-      "volume_musd": 133.4,
-      "apr_7d": -3.08,
-      "apr_30d": 2.49,
-      "last_bps": -0.092,
-      "pos_pct": 61.1,
-      "bond_days": 1301,
-      "has_spot": true,
-      "spread_bps": 1.54,
-      "spot_spread_bps": 1.54,
-      "book_top_usd": 8616,
-      "carry_cost_pct": 0.331,
-      "breakeven_days": null,
-      "flags": [
-        "APR di bawah ambang"
-      ],
-      "alert": false,
-      "depth_usd": null
-    },
-    {
-      "symbol": "LITUSDT",
-      "volume_musd": 38.3,
-      "apr_7d": -3.11,
-      "apr_30d": -2.7,
-      "last_bps": 0.311,
-      "pos_pct": 63.3,
-      "bond_days": 336,
-      "has_spot": false,
-      "spread_bps": 0.42,
-      "spot_spread_bps": null,
-      "book_top_usd": 8752,
-      "carry_cost_pct": 0.3,
-      "breakeven_days": null,
-      "flags": [
-        "tidak ada pasar spot: carry mustahil",
-        "APR di bawah ambang",
-        "volume 38 jt"
-      ],
-      "alert": false,
-      "depth_usd": null
-    },
-    {
-      "symbol": "ARBUSDT",
-      "volume_musd": 55.2,
-      "apr_7d": -4.19,
-      "apr_30d": 1.54,
-      "last_bps": -0.621,
-      "pos_pct": 58.9,
-      "bond_days": 1342,
-      "has_spot": true,
-      "spread_bps": 0.9,
-      "spot_spread_bps": 9.03,
-      "book_top_usd": 1007,
-      "carry_cost_pct": 0.399,
-      "breakeven_days": null,
-      "flags": [
-        "APR di bawah ambang"
-      ],
-      "alert": false,
-      "depth_usd": null
-    },
-    {
-      "symbol": "INJUSDT",
-      "volume_musd": 70.3,
-      "apr_7d": -5.08,
-      "apr_30d": 0.52,
-      "last_bps": -2.259,
-      "pos_pct": 57.8,
-      "bond_days": 1561,
-      "has_spot": true,
-      "spread_bps": 1.71,
-      "spot_spread_bps": 3.41,
-      "book_top_usd": 1797,
-      "carry_cost_pct": 0.351,
-      "breakeven_days": null,
-      "flags": [
-        "APR di bawah ambang"
-      ],
-      "alert": false,
-      "depth_usd": null
-    },
-    {
-      "symbol": "XLMUSDT",
-      "volume_musd": 37.1,
-      "apr_7d": -5.91,
-      "apr_30d": -0.45,
-      "last_bps": -1.463,
-      "pos_pct": 45.6,
-      "bond_days": 2500,
-      "has_spot": true,
-      "spread_bps": 0.8,
-      "spot_spread_bps": 8.02,
-      "book_top_usd": 2060,
-      "carry_cost_pct": 0.388,
-      "breakeven_days": null,
-      "flags": [
-        "APR di bawah ambang",
-        "volume 37 jt"
-      ],
-      "alert": false,
-      "depth_usd": null
-    },
-    {
-      "symbol": "TRXUSDT",
-      "volume_musd": 37.1,
-      "apr_7d": -6.71,
-      "apr_30d": -12.21,
-      "last_bps": -0.414,
-      "pos_pct": 40.0,
-      "bond_days": 2505,
-      "has_spot": true,
-      "spread_bps": 0.32,
-      "spot_spread_bps": 3.24,
-      "book_top_usd": 43883,
-      "carry_cost_pct": 0.336,
-      "breakeven_days": null,
-      "flags": [
-        "APR di bawah ambang",
-        "volume 37 jt"
-      ],
-      "alert": false,
-      "depth_usd": null
-    },
-    {
-      "symbol": "AVAXUSDT",
-      "volume_musd": 84.6,
-      "apr_7d": -6.72,
-      "apr_30d": 0.74,
-      "last_bps": -0.823,
-      "pos_pct": 57.8,
-      "bond_days": 2253,
-      "has_spot": true,
-      "spread_bps": 1.51,
-      "spot_spread_bps": 1.51,
-      "book_top_usd": 5213,
-      "carry_cost_pct": 0.33,
-      "breakeven_days": null,
-      "flags": [
-        "APR di bawah ambang"
-      ],
-      "alert": false,
-      "depth_usd": null
-    },
-    {
-      "symbol": "DOTUSDT",
+      "symbol": "PROMUSDT",
       "volume_musd": 33.7,
-      "apr_7d": -7.66,
-      "apr_30d": -0.52,
-      "last_bps": -2.289,
-      "pos_pct": 48.9,
-      "bond_days": 2285,
+      "apr_7d": -0.07,
+      "apr_30d": 3.84,
+      "last_bps": -0.332,
+      "pos_pct": 86.7,
+      "bond_days": 678,
       "has_spot": true,
-      "spread_bps": 1.53,
-      "spot_spread_bps": 15.23,
-      "book_top_usd": 1060,
-      "carry_cost_pct": 0.468,
+      "spread_bps": 4.51,
+      "spot_spread_bps": 4.5,
+      "book_top_usd": 244,
+      "carry_cost_pct": 0.39,
       "breakeven_days": null,
       "flags": [
         "APR di bawah ambang",
@@ -1093,18 +847,264 @@
       "depth_usd": null
     },
     {
-      "symbol": "ADAUSDT",
-      "volume_musd": 144.6,
-      "apr_7d": -8.56,
-      "apr_30d": 0.29,
-      "last_bps": -1.317,
+      "symbol": "ONDOUSDT",
+      "volume_musd": 31.2,
+      "apr_7d": -0.22,
+      "apr_30d": 0.23,
+      "last_bps": 0.301,
+      "pos_pct": 56.7,
+      "bond_days": 1039,
+      "has_spot": true,
+      "spread_bps": 3.67,
+      "spot_spread_bps": 3.66,
+      "book_top_usd": 10832,
+      "carry_cost_pct": 0.373,
+      "breakeven_days": null,
+      "flags": [
+        "APR di bawah ambang",
+        "volume 31 jt"
+      ],
+      "alert": false,
+      "depth_usd": null
+    },
+    {
+      "symbol": "FILUSDT",
+      "volume_musd": 54.7,
+      "apr_7d": -1.21,
+      "apr_30d": 2.7,
+      "last_bps": 0.143,
+      "pos_pct": 68.9,
+      "bond_days": 2230,
+      "has_spot": true,
+      "spread_bps": 1.89,
+      "spot_spread_bps": 3.78,
+      "book_top_usd": 2296,
+      "carry_cost_pct": 0.357,
+      "breakeven_days": null,
+      "flags": [
+        "APR di bawah ambang"
+      ],
+      "alert": false,
+      "depth_usd": null
+    },
+    {
+      "symbol": "LITUSDT",
+      "volume_musd": 35.9,
+      "apr_7d": -2.34,
+      "apr_30d": -2.75,
+      "last_bps": 0.045,
+      "pos_pct": 63.3,
+      "bond_days": 336,
+      "has_spot": false,
+      "spread_bps": 0.43,
+      "spot_spread_bps": null,
+      "book_top_usd": 418,
+      "carry_cost_pct": 0.3,
+      "breakeven_days": null,
+      "flags": [
+        "tidak ada pasar spot: carry mustahil",
+        "APR di bawah ambang",
+        "volume 36 jt"
+      ],
+      "alert": false,
+      "depth_usd": null
+    },
+    {
+      "symbol": "SOLUSDT",
+      "volume_musd": 1535.1,
+      "apr_7d": -2.51,
+      "apr_30d": 3.08,
+      "last_bps": 0.766,
+      "pos_pct": 72.2,
+      "bond_days": 2262,
+      "has_spot": true,
+      "spread_bps": 1.46,
+      "spot_spread_bps": 1.46,
+      "book_top_usd": 180671,
+      "carry_cost_pct": 0.329,
+      "breakeven_days": null,
+      "flags": [
+        "APR di bawah ambang"
+      ],
+      "alert": false,
+      "depth_usd": null
+    },
+    {
+      "symbol": "LTCUSDT",
+      "volume_musd": 55.5,
+      "apr_7d": -2.92,
+      "apr_30d": 3.08,
+      "last_bps": -0.179,
+      "pos_pct": 66.7,
+      "bond_days": 2511,
+      "has_spot": true,
+      "spread_bps": 2.48,
+      "spot_spread_bps": 2.48,
+      "book_top_usd": 12010,
+      "carry_cost_pct": 0.35,
+      "breakeven_days": null,
+      "flags": [
+        "APR di bawah ambang"
+      ],
+      "alert": false,
+      "depth_usd": null
+    },
+    {
+      "symbol": "SUIUSDT",
+      "volume_musd": 123.8,
+      "apr_7d": -3.25,
+      "apr_30d": 2.37,
+      "last_bps": 0.017,
       "pos_pct": 61.1,
+      "bond_days": 1302,
+      "has_spot": true,
+      "spread_bps": 1.56,
+      "spot_spread_bps": 1.56,
+      "book_top_usd": 12051,
+      "carry_cost_pct": 0.331,
+      "breakeven_days": null,
+      "flags": [
+        "APR di bawah ambang"
+      ],
+      "alert": false,
+      "depth_usd": null
+    },
+    {
+      "symbol": "ARBUSDT",
+      "volume_musd": 53.1,
+      "apr_7d": -4.63,
+      "apr_30d": 1.39,
+      "last_bps": -0.247,
+      "pos_pct": 57.8,
+      "bond_days": 1342,
+      "has_spot": true,
+      "spread_bps": 0.92,
+      "spot_spread_bps": 9.2,
+      "book_top_usd": 441,
+      "carry_cost_pct": 0.401,
+      "breakeven_days": null,
+      "flags": [
+        "APR di bawah ambang"
+      ],
+      "alert": false,
+      "depth_usd": null
+    },
+    {
+      "symbol": "TRXUSDT",
+      "volume_musd": 32.3,
+      "apr_7d": -6.05,
+      "apr_30d": -12.17,
+      "last_bps": 1.0,
+      "pos_pct": 40.0,
+      "bond_days": 2505,
+      "has_spot": true,
+      "spread_bps": 0.32,
+      "spot_spread_bps": 3.25,
+      "book_top_usd": 6116,
+      "carry_cost_pct": 0.336,
+      "breakeven_days": null,
+      "flags": [
+        "APR di bawah ambang",
+        "volume 32 jt"
+      ],
+      "alert": false,
+      "depth_usd": null
+    },
+    {
+      "symbol": "XLMUSDT",
+      "volume_musd": 35.7,
+      "apr_7d": -6.34,
+      "apr_30d": -0.45,
+      "last_bps": -0.606,
+      "pos_pct": 45.6,
+      "bond_days": 2500,
+      "has_spot": true,
+      "spread_bps": 0.82,
+      "spot_spread_bps": 8.17,
+      "book_top_usd": 837,
+      "carry_cost_pct": 0.39,
+      "breakeven_days": null,
+      "flags": [
+        "APR di bawah ambang",
+        "volume 36 jt"
+      ],
+      "alert": false,
+      "depth_usd": null
+    },
+    {
+      "symbol": "INJUSDT",
+      "volume_musd": 65.7,
+      "apr_7d": -6.72,
+      "apr_30d": -0.01,
+      "last_bps": -3.361,
+      "pos_pct": 56.7,
+      "bond_days": 1561,
+      "has_spot": true,
+      "spread_bps": 1.74,
+      "spot_spread_bps": 1.74,
+      "book_top_usd": 1128,
+      "carry_cost_pct": 0.335,
+      "breakeven_days": null,
+      "flags": [
+        "APR di bawah ambang"
+      ],
+      "alert": false,
+      "depth_usd": null
+    },
+    {
+      "symbol": "AVAXUSDT",
+      "volume_musd": 84.9,
+      "apr_7d": -7.1,
+      "apr_30d": 0.71,
+      "last_bps": -0.013,
+      "pos_pct": 56.7,
+      "bond_days": 2253,
+      "has_spot": true,
+      "spread_bps": 1.55,
+      "spot_spread_bps": 1.55,
+      "book_top_usd": 3996,
+      "carry_cost_pct": 0.331,
+      "breakeven_days": null,
+      "flags": [
+        "APR di bawah ambang"
+      ],
+      "alert": false,
+      "depth_usd": null
+    },
+    {
+      "symbol": "DOTUSDT",
+      "volume_musd": 32.9,
+      "apr_7d": -8.62,
+      "apr_30d": -0.82,
+      "last_bps": -1.521,
+      "pos_pct": 47.8,
+      "bond_days": 2285,
+      "has_spot": true,
+      "spread_bps": 1.55,
+      "spot_spread_bps": 15.44,
+      "book_top_usd": 2244,
+      "carry_cost_pct": 0.47,
+      "breakeven_days": null,
+      "flags": [
+        "APR di bawah ambang",
+        "volume 33 jt"
+      ],
+      "alert": false,
+      "depth_usd": null
+    },
+    {
+      "symbol": "ADAUSDT",
+      "volume_musd": 136.2,
+      "apr_7d": -9.06,
+      "apr_30d": 0.19,
+      "last_bps": -0.104,
+      "pos_pct": 60.0,
       "bond_days": 2489,
       "has_spot": true,
-      "spread_bps": 6.9,
-      "spot_spread_bps": 6.9,
-      "book_top_usd": 64826,
-      "carry_cost_pct": 0.438,
+      "spread_bps": 7.04,
+      "spot_spread_bps": 7.03,
+      "book_top_usd": 129925,
+      "carry_cost_pct": 0.441,
       "breakeven_days": null,
       "flags": [
         "APR di bawah ambang"
@@ -1114,17 +1114,17 @@
     },
     {
       "symbol": "TRUMPUSDT",
-      "volume_musd": 57.9,
-      "apr_7d": -9.46,
-      "apr_30d": -5.34,
-      "last_bps": -2.413,
+      "volume_musd": 54.3,
+      "apr_7d": -9.89,
+      "apr_30d": -5.39,
+      "last_bps": -2.0,
       "pos_pct": 37.8,
       "bond_days": 675,
       "has_spot": true,
-      "spread_bps": 11.94,
-      "spot_spread_bps": 11.93,
-      "book_top_usd": 19270,
-      "carry_cost_pct": 0.539,
+      "spread_bps": 12.04,
+      "spot_spread_bps": 12.01,
+      "book_top_usd": 59722,
+      "carry_cost_pct": 0.541,
       "breakeven_days": null,
       "flags": [
         "APR di bawah ambang"
@@ -1134,37 +1134,37 @@
     },
     {
       "symbol": "BCHUSDT",
-      "volume_musd": 44.8,
-      "apr_7d": -9.75,
-      "apr_30d": -0.63,
-      "last_bps": -1.275,
-      "pos_pct": 56.7,
+      "volume_musd": 41.4,
+      "apr_7d": -10.34,
+      "apr_30d": -0.83,
+      "last_bps": -0.775,
+      "pos_pct": 55.6,
       "bond_days": 2532,
       "has_spot": true,
       "spread_bps": 0.51,
-      "spot_spread_bps": 5.06,
-      "book_top_usd": 1943,
+      "spot_spread_bps": 5.11,
+      "book_top_usd": 158,
       "carry_cost_pct": 0.356,
       "breakeven_days": null,
       "flags": [
         "APR di bawah ambang",
-        "volume 45 jt"
+        "volume 41 jt"
       ],
       "alert": false,
       "depth_usd": null
     },
     {
-      "symbol": "1000PEPEUSDT",
-      "volume_musd": 259.1,
-      "apr_7d": -14.59,
-      "apr_30d": -4.94,
-      "last_bps": -3.33,
-      "pos_pct": 57.8,
-      "bond_days": 1299,
+      "symbol": "ONUSDT",
+      "volume_musd": 91.7,
+      "apr_7d": -14.81,
+      "apr_30d": 3.21,
+      "last_bps": 0.5,
+      "pos_pct": 98.9,
+      "bond_days": 396,
       "has_spot": false,
-      "spread_bps": 0.29,
+      "spread_bps": 9.59,
       "spot_spread_bps": null,
-      "book_top_usd": 5794,
+      "book_top_usd": 950,
       "carry_cost_pct": 0.3,
       "breakeven_days": null,
       "flags": [
@@ -1175,17 +1175,17 @@
       "depth_usd": null
     },
     {
-      "symbol": "ONUSDT",
-      "volume_musd": 92.7,
-      "apr_7d": -14.81,
-      "apr_30d": 3.21,
-      "last_bps": 0.5,
-      "pos_pct": 98.9,
-      "bond_days": 396,
+      "symbol": "1000PEPEUSDT",
+      "volume_musd": 249.9,
+      "apr_7d": -16.3,
+      "apr_30d": -5.37,
+      "last_bps": -3.024,
+      "pos_pct": 56.7,
+      "bond_days": 1300,
       "has_spot": false,
-      "spread_bps": 8.32,
+      "spread_bps": 0.29,
       "spot_spread_bps": null,
-      "book_top_usd": 1978,
+      "book_top_usd": 624,
       "carry_cost_pct": 0.3,
       "breakeven_days": null,
       "flags": [
@@ -1197,17 +1197,17 @@
     },
     {
       "symbol": "LISTAUSDT",
-      "volume_musd": 364.7,
-      "apr_7d": -20.6,
-      "apr_30d": -2.11,
-      "last_bps": -5.58,
-      "pos_pct": 77.8,
+      "volume_musd": 380.9,
+      "apr_7d": -22.71,
+      "apr_30d": -2.6,
+      "last_bps": -3.538,
+      "pos_pct": 76.7,
       "bond_days": 887,
       "has_spot": true,
-      "spread_bps": 0.97,
-      "spot_spread_bps": 9.71,
-      "book_top_usd": 331,
-      "carry_cost_pct": 0.407,
+      "spread_bps": 2.95,
+      "spot_spread_bps": 19.67,
+      "book_top_usd": 201,
+      "carry_cost_pct": 0.526,
       "breakeven_days": null,
       "flags": [
         "APR di bawah ambang"
@@ -1217,17 +1217,17 @@
     },
     {
       "symbol": "WLDUSDT",
-      "volume_musd": 95.8,
-      "apr_7d": -30.79,
-      "apr_30d": -15.07,
-      "last_bps": -5.602,
-      "pos_pct": 27.8,
+      "volume_musd": 90.9,
+      "apr_7d": -30.64,
+      "apr_30d": -15.28,
+      "last_bps": -1.583,
+      "pos_pct": 26.7,
       "bond_days": 1219,
       "has_spot": true,
-      "spread_bps": 4.24,
-      "spot_spread_bps": 4.23,
-      "book_top_usd": 10563,
-      "carry_cost_pct": 0.385,
+      "spread_bps": 4.32,
+      "spot_spread_bps": 4.31,
+      "book_top_usd": 12755,
+      "carry_cost_pct": 0.386,
       "breakeven_days": null,
       "flags": [
         "APR di bawah ambang"
@@ -1237,37 +1237,37 @@
     },
     {
       "symbol": "FETUSDT",
-      "volume_musd": 32.6,
-      "apr_7d": -31.52,
+      "volume_musd": 30.4,
+      "apr_7d": -30.84,
       "apr_30d": -6.04,
-      "last_bps": -2.443,
+      "last_bps": 1.0,
       "pos_pct": 51.1,
       "bond_days": 1409,
       "has_spot": true,
-      "spread_bps": 9.39,
-      "spot_spread_bps": 9.38,
-      "book_top_usd": 13041,
-      "carry_cost_pct": 0.488,
+      "spread_bps": 9.52,
+      "spot_spread_bps": 9.51,
+      "book_top_usd": 16697,
+      "carry_cost_pct": 0.49,
       "breakeven_days": null,
       "flags": [
         "APR di bawah ambang",
-        "volume 33 jt"
+        "volume 30 jt"
       ],
       "alert": false,
       "depth_usd": null
     },
     {
       "symbol": "AKEUSDT",
-      "volume_musd": 90.4,
-      "apr_7d": -33.04,
-      "apr_30d": -18.71,
-      "last_bps": -0.028,
-      "pos_pct": 68.9,
+      "volume_musd": 75.3,
+      "apr_7d": -32.23,
+      "apr_30d": -17.76,
+      "last_bps": 0.225,
+      "pos_pct": 70.0,
       "bond_days": 424,
       "has_spot": false,
-      "spread_bps": 4.86,
+      "spread_bps": 4.78,
       "spot_spread_bps": null,
-      "book_top_usd": 846,
+      "book_top_usd": 1257,
       "carry_cost_pct": 0.3,
       "breakeven_days": null,
       "flags": [
@@ -1278,42 +1278,42 @@
       "depth_usd": null
     },
     {
-      "symbol": "SAHARAUSDT",
-      "volume_musd": 67.4,
-      "apr_7d": -131.8,
-      "apr_30d": -26.93,
-      "last_bps": -44.982,
-      "pos_pct": 92.2,
-      "bond_days": 516,
+      "symbol": "ACEUSDT",
+      "volume_musd": 35.6,
+      "apr_7d": -161.39,
+      "apr_30d": -186.06,
+      "last_bps": -6.057,
+      "pos_pct": 52.2,
+      "bond_days": 1072,
       "has_spot": true,
-      "spread_bps": 1.74,
-      "spot_spread_bps": 17.17,
-      "book_top_usd": 1631,
-      "carry_cost_pct": 0.489,
+      "spread_bps": 1.34,
+      "spot_spread_bps": 26.28,
+      "book_top_usd": 25,
+      "carry_cost_pct": 0.576,
       "breakeven_days": null,
       "flags": [
-        "APR di bawah ambang"
+        "APR di bawah ambang",
+        "volume 36 jt"
       ],
       "alert": false,
       "depth_usd": null
     },
     {
-      "symbol": "ACEUSDT",
-      "volume_musd": 40.6,
-      "apr_7d": -191.42,
-      "apr_30d": -181.1,
-      "last_bps": -12.482,
-      "pos_pct": 56.7,
-      "bond_days": 1072,
+      "symbol": "SAHARAUSDT",
+      "volume_musd": 67.8,
+      "apr_7d": -162.56,
+      "apr_30d": -34.16,
+      "last_bps": -58.924,
+      "pos_pct": 91.1,
+      "bond_days": 516,
       "has_spot": true,
-      "spread_bps": 2.74,
-      "spot_spread_bps": 26.85,
-      "book_top_usd": 71,
-      "carry_cost_pct": 0.596,
+      "spread_bps": 5.67,
+      "spot_spread_bps": 18.71,
+      "book_top_usd": 1195,
+      "carry_cost_pct": 0.544,
       "breakeven_days": null,
       "flags": [
-        "APR di bawah ambang",
-        "volume 41 jt"
+        "APR di bawah ambang"
       ],
       "alert": false,
       "depth_usd": null
