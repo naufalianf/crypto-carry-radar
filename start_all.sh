@@ -13,6 +13,9 @@ LOGS=(paper_carry_daemon.log radar_cron.log watchdog_daemon.log)
 # Default mati supaya tidak ada order terkirim tanpa sengaja.
 EXTRA_paper_carry=""
 [ "${TESTNET:-0}" = "1" ] && EXTRA_paper_carry="--testnet"
+# MAX_EXEC_POS = berapa posisi yang benar-benar dikirim ke bursa (sisanya paper).
+# Naikkan ke 3 hanya setelah satu siklus buka-tutup nyata bersih.
+export MAX_EXEC_POS="${MAX_EXEC_POS:-1}"
 
 pola() { echo "^${PY} ${1}\.py --loop"; }
 

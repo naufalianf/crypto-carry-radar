@@ -50,6 +50,7 @@ MODAL_BUKU = 3000.0                       # modal buku tetap; dasar plafon dan u
 NOTIONAL = risk.batas_notional(MODAL_BUKU)  # plafon 20% modal per posisi = 600 (dipaksa, bukan konstanta lepas)
 EXEC_NOTIONAL = NOTIONAL                  # order testnet sama besar dengan paper, supaya slippage sebanding
 MAX_POS = 3
+MAX_EXEC_POS = int(os.environ.get("MAX_EXEC_POS", 1))  # tahap uji: 1 posisi nyata dulu, naikkan setelah 1 siklus buka-tutup bersih
 ENTRY_APR = 4.0      # ambang masuk: hanya level yang benar-benar bisa di-carry (punya pasar spot)
 EXIT_APR = 2.0
 MAX_DAYS = 60
@@ -331,6 +332,7 @@ def export_web(st, now):
         "modal_buku": MODAL_BUKU,
         "notional": NOTIONAL,
         "max_pos": MAX_POS,
+        "max_exec_pos": MAX_EXEC_POS,
         "limits": {"harian": risk.KILL_SWITCH_HARIAN_PCT, "mingguan": risk.KILL_SWITCH_MINGGUAN_PCT,
                    "bulanan": risk.KILL_SWITCH_BULANAN_PCT},
         "halt": ({"level": h["level"], "sejak": h.get("sejak", "")} if h else None),
@@ -481,7 +483,14 @@ def _tick(now):
             log(f"gagal ambil harga {sym}: {type(e).__name__} {e}")
             continue
         info = None
-        if EXCHANGE is not None:
+        boleh_exec = EXCHANGE is not None
+        if boleh_exec:
+            nyata = sum(1 for p in st["positions"].values() if p.get("exec"))
+            if nyata >= MAX_EXEC_POS:
+                log(f"TAHAN EXEC {sym}: sudah {nyata} posisi nyata (batas MAX_EXEC_POS={MAX_EXEC_POS}); "
+                    f"dibuka sebagai paper saja")
+                boleh_exec = False
+        if boleh_exec:
             if execution.halt_aktif():
                 notif_sekali(st, "exec_halt", "EXEC HALT aktif: tidak ada order baru. "
                              "Periksa manual lalu: python3 paper_carry.py --reset-exec-halt",

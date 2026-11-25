@@ -346,6 +346,20 @@ class TestExec(Base):
         self.assertNotIn("exec", st["positions"]["A"])
         self.assertEqual(self.fake.panggilan, [])
 
+    def test_batas_posisi_nyata_max_exec_pos(self):
+        """Tahap uji: hanya MAX_EXEC_POS posisi yang dikirim ke bursa; sisanya tetap paper."""
+        lama = pc.MAX_EXEC_POS
+        pc.MAX_EXEC_POS = 1
+        try:
+            self.radar([row("A", 10), row("B", 9)], T0)
+            st = self.tick(T0)
+            self.assertEqual(sorted(st["positions"]), ["A", "B"], "kedua posisi tetap dibuka di paper")
+            self.assertIn("exec", st["positions"]["A"])
+            self.assertNotIn("exec", st["positions"]["B"], "posisi kedua tidak boleh dikirim ke bursa")
+            self.assertEqual(self.fake.eksposur(), (6.0, 6.0), "hanya satu kaki nyata")
+        finally:
+            pc.MAX_EXEC_POS = lama
+
     def test_gagal_bersih_tidak_membuat_posisi(self):
         self.fake.skrip["spot_buy"] = ["tolak"]
         self.radar([row("A", 10)], T0)
