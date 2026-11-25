@@ -593,6 +593,7 @@ if __name__ == "__main__":
     if a.testnet:
         import binance_testnet
         try:
+            binance_testnet._muat_env()      # kunci dari ~/.testnet.env (di luar repo)
             EXCHANGE = binance_testnet.BinanceTestnet()
         except RuntimeError as e:
             print(f"TIDAK BISA MULAI --testnet: {e}")
