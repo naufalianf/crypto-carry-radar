@@ -98,6 +98,7 @@ class BinanceTestnet(ex.Exchange):
         self.http, self.now = http or _http, now
         self._cid = {}          # cid -> (pasar, simbol); order_status butuh simbol
         self._filter = {}
+        self._simbol = None     # cache simbol perp (simbol_perp())
 
     def _kred(self, base):
         """(key, secret) untuk host tujuan. Kaki futures punya kunci sendiri."""
@@ -137,6 +138,15 @@ class BinanceTestnet(ex.Exchange):
                 if float(b["free"]) + float(b["locked"]) > 0}
 
     # ---- aturan simbol & harga ----
+    def simbol_perp(self):
+        """Himpunan simbol yang ada di bursa perp tujuan. Di-cache: satu request per proses.
+        Perlu karena testnet spot dan futures TIDAK punya daftar simbol yang sama
+        (mis. OPGUSDT ada di spot, tidak ada di futures demo)."""
+        if self._simbol is None:
+            js = self._req(FUT, "/fapi/v1/exchangeInfo", {}, signed=False)
+            self._simbol = {x["symbol"] for x in js["symbols"]}
+        return self._simbol
+
     def _aturan(self, sym):
         if sym in self._filter:
             return self._filter[sym]
@@ -375,6 +385,10 @@ def selftest():
     hp = lambda m, u, p, hd: (200, [{"symbol": "AAAUSDT", "positionAmt": "-2.5"},
                                     {"symbol": "BBBUSDT", "positionAmt": "0.000"}])
     assert BinanceTestnet("k", "s", http=hp).perp_short_qty() == {"AAAUSDT": 2.5}, "positionRisk: hanya short berisi"
+    bf = BinanceTestnet("k", "s", http=lambda m, u, p, hd: (
+        200, {"symbols": [{"symbol": "AAAUSDT"}, {"symbol": "BBBUSDT"}]}))
+    assert bf.simbol_perp() == {"AAAUSDT", "BBBUSDT"}, "simbol_perp: daftar dari exchangeInfo"
+    assert bf.simbol_perp() == {"AAAUSDT", "BBBUSDT"}, "simbol_perp: cache"
     print("binance_testnet selftest: OK")
 
 

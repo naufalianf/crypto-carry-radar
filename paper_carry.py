@@ -461,6 +461,12 @@ def _tick(now):
                 and (r["spread_bps"] or 99) <= 15.0 and r["volume_musd"] >= 50.0)
 
     kandidat = sorted((r for r in rows.values() if layak(r)), key=lambda r: -r["apr_7d"])
+    ada_perp = None
+    if EXCHANGE is not None and hasattr(EXCHANGE, "simbol_perp"):
+        try:
+            ada_perp = EXCHANGE.simbol_perp()
+        except Exception as e:
+            log(f"gagal ambil daftar simbol perp ({type(e).__name__}); kandidat tidak disaring")
     terakhir_tutup = {}
     for c in st["closed"]:
         terakhir_tutup[c["symbol"]] = ts_tutup(c)
@@ -484,6 +490,9 @@ def _tick(now):
             continue
         info = None
         boleh_exec = EXCHANGE is not None
+        if boleh_exec and ada_perp is not None and sym not in ada_perp:
+            log(f"PAPER {sym}: tidak ada di perp bursa tujuan, tidak bisa dieksekusi")
+            boleh_exec = False
         if boleh_exec:
             nyata = sum(1 for p in st["positions"].values() if p.get("exec"))
             if nyata >= MAX_EXEC_POS:
