@@ -7,8 +7,8 @@
 set -u
 cd "$(dirname "$0")" || exit 1
 PY=/tmp/vlog/bin/python
-NAMES=(paper_carry scan_and_push watchdog)
-LOGS=(paper_carry_daemon.log radar_cron.log watchdog_daemon.log)
+NAMES=(paper_carry scan_and_push watchdog supervisor)
+LOGS=(paper_carry_daemon.log radar_cron.log watchdog_daemon.log supervisor.log)
 # TESTNET=1 menyalakan paper_carry dengan --testnet: order demo nyata 600/posisi, maks 3.
 # Default mati supaya tidak ada order terkirim tanpa sengaja.
 EXTRA_paper_carry=""

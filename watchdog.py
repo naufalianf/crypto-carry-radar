@@ -18,7 +18,11 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 BATAS_JAM = 6.0          # tick 4 jam + toleransi 2 jam (scan/fetch yang lambat)
 STATE = os.path.join(HERE, "watchdog_state.json")
 TARGET = {"paper_carry": os.path.join(HERE, "web", "paper.json"),
-          "scan_and_push": os.path.join(HERE, "web", "radar.json")}
+          "scan_and_push": os.path.join(HERE, "web", "radar.json"),
+          "supervisor": os.path.join(HERE, "supervisor.json")}
+# Batas per target, jam. Supervisor menulis detak tiap 60 detik, jadi 0,1 jam (6 menit)
+# sudah cukup longgar; memakai 6 jam akan membuat supervisor mati 5 jam tanpa kabar.
+BATAS = {"paper_carry": BATAS_JAM, "scan_and_push": BATAS_JAM, "supervisor": 0.1}
 
 
 def umur_jam(path, now):
@@ -36,7 +40,8 @@ def periksa(now, target=None):
     hasil = {}
     for nama, path in (target or TARGET).items():
         u = umur_jam(path, now)
-        hasil[nama] = (u is None or u > BATAS_JAM or u < -1.0, u)
+        batas = BATAS.get(nama, BATAS_JAM)
+        hasil[nama] = (u is None or u > batas or u < -1.0, u)
     return hasil
 
 
@@ -120,7 +125,8 @@ def jalankan(now=None, kirim=None, target=None, state_path=STATE, cek=cek_posisi
     for nama, (mati, u) in periksa(now, target).items():
         if mati and not lama.get(nama):
             ket = "file hilang/rusak" if u is None else f"terakhir berdetak {u:.1f} jam lalu"
-            pesan.append(f"DAEMON MATI? {nama}: {ket} (batas {BATAS_JAM:.0f} jam). "
+            batas = BATAS.get(nama, BATAS_JAM)
+            pesan.append(f"DAEMON MATI? {nama}: {ket} (batas {batas:.1f} jam). "
                          f"Cek proses di Hermes dan restart.")
         elif not mati and lama.get(nama):
             pesan.append(f"{nama} berdetak lagi (umur {u:.1f} jam).")
@@ -213,6 +219,20 @@ def selftest():
     def putus():
         raise OSError("bursa tak terjangkau")
     assert cek_posisi(putus, ps) is None, "bursa tak terjangkau bukan alarm"
+
+    # batas per-target: detak supervisor tiap 60 detik, jadi 7 menit sudah basi
+    sv = os.path.join(d, "sv.json")
+    tgt = {"supervisor": sv}
+    def tulis_sv(detik):
+        with open(sv, "w") as f:
+            json.dump({"generated_at": time.strftime("%Y-%m-%d %H:%M UTC",
+                                                    time.gmtime(t0 - detik))}, f)
+    tulis_sv(60)
+    assert periksa(t0, tgt)["supervisor"][0] is False, "1 menit masih segar"
+    tulis_sv(7 * 60)
+    assert periksa(t0, tgt)["supervisor"][0] is True, "7 menit = supervisor mati"
+    os.remove(sv)
+    assert periksa(t0, tgt)["supervisor"][0] is True, "detak hilang = supervisor mati"
     print("watchdog selftest: OK")
 
 

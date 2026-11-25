@@ -1,0 +1,39 @@
+# Uji otomatis. Berjalan di server GitHub, bukan di mesin Hermes: kalau mesin Hermes
+# mati, uji tetap jalan. Inilah gerbang sebelum perubahan masuk main.
+#
+# Tidak memakai secret dan tidak menyentuh bursa: semua uji memakai HTTP palsu.
+# Uji yang butuh jaringan/kunci ada di smoke manual (`--smoke`), bukan di sini.
+name: uji
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  selftest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Selftest tiap modul
+        run: |
+          for m in binance_testnet paper_carry execution watchdog supervisor; do
+            echo "--- $m"
+            python3 "$m.py" --selftest
+          done
+      - name: Uji unit (unittest)
+        run: |
+          python3 test_execution.py
+          python3 test_paper_carry.py
+      - name: Tidak boleh ada kunci di repo
+        run: |
+          # Gagal kalau ada pola yang mirip kunci API / token bot di file yang di-track.
+          if git grep -nEI '(BINANCE_[A-Z_]*(KEY|SECRET)[[:space:]]*=[[:space:]]*[A-Za-z0-9]{20,}|[0-9]{9,10}:AA[A-Za-z0-9_-]{30,})' -- . ':!*.md'; then
+            echo "::error::Kredensial terdeteksi di file yang di-track"
+            exit 1
+          fi
+          echo "bersih"

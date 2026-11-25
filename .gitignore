@@ -19,3 +19,7 @@ paper_carry_state.json
 paper_state.json
 paper_carry_log.txt
 paper_log.txt
+
+# cadangan state & detak supervisor (runtime, jangan di-git)
+backups/
+supervisor.json
