@@ -115,6 +115,11 @@ def load():
             st = json.load(f)
         st.setdefault("positions", {})
         st.setdefault("closed", [])
+        # `equity` dulu diisi 1000 dan tidak pernah diturunkan mengikuti PnL, jadi
+        # angkanya menyesatkan kalau ada yang membacanya. Dibuang sekali di sini;
+        # bukan dibuang membabi buta — hanya kunci mati yang sudah diketahui.
+        if st.pop("equity", None) is not None:
+            log("state: kunci mati 'equity' dibuang (tidak pernah mengikuti PnL)")
         return st
     except (ValueError, OSError) as e:
         raise RuntimeError(f"state paper carry tidak terbaca ({e}); berhenti, periksa {STATE} manual")
@@ -333,7 +338,12 @@ def export_web(st, now):
         "positions": [{"symbol": p["symbol"], "hari": round((now - p["opened"]) / 86400, 2),
                        "apr_entry": p.get("apr_entry"), "funding_pct": round(p["funding"] * 100, 3),
                        "basis_geser_pct": round(p.get("basis_pct", 0.0) - p.get("basis_entry_pct", 0.0), 3),
-                       "net_pct": round(p.get("net", 0.0) * 100, 3)} for p in st["positions"].values()],
+                       "net_pct": round(p.get("net", 0.0) * 100, 3),
+                       # notional ditampilkan per posisi: posisi lama dibuka saat plafon
+                       # masih 1000, yang baru 600. Tanpa ini PnL lama terbaca seolah
+                       # sebanding padahal modalnya 67% lebih besar.
+                       "notional": p.get("notional"), "lama": p.get("notional") != NOTIONAL}
+                   for p in st["positions"].values()],
         "closed": [{"symbol": c["symbol"], "hari": round(c.get("age_days", 0.0), 2),
                     "funding_pct": round(c["funding"] * 100, 3), "net_pct": round(c["net"] * 100, 3),
                     "alasan": c.get("exit_reason", ""), "keluar": c.get("closed_iso", "")}
