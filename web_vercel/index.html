@@ -400,7 +400,9 @@ function renderPaper(p) {
   if ((p.positions || []).length) {
     html += '<div class="tscroll"><table class="ptable"><tr><th>simbol</th><th>umur (hari)</th><th>APR masuk</th>' +
       "<th>funding</th><th>basis geser</th><th>net</th></tr>" +
-      p.positions.map(x => `<tr><td><span class="sym">${esc(x.symbol)}</span></td><td>${x.hari.toFixed(1)}</td>` +
+      p.positions.map(x => `<tr><td><span class="sym">${esc(x.symbol)}</span>` +
+        (x.lama ? ` <small title="dibuka saat plafon masih ${x.notional}$; PnL-nya 67% lebih besar dari posisi baru">plafon lama ${x.notional}$</small>` : "") +
+        `</td><td>${x.hari.toFixed(1)}</td>` +
         `<td>${x.apr_entry == null ? "—" : x.apr_entry.toFixed(1) + "%"}</td><td>${sgn(x.funding_pct)}%</td>` +
         `<td>${sgn(x.basis_geser_pct)}%</td><td class="${pcls(x.net_pct)}">${sgn(x.net_pct)}%</td></tr>`).join("") +
       "</table></div>";
