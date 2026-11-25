@@ -33,7 +33,11 @@ from decimal import Decimal, ROUND_DOWN
 import execution as ex
 
 SPOT = "https://testnet.binance.vision"
-FUT = "https://testnet.binancefuture.com"
+# Binance punya DUA testnet futures: yang lama (testnet.binancefuture.com) dan
+# "Demo Trading API" di akun (demo-fapi.binance.com). Kunci demo hanya berlaku di
+# host demo — diuji, kunci demo ditolak -2015 oleh host lama dan sebaliknya.
+# Bisa ditimpa lewat env BINANCE_TESTNET_FUT_HOST untuk berpindah tanpa ubah kode.
+FUT = os.environ.get("BINANCE_TESTNET_FUT_HOST", "https://demo-fapi.binance.com")
 TOL_BPS = 10.0
 RECV_WINDOW = 5000
 UNKNOWN_CODES = {-1006, -1007, -1008, -1021}     # status tak pasti / waktu / beban
@@ -184,8 +188,7 @@ class BinanceTestnet(ex.Exchange):
         q = float(js.get("executedQty") or 0)
         if q <= 0:
             return 0.0, 0.0
-        harga = float(js["cummulativeQuoteQty"]) / q if pasar == "spot" else float(js["avgPrice"])
-        return q, harga
+        return q, _avg_harga(pasar, js)
 
     def spot_buy(self, sym, qty, cid): return self._order("spot", sym, "BUY", qty, cid)
     def spot_sell(self, sym, qty, cid): return self._order("spot", sym, "SELL", qty, cid)
@@ -206,6 +209,26 @@ class BinanceTestnet(ex.Exchange):
         if js.get("status") in ("NEW", "PARTIALLY_FILLED") and float(js.get("executedQty") or 0) == 0:
             raise ex.Unknown("order masih terbuka")    # IOC seharusnya tidak begini; jangan menebak
         return self._hasil(pasar, js)
+
+
+def _avg_harga(pasar, js):
+    """Harga isi rata-rata, tahan dua bentuk respons.
+
+    Spot (RESULT) memberi `cummulativeQuoteQty`. Futures DIDOKUMENTASIKAN memberi
+    `avgPrice` untuk newOrderRespType=RESULT, tapi host demo/testnet yang diuji
+    tidak mengirimnya sama sekali — hanya `price` LIMIT. Jatuh ke `cumQuote/executedQty`
+    kalau ada, lalu ke `price`.
+    """
+    q = float(js.get("executedQty") or 0)
+    if q <= 0:
+        return 0.0
+    cq = js.get("cummulativeQuoteQty") or js.get("cumQuote")
+    if cq:
+        return float(cq) / q
+    if js.get("avgPrice"):
+        return float(js["avgPrice"])
+    # IOC limit yang FILLED terisi tepat di harga limitnya; tidak ada sumber lain.
+    return float(js.get("price") or 0.0)
 
 
 def _fake_http(skrip):
@@ -328,6 +351,12 @@ def selftest():
     bk._aturan("ABC")
     assert hk.log[0][3]["X-MBX-APIKEY"] == "KSPOT", "exchangeInfo spot pakai kunci spot"
     assert hk.log[1][3]["X-MBX-APIKEY"] == "KFUT", "exchangeInfo futures pakai kunci futures"
+    # futures tidak mengirim avgPrice (host demo/testnet): harus jatuh ke price LIMIT
+    assert _avg_harga("perp", {"executedQty": "2", "price": "99.9", "status": "FILLED"}) == 99.9
+    assert _avg_harga("perp", {"executedQty": "2", "avgPrice": "100.0"}) == 100.0
+    assert _avg_harga("perp", {"executedQty": "2", "cumQuote": "200"}) == 100.0
+    assert _avg_harga("spot", {"executedQty": "2", "cummulativeQuoteQty": "202"}) == 101.0
+    assert _avg_harga("perp", {"executedQty": "0", "price": "99.9"}) == 0.0
     print("binance_testnet selftest: OK")
 
 
@@ -376,12 +405,17 @@ def smoke(sym, kaki="dua"):
         raise
     book = b._req(SPOT, "/api/v3/ticker/bookTicker", {"symbol": sym}, signed=False)
     ref = float(book["askPrice"])
+    # Referensi kaki perp HARUS dari buku perp, bukan dari harga spot. Memakai harga
+    # spot membuat "slip_bps" mencampur basis spot-perp dengan slippage sungguhan.
+    pb = b._req(FUT, "/fapi/v1/ticker/bookTicker", {"symbol": sym}, signed=False)
+    ref_perp = float(pb["bidPrice"])
     tid = f"SMOKE{int(time.time())}"
     qty = b.qty_valid(sym, 120.0 / ref)
-    r = ex.buka_carry(b, sym, qty * ref, ref, ref, tid)
+    r = ex.buka_carry(b, sym, qty * ref, ref, ref_perp, tid)
     print("buka:", r)
     if r["status"] == "ok":
-        print("tutup:", ex.tutup_carry(b, sym, r["qty"], ref, ref, tid))
+        pb2 = b._req(FUT, "/fapi/v1/ticker/bookTicker", {"symbol": sym}, signed=False)
+        print("tutup:", ex.tutup_carry(b, sym, r["qty"], ref, float(pb2["askPrice"]), tid))
     print("slippage tercatat di", ex.FILLS_CSV)
 
 

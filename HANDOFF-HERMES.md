@@ -148,4 +148,49 @@ Kunci spot tidak berlaku di testnet futures — Binance memisah dua akun itu.
 - Catatan: bukti langsung bahwa satu pasang kunci tidak cukup — lihat temuan 8 di
   `CATATAN-HERMES-UNTUK-CLAUDE.md`.
 
-(**belum ada percobaan dua kaki yang bersih** — menunggu kunci testnet futures)
+### Percobaan 3, 2026-11-25 04:31 UTC — DUA KAKI, BERSIH (kunci hanyalah "Demo Trading API")
+- Perintah: `python3 binance_testnet.py --smoke BTCUSDT`
+- Hasil: **BERSIH** — dua kaki dibuka dan ditutup, posisi datar, tidak ada sisa
+- Keluaran asli:
+```
+FUT host: https://demo-fapi.binance.com
+buka: {'status': 'ok', 'qty': 0.002, 'spot': (0.002, 59050.74), 'perp': (0.002, 59025.9)}
+tutup: {'status': 'ok'}
+```
+- Isi `execution_fills.csv` (empat baris terakhir):
+```
+ts,trade_id,leg,side,qty,ref_price,fill_price,slip_bps,status
+1795581874,SMOKE1795581873,spot,buy,0.002,59050.74,59050.74,0.00,ok
+1795581875,SMOKE1795581873,perp,sell,0.002,59085.00,59025.90,10.00,ok
+1795581876,SMOKE1795581873,perp,buy,0.002,59122.00,59181.20,10.01,close
+1795581876,SMOKE1795581873,spot,sell,0.002,59050.74,59050.73,0.00,close
+```
+- Verifikasi independen setelahnya: `PERP amt 0.0000` (datar), `SPOT BTC 1.00000000`,
+  `SPOT USDT 9999.78168`, `FUT wallet 4999.55857`. Tidak ada posisi maupun order menggantung.
+- Ada file `execution_halt.json`? tidak
+- Catatan (semua ini bug yang ketemu dan diperbaiki saat percobaan):
+  1. **Kunci "Demo Trading API" BUKAN kunci testnet lama.** Ditolak `-2015` oleh
+     `testnet.binancefuture.com`, diterima oleh `demo-fapi.binance.com`. Host futures
+     dipindah ke demo, bisa ditimpa lewat `BINANCE_TESTNET_FUT_HOST`.
+  2. **Futures tidak mengirim `avgPrice`.** Kode lama membaca `js["avgPrice"]` untuk
+     semua respons futures → `KeyError` padahal order `FILLED`. Akibatnya smoke pertama
+     meninggalkan short 0,002 BTC menggantung (ditemukan lewat `/fapi/v2/positionRisk`,
+     bukan dari respons order). Sudah ditutup manual, lalu `_avg_harga()` dibuat tahan
+     empat bentuk respons. **Pelajaran: jangan pernah percaya respons order sebagai bukti
+     posisi — query ulang posisi.**
+  3. **`slip_bps` kaki perp diukur terhadap harga SPOT.** Percobaan 2 sempat mencatat
+     +4,96 dan +23,45 bps yang bukan slippage, melainkan basis spot-perp. Sekarang
+     referensi perp diambil dari `fapi/v1/ticker/bookTicker`.
+  4. Slippage perp yang terukur **+10,00 bps = tepat `TOL_BPS`**, artinya order limit IOC
+     menyilang sebesar toleransi. Itu angka wajar untuk buku demo, tetap **bukan**
+     perkiraan biaya pasar asli.
+  5. IP mesin Hermes sempat kena `-1003 IP banned` di host futures lama karena terlalu
+     banyak request saat diagnosis (bukan karena kode bot). Endpoint publik tidak terpengaruh.
+
+### Percobaan 4, 2026-11-25 04:38 UTC — verifikasi ulang setelah perbaikan referensi harga
+```
+buka: {'status': 'ok', 'qty': 0.002, 'spot': (0.002, 59050.74), 'perp': (0.002, 59025.9)}
+tutup: {'status': 'ok'}
+PERP amt 0.0000 | SPOT BTC 1.00000000 | FUT wallet 4999.55857326
+```
+Selftest 4 modul: OK. Nol posisi menggantung.
