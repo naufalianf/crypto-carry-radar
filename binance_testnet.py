@@ -39,6 +39,8 @@ SPOT = "https://testnet.binance.vision"
 # Bisa ditimpa lewat env BINANCE_TESTNET_FUT_HOST untuk berpindah tanpa ubah kode.
 FUT = os.environ.get("BINANCE_TESTNET_FUT_HOST", "https://demo-fapi.binance.com")
 TOL_BPS = 10.0
+TOL_MAKS_BPS = 15.0       # sama dengan gate radar max_spread: buku lebih lebar dari ini = jangan disentuh
+TOL_BUFFER_BPS = 2.0      # toleransi = spread nyata + buffer kecil, supaya tidak makan level kedua
 RECV_WINDOW = 5000
 UNKNOWN_CODES = {-1006, -1007, -1008, -1021}     # status tak pasti / waktu / beban
 DUPLIKAT_CODES = {-2010, -4015}                  # cid sudah dipakai (spot / futures)
@@ -181,13 +183,20 @@ class BinanceTestnet(ex.Exchange):
         self._req(FUT, "/fapi/v1/leverage", {"symbol": sym, "leverage": 1}, "POST")
 
     def _harga_batas(self, pasar, sym, sisi):
+        """Harga batas IOC. Toleransi diambil dari spread nyata di buku, bukan konstanta:
+        spread sempit (BTC <1 bps) tidak perlu bayar 10 bps, spread lebar ditolak sebelum order.
+        Buku lebih lebar dari TOL_MAKS_BPS = koin tidak layak dieksekusi (sama dengan gate radar)."""
         base, path = (SPOT, "/api/v3/ticker/bookTicker") if pasar == "spot" else (FUT, "/fapi/v1/ticker/bookTicker")
-        js = self._req(base, path, {"symbol": sym}, signed=False)
+        js = self._req(base, path, {"symbol": sym}, signed=False) or {}
         beli = sisi == "BUY"
         ref = Decimal(js["askPrice" if beli else "bidPrice"])
-        if ref <= 0:
+        lawan = Decimal(js["bidPrice" if beli else "askPrice"])
+        if ref <= 0 or lawan <= 0:
             raise ex.Rejected("buku kosong")
-        tol = Decimal(str(TOL_BPS)) / Decimal(10000)
+        spread_bps = float((ref - lawan) / lawan * 10000) if ref > lawan else 0.0
+        if spread_bps > TOL_MAKS_BPS:
+            raise ex.Rejected(f"spread {spread_bps:.1f} bps > {TOL_MAKS_BPS:g} bps; buku terlalu tipis")
+        tol = Decimal(str(min(max(spread_bps + TOL_BUFFER_BPS, 1.0), TOL_BPS))) / Decimal(10000)
         tick = Decimal(self._aturan(sym)[pasar]["tick"])
         if beli:
             return str(_floor(ref * (1 + tol), tick) + tick)    # beli: pembulatan ke atas, pasti menyilang
@@ -289,6 +298,20 @@ def selftest():
         raise AssertionError(f"harus melempar {jenis.__name__}")
 
     harus(RuntimeError, lambda: BinanceTestnet("", ""))
+
+    # toleransi mengikuti spread buku, bukan konstanta 10 bps
+    bsp, _ = mk([(200, {"askPrice": "100.00", "bidPrice": "99.90"})])
+    bsp._aturan = lambda sym: {"spot": {"tick": "0.1"}, "perp": {"tick": "0.1"}}
+    assert Decimal(bsp._harga_batas("spot", "ABC", "BUY")) == Decimal("100.2"), "spread 10 bps -> 100.1 + 1 tick"
+
+    bsn, _ = mk([(200, {"askPrice": "100.00", "bidPrice": "99.99"})])
+    bsn._aturan = lambda sym: {"spot": {"tick": "0.01"}, "perp": {"tick": "0.01"}}
+    hn = Decimal(bsn._harga_batas("spot", "ABC", "BUY"))
+    assert Decimal("100.00") < hn < Decimal("100.05"), f"spread 1 bps harus murah, dapat {hn}"
+
+    blb, _ = mk([(200, {"askPrice": "100.00", "bidPrice": "99.80"})])
+    blb._aturan = lambda sym: {"spot": {"tick": "0.1"}, "perp": {"tick": "0.1"}}
+    harus(ex.Rejected, lambda: blb._harga_batas("spot", "ABC", "BUY"))     # 20 bps > 15 bps
 
     # beli spot: qty dibulatkan ke langkah terbesar (0.01), LIMIT IOC menyilang, tanda tangan benar
     b, h = mk([(200, A), (200, F), BOOK, (200, {"executedQty": "1.23", "cummulativeQuoteQty": "123.5"})])
