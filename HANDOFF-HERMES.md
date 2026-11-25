@@ -91,4 +91,58 @@ Format entri (salin, lalu isi):
 - Catatan: <apa pun yang terasa janggal>
 ```
 
-(belum ada percobaan)
+### Percobaan 1, 2026-11-25 02:38 UTC — SPOT SAJA (`--spot`)
+- Commit yang dijalankan: `7ca664f` (+ perubahan adapter yang belum di-commit saat uji)
+- Perintah: `python3 binance_testnet.py --smoke BTCUSDT --spot`
+- Selftest 4 modul: OK (paper_carry 34 tes, execution 19 tes, binance_testnet, watchdog)
+- Hasil: **BERSIH** — dua order FILLED, saldo kembali, nol sisa
+- Keluaran asli:
+```
+BTCUSDT: ask 59221.77 bid 59221.76 spread 0.0 bps | target 120 USDT
+qty: 0.002 (nilai ~118.44 USDT)
+beli: qty 0.002 harga 59221.77 ref 59221.77 slip +0.00 bps
+jual: qty 0.002 harga 59221.76 ref 59221.76 slip -0.00 bps
+sisa aset: {'BTC': 1.0}
+SPOT SMOKE SELESAI — slippage tercatat di execution_fills.csv
+```
+- Isi `execution_fills.csv`:
+```
+ts,trade_id,leg,side,qty,ref_price,fill_price,slip_bps,status
+1795575518,SMOKE1795575518,spot,buy,0.00200000,59221.77000000,59221.77000000,0.00,ok
+1795575520,SMOKE1795575518,spot,sell,0.00200000,59221.76000000,59221.76000000,-0.00,ok
+```
+- Verifikasi independen di exchange (bukan dari respons order, tapi query ulang):
+```
+SMOKE1795575518B | status: FILLED | executedQty: 0.002 | cumQuote: 118.44354 | orderId: 17571472
+SMOKE1795575518J | status: FILLED | executedQty: 0.002 | cumQuote: 118.44352 | orderId: 17571474
+BTC free 1.00000000 (utuh, tidak ada sisa) | USDT free 9999.99996
+```
+- Saldo akun testnet setelahnya: spot BTC = **1.00000000** (saldo awal 1 BTC, tidak bertambah —
+  0,002 dibeli lalu 0,002 dijual), posisi perp BTCUSDT = **tidak diuji** (kunci futures belum ada)
+- Ada file `execution_halt.json`? **tidak**
+- Catatan:
+  1. **Slippage 0,00 bps itu mencurigakan-tapi-benar.** Order IOC limit menyilang harga terbaik
+     di buku testnet yang sangat tipis; 0,002 BTC ≈ 118 USDT terserap di satu level. Ini **bukan**
+     bukti biaya riil — justru menguatkan bahwa testnet tidak bisa dipakai memperkirakan biaya
+     pasar asli. Jangan pakai angka ini untuk mengisi asumsi 0,3%.
+  2. **Spread tercatat 0,0 bps** (ask 59221.77 / bid 59221.76). Di pasar asli BTC spread-nya
+     beberapa bps. Buku testnet memang tidak realistis.
+  3. Baris kedua `slip_bps` tercatat `-0.00`. `tutup_carry`/`_catat` memberi tanda negatif untuk
+     sisi jual; hasilnya angka negatif nol. Tidak salah hitung, hanya tampilan.
+  4. Jumlah BTC awal akun 1,0 membuat "sisa aset" tidak bisa dibaca sebagai "bersih" secara
+     langsung — harus dibandingkan dengan saldo sebelum order. Sudah dibandingkan: 1,0 -> 1,0.
+
+### Percobaan 2, 2026-11-25 02:41 UTC — DUA KAKI, gagal di gerbang kunci
+- Perintah: `python3 binance_testnet.py --smoke BTCUSDT`
+- Hasil: **GALAT (diharapkan)** — kaki futures menolak kunci spot SEBELUM order apa pun
+- Keluaran asli:
+```
+KAKI FUTURES DITOLAK (kode -2015): Invalid API-key, IP, or permissions for action
+Kunci spot tidak berlaku di testnet futures — Binance memisah dua akun itu.
+```
+- Saldo: tidak berubah, nol order terkirim ke spot (setup futures jalan lebih dulu)
+- Ada file `execution_halt.json`? tidak
+- Catatan: bukti langsung bahwa satu pasang kunci tidak cukup — lihat temuan 8 di
+  `CATATAN-HERMES-UNTUK-CLAUDE.md`.
+
+(**belum ada percobaan dua kaki yang bersih** — menunggu kunci testnet futures)

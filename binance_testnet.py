@@ -46,6 +46,7 @@ class GalatBinance(ex.Rejected):
     def __init__(self, kode, msg):
         super().__init__(f"kode {kode}: {msg}")
         self.kode = kode
+        self.msg = msg
 
 
 def _http(method, url, params, headers, timeout=10):
@@ -70,25 +71,45 @@ def _floor(x, step):
 
 
 class BinanceTestnet(ex.Exchange):
-    def __init__(self, key=None, secret=None, http=None, now=time.time):
-        self.key = key or os.environ.get("BINANCE_TESTNET_KEY", "")
-        self.secret = secret or os.environ.get("BINANCE_TESTNET_SECRET", "")
+    def __init__(self, key=None, secret=None, http=None, now=time.time,
+                 fut_key=None, fut_secret=None):
+        """Kunci spot dan futures TERPISAH: Binance memisah dua testnet itu,
+        kunci spot tidak berlaku di host futures (401 -2014).
+
+        Urutan pencarian: argumen -> BINANCE_TESTNET_SPOT_KEY/SECRET ->
+        BINANCE_TESTNET_KEY/SECRET (nama lama). Futures: argumen ->
+        BINANCE_TESTNET_FUT_KEY/SECRET -> jatuh ke kunci spot (supaya akun yang
+        kebetulan berbagi kunci tetap jalan).
+        """
+        e = os.environ
+        self.key = key or e.get("BINANCE_TESTNET_SPOT_KEY") or e.get("BINANCE_TESTNET_KEY", "")
+        self.secret = secret or e.get("BINANCE_TESTNET_SPOT_SECRET") or e.get("BINANCE_TESTNET_SECRET", "")
+        self.fut_key = fut_key or e.get("BINANCE_TESTNET_FUT_KEY") or self.key
+        self.fut_secret = fut_secret or e.get("BINANCE_TESTNET_FUT_SECRET") or self.secret
         if not self.key or not self.secret:
-            raise RuntimeError("isi BINANCE_TESTNET_KEY dan BINANCE_TESTNET_SECRET (kunci testnet)")
+            raise RuntimeError(
+                "kunci testnet belum diisi. Taruh BINANCE_TESTNET_KEY dan "
+                "BINANCE_TESTNET_SECRET (spot) di ~/.testnet.env — lihat "
+                "HANDOFF-HERMES.md langkah 5")
         self.http, self.now = http or _http, now
         self._cid = {}          # cid -> (pasar, simbol); order_status butuh simbol
         self._filter = {}
 
+    def _kred(self, base):
+        """(key, secret) untuk host tujuan. Kaki futures punya kunci sendiri."""
+        return (self.fut_key, self.fut_secret) if base == FUT else (self.key, self.secret)
+
     # ---- transport ----
     def _req(self, base, path, params, method="GET", signed=True):
         p = dict(params)
+        k, s = self._kred(base)
         if signed:
             p["timestamp"] = int(self.now() * 1000)
             p["recvWindow"] = RECV_WINDOW
             q = urllib.parse.urlencode(p)
-            p["signature"] = hmac.new(self.secret.encode(), q.encode(), hashlib.sha256).hexdigest()
+            p["signature"] = hmac.new(s.encode(), q.encode(), hashlib.sha256).hexdigest()
         try:
-            st, js = self.http(method, base + path, p, {"X-MBX-APIKEY": self.key})
+            st, js = self.http(method, base + path, p, {"X-MBX-APIKEY": k})
         except OSError as e:                      # timeout / koneksi putus
             raise ex.Unknown(type(e).__name__) from None
         if st == 200:
@@ -300,12 +321,59 @@ def selftest():
                 BOOK, (200, {"executedQty": "1.00", "avgPrice": "99.95"})])
     r = ex.buka_carry(b9, "ABC", 100.0, 100.0, 100.0, "T9", os.path.join(d, "h"), os.path.join(d, "f.csv"))
     assert r["status"] == "ok", r
+    # kunci spot vs futures dipisah: header tiap host harus memakai kuncinya sendiri
+    bk, hk = mk([(200, A), (200, F)])
+    bk.key, bk.secret = "KSPOT", "SSPOT"
+    bk.fut_key, bk.fut_secret = "KFUT", "SFUT"
+    bk._aturan("ABC")
+    assert hk.log[0][3]["X-MBX-APIKEY"] == "KSPOT", "exchangeInfo spot pakai kunci spot"
+    assert hk.log[1][3]["X-MBX-APIKEY"] == "KFUT", "exchangeInfo futures pakai kunci futures"
     print("binance_testnet selftest: OK")
 
 
-def smoke(sym):
+def _muat_env(path=None):
+    """Baca .testnet.env tanpa menimpa env yang sudah di-set shell.
+
+    Kunci tidak pernah dicetak. File dicari di lokasi bawaan profil, bukan di repo,
+    supaya tidak ikut ter-commit.
+    """
+    p = path or os.path.expanduser("~/.testnet.env")
+    if not os.path.exists(p):
+        p = "/opt/data/profiles/techbro-bot/home/.testnet.env"
+    if not os.path.exists(p):
+        return False
+    with open(p) as f:
+        for baris in f:
+            baris = baris.strip()
+            if not baris or baris.startswith("#") or "=" not in baris:
+                continue
+            k, v = baris.split("=", 1)
+            os.environ.setdefault(k.strip(), v.strip())
+    return True
+
+
+def smoke(sym, kaki="dua"):
+    """Buka lalu tutup posisi uji di testnet.
+
+    kaki="dua"   : spot beli + perp short (butuh kunci spot DAN futures)
+    kaki="spot"  : beli lalu jual di spot saja. Membuktikan tanda tangan HMAC,
+                   format order, dan pembacaan respons — tanpa perlu akun Binance.
+    """
     b = BinanceTestnet()
-    b.setup(sym)
+    if kaki == "spot":
+        return _smoke_spot(b, sym)
+    try:
+        b.setup(sym)
+    except GalatBinance as e:
+        if e.kode in (-2015, -2014):
+            print(f"KAKI FUTURES DITOLAK (kode {e.kode}): {e.msg}")
+            print("Kunci spot tidak berlaku di testnet futures — Binance memisah dua akun itu.")
+            print("Buat kunci di testnet.binancefuture.com lalu isi:")
+            print("  BINANCE_TESTNET_FUT_KEY=...")
+            print("  BINANCE_TESTNET_FUT_SECRET=...")
+            print("Uji kaki spot saja dulu: --smoke SYMBOL --spot")
+            return 2
+        raise
     book = b._req(SPOT, "/api/v3/ticker/bookTicker", {"symbol": sym}, signed=False)
     ref = float(book["askPrice"])
     tid = f"SMOKE{int(time.time())}"
@@ -317,10 +385,57 @@ def smoke(sym):
     print("slippage tercatat di", ex.FILLS_CSV)
 
 
+def _smoke_spot(b, sym, usdt=120.0):
+    """Uji kaki spot saja: beli lalu jual kembali, laporkan slippage tiap kaki."""
+    js = b._req(SPOT, "/api/v3/ticker/bookTicker", {"symbol": sym}, signed=False)
+    ask, bid = float(js["askPrice"]), float(js["bidPrice"])
+    if ask <= 0 or bid <= 0:
+        print(f"BUKU KOSONG {sym}: ask {ask} bid {bid} — testnet tidak punya likuiditas")
+        return 1
+    print(f"{sym}: ask {ask} bid {bid} spread {(ask/bid-1)*10000:.1f} bps | target {usdt:.0f} USDT")
+    qty = b.qty_valid(sym, usdt / ask)
+    if qty <= 0:
+        print(f"QTY NOL: {usdt:.0f} USDT / {ask} dibulatkan ke 0 oleh step size")
+        return 1
+    print(f"qty: {qty} (nilai ~{qty*ask:.2f} USDT)")
+
+    tid = f"SMOKE{int(time.time())}"
+    hasil = {}
+    for nama, fn, ref, sisi in (("beli", b.spot_buy, ask, "buy"), ("jual", b.spot_sell, bid, "sell")):
+        cid = f"{tid}{nama[0].upper()}"
+        try:
+            q, h = fn(sym, qty, cid)
+        except (ex.Rejected, ex.Unknown) as e:
+            print(f"{nama}: GAGAL {type(e).__name__}: {e}")
+            ex._catat(tid, "spot", sisi, qty, ref, 0.0, f"gagal {type(e).__name__}")
+            return 1
+        slip = (h / ref - 1) * 10000 if h else 0.0
+        hasil[nama] = (q, h, slip)
+        ex._catat(tid, "spot", sisi, q, ref, h, "ok" if q > 0 else "terisi nol")
+        print(f"{nama}: qty {q} harga {h} ref {ref} slip {slip:+.2f} bps")
+        if q <= 0:
+            print(f"{nama}: TERISI NOL (IOC tidak dapat lawan di {ref}) — bukan galat kode")
+            return 1
+        time.sleep(1)
+
+    # pastikan tidak ada sisa
+    try:
+        akun = b._req(SPOT, "/api/v3/account", {})
+        sisa = {x["asset"]: float(x["free"]) + float(x["locked"]) for x in akun["balances"]
+                if x["asset"] == sym.replace("USDT", "") and float(x["free"]) + float(x["locked"]) > 0}
+    except (ex.Rejected, ex.Unknown) as e:
+        sisa = f"(tidak bisa cek saldo: {e})"
+    print("sisa aset:", sisa or "0 (bersih)")
+    print(f"SPOT SMOKE SELESAI — slippage tercatat di {ex.FILLS_CSV}")
+    return 0
+
+
 if __name__ == "__main__":
     if "--selftest" in sys.argv:
         selftest()
     elif "--smoke" in sys.argv:
-        smoke(sys.argv[sys.argv.index("--smoke") + 1])
+        _muat_env()
+        kak = "spot" if "--spot" in sys.argv else "dua"
+        sys.exit(smoke(sys.argv[sys.argv.index("--smoke") + 1], kak))
     else:
         print(__doc__)

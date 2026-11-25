@@ -12,3 +12,4 @@ loop.out
 alert_queue.jsonl
 paper_trades_selftest.csv
 watchdog_state.json
+execution_fills.csv
