@@ -1,0 +1,38 @@
+{
+  "symbol": "BTCUSDT",
+  "interval": "4h",
+  "bar": 1080,
+  "hari": 180.0,
+  "biaya_putaran_pct": 0.3,
+  "gerak_median_bar_pct": 0.3618,
+  "aturan": {
+    "sma_12_48": {
+      "trade": 13,
+      "menang_pct": 23.076923076923077,
+      "net_pct": 1.2523396206733706,
+      "bruto_pct": 7.617201685312414,
+      "biaya_pct": 1.9607719939270352,
+      "rata_tahan_bar": 31.3,
+      "rata_net_trade_pct": 0.4351099762604137
+    },
+    "breakout_48": {
+      "trade": 5,
+      "menang_pct": 60.0,
+      "net_pct": -0.2614830300558091,
+      "bruto_pct": 2.2898606084339246,
+      "biaya_pct": 0.7531836459822694,
+      "rata_tahan_bar": 98.8,
+      "rata_net_trade_pct": 0.30733539249033104
+    },
+    "rsi_14": {
+      "trade": 14,
+      "menang_pct": 64.28571428571429,
+      "net_pct": -7.318474280716192,
+      "bruto_pct": -5.7974497331401365,
+      "biaya_pct": 2.0906067241251214,
+      "rata_tahan_bar": 30.6,
+      "rata_net_trade_pct": -0.5634326040903755
+    }
+  },
+  "bar_lolos_biaya_pct": 56.44
+}
