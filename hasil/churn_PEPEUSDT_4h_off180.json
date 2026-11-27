@@ -1,0 +1,39 @@
+{
+  "symbol": "PEPEUSDT",
+  "interval": "4h",
+  "bar": 1080,
+  "hari": 180.0,
+  "biaya_putaran_pct": 0.3,
+  "gerak_median_bar_pct": 0.9259,
+  "aturan": {
+    "sma_12_48": {
+      "trade": 14,
+      "menang_pct": 42.857142857142854,
+      "net_pct": 29.10951704705362,
+      "bruto_pct": 40.73699384298275,
+      "biaya_pct": 2.160385122267472,
+      "rata_tahan_bar": 30.5,
+      "rata_net_trade_pct": 2.755472051479663
+    },
+    "breakout_48": {
+      "trade": 3,
+      "menang_pct": 33.333333333333336,
+      "net_pct": 27.40193792421355,
+      "bruto_pct": 31.153811576281587,
+      "biaya_pct": 0.49656514045860467,
+      "rata_tahan_bar": 162.7,
+      "rata_net_trade_pct": 10.219082145274328
+    },
+    "rsi_14": {
+      "trade": 16,
+      "menang_pct": 62.5,
+      "net_pct": -9.222108535741603,
+      "bruto_pct": 5.764920022420316,
+      "biaya_pct": 2.4078444975735858,
+      "rata_tahan_bar": 37.1,
+      "rata_net_trade_pct": 0.2098172203029207
+    }
+  },
+  "bar_lolos_biaya_pct": 78.78,
+  "beli_tahan_pct": -15.93
+}

@@ -115,3 +115,72 @@ python3 uji_churn.py --selftest
 python3 uji_churn.py --run --hari 180 --interval 5m   # 15m | 1h | 4h
 cat hasil/churn_4h.json
 ```
+---
+
+# Bagian II — koin liar dan uji pecah waktu (2026-11-27, lanjutan)
+
+Ian minta diuji koin yang lebih volatil, selama itu berguna. Uji ini **tidak** memperbaiki
+bot carry; nilainya menutup pertanyaan "strategi gaya Pine" sampai tuntas.
+
+## 9. Biaya nyata vs asumsi
+
+Spread diukur langsung dari `bookTicker` Binance (bukan asumsi):
+
+```
+BTCUSDT    0,00 bps     SOLUSDT    1,37 bps
+DOGEUSDT   1,72 bps     WIFUSDT    7,26 bps
+PEPEUSDT  27,70 bps
+```
+
+Asumsi uji (fee 0,1%/sisi + slip 0,05%/sisi = **100 bps/putaran**) **3,6x lebih konservatif**
+daripada koin terburuk yang diuji. Jadi hasil negatif di Bagian I bukan artefak asumsi keras.
+
+## 10. Koin liar, jendela 180 hari terakhir
+
+45 kombinasi (5 koin × 3 timeframe × 3 aturan) diuji. Lima teratas:
+
+```
+simbol     iv   aturan        trade      NET   beli-diamkan   selisih
+PEPEUSDT   4h   rsi_14           15   +31,7%        +5,2%     +26,4%
+SOLUSDT    4h   sma_12_48        14   +31,1%       -11,8%     +42,9%
+PEPEUSDT   1h   sma_12_48        50   +27,4%        +4,9%     +22,5%
+SOLUSDT    4h   breakout_48       5   +19,5%       -11,8%     +31,3%
+WIFUSDT    4h   sma_12_48        12   +15,9%       -27,5%     +43,4%
+```
+
+Terlihat meyakinkan — beberapa mengalahkan beli-diamkan. **Ini jebakan seleksi:**
+yang dilaporkan adalah yang terbaik dari 45 percobaan. Cara membedakan sinyal nyata
+dan kebetulan adalah menguji ulang di jendela waktu yang tidak dipakai memilih.
+
+## 11. Uji pecah waktu — tiga jendela 180 hari terpisah
+
+Kombinasi dengan hasil positif di jendela kini diuji di dua jendela sebelumnya
+(offset 180 dan 360 hari). Sinyal nyata harus positif di ketiganya.
+
+```
+simbol     iv   aturan        kini    -180h   -360h   putusan
+PEPEUSDT   4h   rsi_14      +31,7%   -9,2%   -37,5%   hanya jendela kini
+SOLUSDT    4h   sma_12_48   +31,1%  -27,4%   +20,9%   hanya jendela kini
+PEPEUSDT   1h   sma_12_48   +27,4%  -18,9%   -27,7%   hanya jendela kini
+SOLUSDT    4h   breakout_48 +19,5%  -23,6%   +11,7%   hanya jendela kini
+WIFUSDT    4h   sma_12_48   +15,9%  -33,4%   -49,7%   hanya jendela kini
+PEPEUSDT   4h   breakout_48  +8,5%  +27,4%   -23,7%   hanya jendela kini
+SOLUSDT    1h   sma_12_48    +8,5%  -51,5%   -22,8%   hanya jendela kini
+```
+
+**0 dari 18 kombinasi positif di tiga jendela berturut-turut.** Setiap "pemenang" berbalik
+tanda ketika jendela digeser. Itu tanda tangan kebetulan, bukan edge.
+
+Tiga kombinasi yang tampak paling konsisten pun tidak selamat:
+`SOLUSDT 4h sma_12_48` = +31,1 / **−27,4** / +20,9 — positif, negatif, positif.
+Tidak ada aturan yang bertahan di semua rezim pasar.
+
+## 12. Keputusan
+
+**Tidak ada jalur uang baru di sini.** Frekuensi transaksi di bawah 5 trade/hari membuat
+strategi indikator sederhana berada di sekitar nol (acak dikurangi biaya), dan hasil positif
+yang muncul tidak dapat direproduksi di jendela waktu lain.
+
+Yang tetap dipakai: `uji_churn.py --symbol X --interval Y --offset-hari N` sebagai
+**alat penolak ide** berstandar tiga jendela. Setiap strategi baru diuji:
+`net > 0 di ketiga jendela` atau ditolak — tanpa menulis bot, tanpa VPS, tanpa langganan.

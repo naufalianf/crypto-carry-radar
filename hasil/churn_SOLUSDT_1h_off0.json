@@ -1,0 +1,39 @@
+{
+  "symbol": "SOLUSDT",
+  "interval": "1h",
+  "bar": 4320,
+  "hari": 180.0,
+  "biaya_putaran_pct": 0.3,
+  "gerak_median_bar_pct": 0.2887,
+  "aturan": {
+    "sma_12_48": {
+      "trade": 52,
+      "menang_pct": 38.46153846153846,
+      "net_pct": 8.53792538235929,
+      "bruto_pct": 25.61686404477933,
+      "biaya_pct": 7.835812487634774,
+      "rata_tahan_bar": 36.3,
+      "rata_net_trade_pct": 0.34194329917585686
+    },
+    "breakout_48": {
+      "trade": 22,
+      "menang_pct": 27.272727272727273,
+      "net_pct": 1.792258848050854,
+      "bruto_pct": 14.920613277112228,
+      "biaya_pct": 3.3212734596088422,
+      "rata_tahan_bar": 89.2,
+      "rata_net_trade_pct": 0.5272427189774266
+    },
+    "rsi_14": {
+      "trade": 51,
+      "menang_pct": 56.86274509803921,
+      "net_pct": -16.263363704693823,
+      "bruto_pct": 2.6706822141912,
+      "biaya_pct": 7.651454687979942,
+      "rata_tahan_bar": 42.2,
+      "rata_net_trade_pct": -0.0976622053684067
+    }
+  },
+  "bar_lolos_biaya_pct": 48.85,
+  "beli_tahan_pct": -11.76
+}

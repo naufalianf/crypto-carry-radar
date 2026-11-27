@@ -135,16 +135,16 @@ def selftest():
     print("uji_churn selftest: OK")
 
 
-def muat(hari, symbol="BTCUSDT", interval="5m"):
-    akhir = int(__import__("time").time() * 1000)
+def muat(hari, symbol="BTCUSDT", interval="5m", offset=0):
+    akhir = int(__import__("time").time() * 1000) - offset * 86_400_000
     mulai = akhir - hari * 86_400_000
     rows = bot.fetch(symbol, interval, mulai, akhir)
     rows = [r for r in rows if int(r[0]) >= mulai]
     return rows
 
 
-def run(hari=180, interval="5m"):
-    rows = muat(hari, interval=interval)
+def run(hari=180, interval="5m", symbol="BTCUSDT", fee=None, slip=None, offset=0):
+    rows = muat(hari, symbol=symbol, interval=interval, offset=offset)
     if len(rows) < 500:
         raise SystemExit(f"data terlalu sedikit: {len(rows)} bar")
     o = [float(r[1]) for r in rows]
@@ -158,26 +158,29 @@ def run(hari=180, interval="5m"):
     gerak = [abs(c[i] / c[i - 1] - 1) for i in range(1, bar)]
     gerak.sort()
     amb = gerak[len(gerak) // 2]
-    biaya_putaran = 2 * BIAYA * 100
+    _fee = bot.FEE if fee is None else fee
+    _slip = bot.SLIP if slip is None else slip
+    biaya_putaran = 2 * (_fee + _slip) * 100
 
     aturan = {
         "sma_12_48": aturan_sma(c),
         "breakout_48": aturan_breakout(h, l, c),
         "rsi_14": aturan_rsi(c),
     }
-    hasil = {"symbol": "BTCUSDT", "interval": interval, "bar": bar,
+    hasil = {"symbol": symbol, "interval": interval, "bar": bar,
              "hari": round(hari_nyata, 1), "biaya_putaran_pct": round(biaya_putaran, 3),
              "gerak_median_bar_pct": round(amb * 100, 4),
              "aturan": {}}
     for nama, sig in aturan.items():
-        hasil["aturan"][nama] = hitung(o, h, l, c, sig)
+        hasil["aturan"][nama] = hitung(o, h, l, c, sig, fee=fee, slip=slip)
 
     # berapa bar yang geraknya melebihi biaya satu putaran -> peluang realistis
     lolos = sum(1 for g in gerak if g > 2 * BIAYA)
     hasil["bar_lolos_biaya_pct"] = round(100.0 * lolos / len(gerak), 2)
+    hasil["beli_tahan_pct"] = round(100.0 * (c[-1] / c[0] - 1.0), 2)
 
     os.makedirs(OUT, exist_ok=True)
-    with open(os.path.join(OUT, f"churn_{interval}.json"), "w") as f:
+    with open(os.path.join(OUT, f"churn_{symbol}_{interval}_off{offset}.json"), "w") as f:
         json.dump(hasil, f, indent=2)
     return hasil
 
@@ -188,13 +191,17 @@ def main():
     ap.add_argument("--run", action="store_true")
     ap.add_argument("--hari", type=int, default=180)
     ap.add_argument("--interval", default="5m", choices=["5m", "15m", "1h", "4h"])
+    ap.add_argument("--symbol", default="BTCUSDT")
+    ap.add_argument("--offset-hari", type=int, default=0)
+    ap.add_argument("--fee", type=float, default=None)
+    ap.add_argument("--slip", type=float, default=None)
     a = ap.parse_args()
     if a.selftest:
         selftest()
         return
     if a.run:
-        h = run(a.hari, a.interval)
-        print(f"BTCUSDT {h['interval']} — {h['hari']} hari, {h['bar']} bar")
+        h = run(a.hari, a.interval, a.symbol, a.fee, a.slip, a.offset_hari)
+        print(f"{h['symbol']} {h['interval']} — {h['hari']} hari, {h['bar']} bar")
         print(f"biaya 1 putaran      : {h['biaya_putaran_pct']}%")
         print(f"gerak median per bar : {h['gerak_median_bar_pct']}%")
         print(f"bar lolos biaya      : {h['bar_lolos_biaya_pct']}%")

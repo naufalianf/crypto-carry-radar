@@ -1,0 +1,39 @@
+{
+  "symbol": "WIFUSDT",
+  "interval": "4h",
+  "bar": 1080,
+  "hari": 180.0,
+  "biaya_putaran_pct": 0.3,
+  "gerak_median_bar_pct": 1.0417,
+  "aturan": {
+    "sma_12_48": {
+      "trade": 16,
+      "menang_pct": 31.25,
+      "net_pct": -33.39701146121195,
+      "bruto_pct": -29.21409490234502,
+      "biaya_pct": 2.3553934646938224,
+      "rata_tahan_bar": 22.4,
+      "rata_net_trade_pct": -1.9730930229399277
+    },
+    "breakout_48": {
+      "trade": 4,
+      "menang_pct": 25.0,
+      "net_pct": -20.5469679405623,
+      "bruto_pct": -19.151739809329293,
+      "biaya_pct": 0.5710819661558841,
+      "rata_tahan_bar": 111.5,
+      "rata_net_trade_pct": -4.930705443871294
+    },
+    "rsi_14": {
+      "trade": 14,
+      "menang_pct": 57.142857142857146,
+      "net_pct": -27.416930052114207,
+      "bruto_pct": -14.028238829568252,
+      "biaya_pct": 2.0782646558750506,
+      "rata_tahan_bar": 44.9,
+      "rata_net_trade_pct": -1.1504645346745215
+    }
+  },
+  "bar_lolos_biaya_pct": 83.32,
+  "beli_tahan_pct": -44.8
+}
