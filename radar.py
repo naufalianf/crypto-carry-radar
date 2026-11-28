@@ -93,6 +93,14 @@ def gate(r, threshold, min_bond=30, max_spread=15.0, min_vol=50.0):
         bad.append("spread tidak terbaca")
     elif r["spread_bps"] > max_spread:
         bad.append(f"spread {r['spread_bps']:.1f} bps")
+    # Gate wajib menilai KEDUA kaki. Carry = spot + perp dengan nominal sama; kalau
+    # hanya perp yang dicek, koin dengan perp rapat tapi spot lebar tetap lolos —
+    # dan justru kaki spot itu yang menelan biaya masuk-keluar.
+    sp = r.get("spot_spread_bps")
+    if sp is None:
+        bad.append("spread spot tak terbaca")
+    elif sp > max_spread:
+        bad.append(f"spread spot {sp:.1f} bps")
     if r["volume_musd"] < min_vol:
         bad.append(f"volume {r['volume_musd']:.0f} jt")
     if r["breakeven_days"] and r["breakeven_days"] <= 3:
@@ -356,12 +364,18 @@ def selfcheck():
     # gate: koin APR tinggi tapi baru listing & spread lebar harus ditolak
     bagus = {"apr_7d": 20.0, "bond_days": 400, "spread_bps": 1.0, "has_spot": True,
              "volume_musd": 500.0, "breakeven_days": 5.0}
+    # Dua kaki wajib dinilai: spread spot sebesar apa pun di atas batas harus ditolak,
+    # walaupun spread perp-nya rapat. Lubang ini nyata — ROBOUSDT spread spot 31,3 bps
+    # lolos gate lama karena yang dicek hanya spread perp 6,3 bps.
+    bagus["spot_spread_bps"] = 1.0
     assert gate(bagus, 10.0) == [], "koin layak malah ditolak"
+    assert gate({**bagus, "spot_spread_bps": 40.0}, 10.0), "spread spot 40 bps harus ditolak"
+    assert gate({**bagus, "spot_spread_bps": None}, 10.0), "spread spot tak terbaca harus ditolak"
     assert gate({**bagus, "has_spot": False}, 10.0), "tanpa pasar spot harus ditolak"
     assert gate({**bagus, "bond_days": 5}, 10.0), "listing 5 hari harus ditolak"
     assert gate({**bagus, "spread_bps": 40.0}, 10.0), "spread 40 bps harus ditolak"
     assert gate({**bagus, "apr_7d": 3.0}, 10.0), "APR di bawah ambang harus ditolak"
-    print(f"selfcheck OK (APR {apr:.2f}%; balik modal {be:.0f} hari; gate 4 aturan)")
+    print(f"selfcheck OK (APR {apr:.2f}%; balik modal {be:.0f} hari; gate 6 aturan)")
 
 
 if __name__ == "__main__":
