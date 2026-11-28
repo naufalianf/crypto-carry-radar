@@ -29,6 +29,13 @@ SPOT = "https://api.binance.com"
 TOPN = 60            # ambil dari perp kripto paling likuid
 ENTRY_APR = 4.0      # ambang APR untuk rencana order / paper carry
 ROUND_TRIP = 0.003   # biaya masuk+keluar carry (spot taker 0.1% + perp taker 0.05%, dua kali)
+# Batas likuiditas kaki spot diukur terhadap UKURAN ORDER KITA, bukan volume pasar.
+# ORDER_USD = nominal satu posisi (600, dari risk.batas_notional(3000)); disalin
+# sebagai angka karena radar.py tidak mengimpor risk.py — kalau plafon notional
+# berubah di risk.py, angka ini WAJIB ikut diubah (dijaga selfcheck di bawah).
+ORDER_USD = 600.0
+MAX_ORDER_VOL_PCT = 0.05      # order <= 0,05% volume spot 24 jam
+MAX_ORDER_DEPTH_PCT = 5.0     # order masuk+keluar <= 5% kedalaman 20 level
 
 
 def get(url, cache_name=None, ttl=900):
@@ -79,6 +86,33 @@ def depth_usd(sym, limit=20):
                  + sum(float(p) * float(q) for p, q in d["asks"]))
 
 
+def depth_spot_usd(sym, limit=20):
+    """Kedalaman orderbook 20 level teratas (SPOT), USD.
+
+    Kaki spot yang menelan biaya masuk-keluar, jadi likuiditasnya yang harus diukur.
+    Pakai api.binance.com (spot) — satu request per koin, hanya untuk koin yang
+    lolos tahap awal, supaya tidak 60 request per scan.
+    """
+    d = get(f"{SPOT}/api/v3/depth?symbol={sym}&limit={limit}",
+            f"depthspot_{sym}_{int(time.time())//600}.json", ttl=600)
+    return round(sum(float(p) * float(q) for p, q in d["bids"])
+                 + sum(float(p) * float(q) for p, q in d["asks"]))
+
+
+def spot_volume_map():
+    """{simbol: volume spot 24 jam dalam juta USD} — SATU request untuk semua simbol.
+
+    60 panggilan klines per scan tidak perlu: ticker/24hr spot mengembalikan seluruh
+    pasar sekaligus. Dipakai gate untuk mengukur ukuran order terhadap likuiditas.
+    """
+    try:
+        return {t["symbol"]: float(t["quoteVolume"]) / 1e6
+                for t in get(f"{SPOT}/api/v3/ticker/24hr", None, ttl=900)}
+    except Exception as e:
+        print(f"  volume spot tak terbaca: {e}")
+        return {}
+
+
 def gate(r, threshold, min_bond=30, max_spread=15.0, min_vol=50.0):
     """Saring koin yang APR-nya kelihatan besar tapi tidak layak dieksekusi.
     Kembalikan daftar alasan gagal; kosong = lolos."""
@@ -103,6 +137,26 @@ def gate(r, threshold, min_bond=30, max_spread=15.0, min_vol=50.0):
         bad.append(f"spread spot {sp:.1f} bps")
     if r["volume_musd"] < min_vol:
         bad.append(f"volume {r['volume_musd']:.0f} jt")
+    # Kaki spot: cukupkah likuiditasnya untuk UKURAN ORDER KITA, bukan untuk ambang
+    # absolut. Ambang absolut salah sasaran — BTC dan ETH akan gugur kalau batasnya
+    # 50 jt (volume spot mereka 1.005 dan 505 jt, tapi itu angka pasar; order kita
+    # 600 dolar = 0,0001% dari volume). Yang penting: order kita tidak menggerakkan
+    # harga dan tidak menghabiskan orderbook. Ambang 0,05% volume harian dan 5%
+    # kedalaman 20 level = 4-100x lebih longgar dari order 600 dolar di koin mana pun
+    # yang lolos gate ini.
+    sv = r.get("spot_vol_musd")
+    if sv is None:
+        bad.append("volume spot tak terbaca")
+    elif sv * 1e6 and ORDER_USD / (sv * 1e6) * 100 > MAX_ORDER_VOL_PCT:
+        bad.append(f"order {ORDER_USD:.0f}$ terlalu besar untuk vol spot {sv:.1f} jt")
+    dv = r.get("depth_spot_usd")
+    # Tahap 1 sengaja belum mengukur kedalaman spot (mahal: 1 request per koin),
+    # jadi kunci ini belum ada — jangan gugurkan. Tahap 2 mengisi lalu gate diulang.
+    if "depth_spot_usd" in r:
+        if dv is None:
+            bad.append("kedalaman spot tak terbaca")
+        elif ORDER_USD * 2 / dv * 100 > MAX_ORDER_DEPTH_PCT:   # 2 kaki: masuk + keluar
+            bad.append(f"order {ORDER_USD:.0f}$ > {MAX_ORDER_DEPTH_PCT}% kedalaman ${dv:,.0f}")
     if r["breakeven_days"] and r["breakeven_days"] <= 3:
         bad.append("balik modal <3 hari: APR tidak stabil")
     return bad
@@ -112,6 +166,7 @@ def scan(topn=TOPN, threshold=10.0):
     perps = crypto_perps()
     tickers = get(f"{FAPI}/fapi/v1/ticker/24hr", None)
     books = book_map()
+    spot_vol = spot_volume_map()      # 1 request untuk semua simbol, bukan 60 klines
     now_ms = time.time() * 1000
     ranked = sorted((t for t in tickers if t["symbol"] in perps),
                     key=lambda t: float(t["quoteVolume"]), reverse=True)[:topn]
@@ -153,6 +208,7 @@ def scan(topn=TOPN, threshold=10.0):
                "spread_bps": round(perp_sp_read, 2) if perp_sp_read is not None else None,
                "spot_spread_bps": round(spot_sp_read, 2) if spot_sp_read is not None else None,
                "book_top_usd": round(perp_top),
+               "spot_vol_musd": (round(spot_vol[sym], 1) if sym in spot_vol else None),
                "carry_cost_pct": round(cost, 3),
                "breakeven_days": round(be, 1) if be else None}
         row["flags"] = gate(row, threshold)
@@ -166,6 +222,18 @@ def scan(topn=TOPN, threshold=10.0):
     perlu = {r["symbol"] for r in rows[:20]} | {r["symbol"] for r in ok}
     for r in rows:
         r["depth_usd"] = depth_usd(r["symbol"]) if r["symbol"] in perlu else None
+    # Kedalaman SPOT hanya untuk koin yang lolos gate perp/APR/spread — biasanya
+    # 0-3 koin, jadi tidak menambah 60 request. Gate dijalankan dua tahap: tahap 1
+    # tanpa kedalaman spot, tahap 2 mengulang dengan angka kedalaman spot yang asli.
+    # (Kalau dijalankan sekali, "kedalaman spot tak terbaca" akan menggugurkan semua.)
+    for r in ok:
+        try:
+            r["depth_spot_usd"] = depth_spot_usd(r["symbol"])   # kedalaman kaki SPOT
+        except Exception:
+            r["depth_spot_usd"] = None
+        r["flags"] = gate(r, threshold)
+        r["alert"] = not r["flags"]
+    ok = [r for r in rows if r["alert"]]
     payload = {"generated_at": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime()),
                "universe": len(rows), "scanned_rank": topn, "threshold": threshold,
                "round_trip_cost_pct": ROUND_TRIP * 100,
@@ -368,7 +436,18 @@ def selfcheck():
     # walaupun spread perp-nya rapat. Lubang ini nyata — ROBOUSDT spread spot 31,3 bps
     # lolos gate lama karena yang dicek hanya spread perp 6,3 bps.
     bagus["spot_spread_bps"] = 1.0
+    bagus["spot_vol_musd"] = 500.0
+    bagus["depth_spot_usd"] = 500_000
     assert gate(bagus, 10.0) == [], "koin layak malah ditolak"
+    # Likuiditas diukur terhadap ukuran order kita (600 dolar), bukan ambang pasar.
+    # Order 600 di pasar spot 1 jt/hari = 0,06% -> di atas batas 0,05%, gugur.
+    assert gate({**bagus, "spot_vol_musd": 1.0}, 10.0), "order 600$ di pasar 1 jt harus ditolak"
+    assert gate({**bagus, "spot_vol_musd": 500.0}, 10.0) == [], "pasar 500 jt harus lolos"
+    assert gate({**bagus, "spot_vol_musd": None}, 10.0), "volume spot tak terbaca harus ditolak"
+    # Kedalaman: 2 kaki x 600 = 1.200 harus <= 5% kedalaman spot.
+    assert gate({**bagus, "depth_spot_usd": 20_000}, 10.0), "2 kaki di kedalaman 20rb harus ditolak"
+    assert gate({**bagus, "depth_spot_usd": 100_000}, 10.0) == [], "kedalaman 100rb harus lolos"
+    assert gate({**bagus, "depth_spot_usd": None}, 10.0), "kedalaman tak terbaca harus ditolak"
     assert gate({**bagus, "spot_spread_bps": 40.0}, 10.0), "spread spot 40 bps harus ditolak"
     assert gate({**bagus, "spot_spread_bps": None}, 10.0), "spread spot tak terbaca harus ditolak"
     assert gate({**bagus, "has_spot": False}, 10.0), "tanpa pasar spot harus ditolak"
