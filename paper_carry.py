@@ -34,6 +34,7 @@ import sys
 import time
 
 from radar import FAPI, get
+import radar
 import execution
 import risk
 
@@ -454,11 +455,12 @@ def _tick(now):
         save(st)
         return st
 
-    # Kandidat memakai aturan kualitas yang sama seperti gate radar, TAPI ambang APR sendiri,
-    # supaya jejak eksekusi terkumpul pada koin yang benar-benar bisa di-carry (punya pasar spot).
+    # Kandidat memakai aturan yang SAMA PERSIS dengan gate radar. Sebelumnya aturan ini
+# disalin di sini, dan salinan itu tidak ikut berubah saat gate radar diperbaiki
+# (spread kaki spot, likuiditas spot) — artinya perbaikan gate tidak menjangkau
+# jalur yang benar-benar membuka posisi. Sekarang satu sumber: radar.gate().
     def layak(r):
-        return (r.get("has_spot") and r["bond_days"] >= 30 and r["apr_7d"] >= ENTRY_APR
-                and (r["spread_bps"] or 99) <= 15.0 and r["volume_musd"] >= 50.0)
+        return not radar.gate(r, ENTRY_APR)
 
     kandidat = sorted((r for r in rows.values() if layak(r)), key=lambda r: -r["apr_7d"])
     ada_perp = None

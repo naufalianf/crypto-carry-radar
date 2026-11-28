@@ -157,7 +157,7 @@ def gate(r, threshold, min_bond=30, max_spread=15.0, min_vol=50.0):
             bad.append("kedalaman spot tak terbaca")
         elif ORDER_USD * 2 / dv * 100 > MAX_ORDER_DEPTH_PCT:   # 2 kaki: masuk + keluar
             bad.append(f"order {ORDER_USD:.0f}$ > {MAX_ORDER_DEPTH_PCT}% kedalaman ${dv:,.0f}")
-    if r["breakeven_days"] and r["breakeven_days"] <= 3:
+    if r.get("breakeven_days") and r["breakeven_days"] <= 3:
         bad.append("balik modal <3 hari: APR tidak stabil")
     return bad
 

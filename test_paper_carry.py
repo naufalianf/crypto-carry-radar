@@ -21,7 +21,10 @@ T0 = 1_800_000_000.0     # waktu simulasi tetap
 
 def row(sym, apr, has_spot=True):
     return {"symbol": sym, "apr_7d": apr, "has_spot": has_spot, "bond_days": 100,
-            "spread_bps": 5.0, "volume_musd": 100.0, "carry_cost_pct": 0.3, "depth_usd": 1000}
+            "spread_bps": 5.0, "volume_musd": 100.0, "carry_cost_pct": 0.3, "depth_usd": 1000,
+            # Field yang dipakai radar.gate sejak gate menilai kedua kaki. Tanpa ini
+            # kandidat gugur karena "tak terbaca" — fixture harus berbentuk data nyata.
+            "spot_spread_bps": 5.0, "spot_vol_musd": 100.0, "breakeven_days": 10.0}
 
 
 class Base(unittest.TestCase):
