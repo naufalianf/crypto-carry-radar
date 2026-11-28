@@ -1,0 +1,39 @@
+{
+  "symbol": "PAXGUSDT",
+  "interval": "1h",
+  "bar": 4320,
+  "hari": 180.0,
+  "biaya_putaran_pct": 0.3,
+  "gerak_median_bar_pct": 0.1078,
+  "aturan": {
+    "sma_12_48": {
+      "trade": 53,
+      "menang_pct": 39.62264150943396,
+      "net_pct": 7.6116629914060985,
+      "bruto_pct": 24.11292182405432,
+      "biaya_pct": 7.983507326274742,
+      "rata_tahan_bar": 42.2,
+      "rata_net_trade_pct": 0.3043285754298034
+    },
+    "breakout_48": {
+      "trade": 20,
+      "menang_pct": 40.0,
+      "net_pct": 1.9428503152611354,
+      "bruto_pct": 8.95061783402209,
+      "biaya_pct": 3.0124214514420378,
+      "rata_tahan_bar": 128.4,
+      "rata_net_trade_pct": 0.2969098191290026
+    },
+    "rsi_14": {
+      "trade": 49,
+      "menang_pct": 59.183673469387756,
+      "net_pct": -15.844038650892855,
+      "bruto_pct": -1.5316333495739798,
+      "biaya_pct": 7.345253315792066,
+      "rata_tahan_bar": 39.0,
+      "rata_net_trade_pct": -0.1811609523544091
+    }
+  },
+  "bar_lolos_biaya_pct": 19.22,
+  "beli_tahan_pct": 7.46
+}
