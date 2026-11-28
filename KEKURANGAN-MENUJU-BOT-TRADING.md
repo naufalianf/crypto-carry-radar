@@ -56,7 +56,7 @@ Itu tujuan tahap ini, bukan kegagalan.
 
 | # | Item | Catatan |
 |---|---|---|
-| C1 | Jalur spot uang asli | Host spot masih hardcoded `testnet.binance.vision`. Sengaja belum dibuat |
+| C1 | Jalur spot uang asli | **Selesai 2026-11-28** (`0d4…`): host dipilih `BINANCE_MODE` (`testnet` default / `live`), kunci live wajib nama sendiri (`BINANCE_LIVE_*`), `start_all.sh` butuh `KUNCI_LIVE_DISETUJUI=1` + jeda 10 detik. Yang belum: kunci asli dan satu siklus buka-tutup nyata |
 | C2 | Kunci API asli dengan izin minimum | Hanya trade, tanpa withdraw, dengan IP whitelist. Dibuat sendiri oleh Ian |
 | C3 | Pemodelan biaya yang belum ada | Delisting, funding saat keluar lebih awal, rumus likuidasi masih perkiraan |
 | C4 | Perintah tutup manual `--close SIMBOL` | Belum ada. Opsional, lewat jalur penutupan resmi, **belum disetujui** |

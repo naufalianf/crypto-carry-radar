@@ -2,8 +2,10 @@
 """Adapter Binance TESTNET untuk execution.Exchange. Hanya stdlib.
 
 PENGAMAN:
-  - URL testnet ditulis mati di sini. Tidak ada mode live; untuk live harus menulis berkas
-    baru dengan sadar, bukan mengubah satu flag.
+  - Host dipilih dari BINANCE_MODE ('testnet' default / 'live'). Nilai lain = RuntimeError
+    saat import, jadi salah ketik tidak pernah jadi order uang asli. Kunci live WAJIB nama
+    lain (BINANCE_LIVE_KEY/SECRET) supaya kunci testnet tidak terpakai di bursa nyata dan
+    sebaliknya.
   - Kunci dibaca dari env BINANCE_TESTNET_KEY / BINANCE_TESTNET_SECRET (nama sengaja beda
     dari kunci live, jadi kunci live yang kebetulan ada di env tidak ikut terpakai).
     Kunci tidak pernah ditulis ke log. Kunci testnet dibuat di testnet.binance.vision
@@ -33,11 +35,23 @@ from decimal import Decimal, ROUND_DOWN
 import execution as ex
 
 SPOT = "https://testnet.binance.vision"
-# Binance punya DUA testnet futures: yang lama (testnet.binancefuture.com) dan
-# "Demo Trading API" di akun (demo-fapi.binance.com). Kunci demo hanya berlaku di
-# host demo — diuji, kunci demo ditolak -2015 oleh host lama dan sebaliknya.
-# Bisa ditimpa lewat env BINANCE_TESTNET_FUT_HOST untuk berpindah tanpa ubah kode.
-FUT = os.environ.get("BINANCE_TESTNET_FUT_HOST", "https://demo-fapi.binance.com")
+# Host dipilih dari BINANCE_MODE, bukan dari satu variabel host. Alasannya: satu variabel
+# host bisa terisi tanpa sadar (dari .env lama, dari skrip lain) dan langsung jadi order
+# uang asli. Dengan saklar mode, default testnet dan nilai tak dikenal = berhenti.
+#   testnet (default) -> spot testnet.binance.vision, futures demo-fapi.binance.com
+#   live              -> spot api.binance.com, futures fapi.binance.com
+MODE = os.environ.get("BINANCE_MODE", "testnet").strip().lower()
+if MODE == "live":
+    SPOT = os.environ.get("BINANCE_LIVE_SPOT_HOST", "https://api.binance.com")
+    FUT = os.environ.get("BINANCE_LIVE_FUT_HOST", "https://fapi.binance.com")
+elif MODE == "testnet":
+    # Binance punya DUA testnet futures: yang lama (testnet.binancefuture.com) dan
+    # "Demo Trading API" di akun (demo-fapi.binance.com). Kunci demo hanya berlaku di
+    # host demo — diuji, kunci demo ditolak -2015 oleh host lama dan sebaliknya.
+    # Bisa ditimpa lewat env BINANCE_TESTNET_FUT_HOST untuk berpindah tanpa ubah kode.
+    FUT = os.environ.get("BINANCE_TESTNET_FUT_HOST", "https://demo-fapi.binance.com")
+else:
+    raise RuntimeError(f"BINANCE_MODE tidak dikenal: {MODE!r} — pakai 'testnet' atau 'live'")
 TOL_BPS = 10.0
 TOL_MAKS_BPS = 15.0       # sama dengan gate radar max_spread: buku lebih lebar dari ini = jangan disentuh
 TOL_BUFFER_BPS = 2.0      # toleransi = spread nyata + buffer kecil, supaya tidak makan level kedua
@@ -88,15 +102,19 @@ class BinanceTestnet(ex.Exchange):
         kebetulan berbagi kunci tetap jalan).
         """
         e = os.environ
-        self.key = key or e.get("BINANCE_TESTNET_SPOT_KEY") or e.get("BINANCE_TESTNET_KEY", "")
-        self.secret = secret or e.get("BINANCE_TESTNET_SPOT_SECRET") or e.get("BINANCE_TESTNET_SECRET", "")
-        self.fut_key = fut_key or e.get("BINANCE_TESTNET_FUT_KEY") or self.key
-        self.fut_secret = fut_secret or e.get("BINANCE_TESTNET_FUT_SECRET") or self.secret
+        # Nama kunci mengikuti MODE. Kunci testnet tidak boleh terpakai di bursa nyata
+        # (dan sebaliknya): kalau salah pasang, order ditolak -2015, bukan diam-diam jalan.
+        pre = "BINANCE_LIVE" if MODE == "live" else "BINANCE_TESTNET"
+        self.key = (key or e.get(f"{pre}_SPOT_KEY") or e.get(f"{pre}_KEY")
+                    or e.get("BINANCE_TESTNET_KEY", ""))
+        self.secret = (secret or e.get(f"{pre}_SPOT_SECRET") or e.get(f"{pre}_SECRET")
+                       or e.get("BINANCE_TESTNET_SECRET", ""))
+        self.fut_key = fut_key or e.get(f"{pre}_FUT_KEY") or self.key
+        self.fut_secret = fut_secret or e.get(f"{pre}_FUT_SECRET") or self.secret
         if not self.key or not self.secret:
             raise RuntimeError(
-                "kunci testnet belum diisi. Taruh BINANCE_TESTNET_KEY dan "
-                "BINANCE_TESTNET_SECRET (spot) di ~/.testnet.env — lihat "
-                "HANDOFF-HERMES.md langkah 5")
+                f"kunci {MODE} belum diisi. Taruh {pre}_KEY dan {pre}_SECRET "
+                "(spot) di ~/.testnet.env — lihat HANDOFF-HERMES.md langkah 5")
         self.http, self.now = http or _http, now
         self._cid = {}          # cid -> (pasar, simbol); order_status butuh simbol
         self._filter = {}
@@ -412,6 +430,27 @@ def selftest():
         200, {"symbols": [{"symbol": "AAAUSDT"}, {"symbol": "BBBUSDT"}]}))
     assert bf.simbol_perp() == {"AAAUSDT", "BBBUSDT"}, "simbol_perp: daftar dari exchangeInfo"
     assert bf.simbol_perp() == {"AAAUSDT", "BBBUSDT"}, "simbol_perp: cache"
+    # Saklar mode: default testnet, 'live' ganti host + nama kunci, nilai asing = berhenti.
+    # Diuji lewat subprocess karena MODE dibaca saat import.
+    import subprocess
+    _kode = ("import binance_testnet as b;print(b.MODE, b.SPOT, b.FUT);"
+             "print(b.BinanceTestnet(None,None,http=lambda m,u,p,h: (200,{})).key)")
+    _env = {k: v for k, v in os.environ.items() if not k.startswith("BINANCE_")}
+    def _jalankan(extra):
+        r = subprocess.run([sys.executable, "-c", _kode], capture_output=True, text=True,
+                           env={**_env, **extra}, cwd=os.path.dirname(os.path.abspath(__file__)))
+        return r.returncode, (r.stdout + r.stderr).strip().splitlines()
+    rc, out = _jalankan({"BINANCE_TESTNET_KEY": "KT", "BINANCE_TESTNET_SECRET": "ST"})
+    assert rc == 0 and out[0].startswith("testnet https://testnet.binance.vision"), out
+    assert out[1] == "KT", "kunci testnet diambil dari BINANCE_TESTNET_KEY"
+    rc, out = _jalankan({"BINANCE_MODE": "live", "BINANCE_LIVE_KEY": "KLIVE",
+                         "BINANCE_LIVE_SECRET": "SLIVE"})
+    assert rc == 0 and out[0] == "live https://api.binance.com https://fapi.binance.com", out
+    assert out[1] == "KLIVE", "kunci live diambil dari BINANCE_LIVE_KEY"
+    rc, out = _jalankan({"BINANCE_MODE": "liv"})
+    assert rc != 0 and "BINANCE_MODE tidak dikenal" in out[-1], "salah ketik modus harus berhenti"
+    rc, out = _jalankan({"BINANCE_MODE": "live"})
+    assert rc != 0 and "kunci live belum diisi" in out[-1], "live tanpa kunci harus ditolak"
     print("binance_testnet selftest: OK")
 
 

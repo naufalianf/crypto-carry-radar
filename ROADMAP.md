@@ -48,10 +48,11 @@ setelah persetujuan.
 7. Rekonsiliasi posisi otomatis: kalau dua kaki tidak seimbang, bot menutup dan memberi tahu.
    *Status: logikanya sudah ada di `execution.py` (urutan spot lalu perp, unwind kaki yatim,
    status order tak jelas -> HALT, tutup perp dulu baru spot), 19 tes lulus dengan exchange
-   tiruan dan uji mutasi. Adapter TESTNET ada di `binance_testnet.py` (limit IOC, URL testnet
-   ditulis mati, tidak ada mode live; diuji dengan transport tiruan, BELUM pernah menyentuh
-   testnet sungguhan). Berikutnya: `python3 binance_testnet.py --smoke BTCUSDT` dengan kunci
-   testnet, lalu minimal 2 minggu di testnet sebelum uang sungguhan.*
+   tiruan dan uji mutasi. Adapter ada di `binance_testnet.py` (limit IOC, 19 tes transport tiruan).
+   *Koreksi 2026-11-28:* host dulu ditulis mati; sekarang dipilih `BINANCE_MODE` (`testnet`
+   default / `live`), kunci live wajib nama sendiri `BINANCE_LIVE_KEY/SECRET`, `live` tanpa
+   konfirmasi = berhenti. `--smoke` sudah pernah menyentuh testnet sungguhan (spot dan dua kaki).
+   Berikutnya: satu siklus buka-tutup dari daemon, lalu minimal 2 minggu testnet sebelum uang sungguhan.*
 8. Kredensial: API key **hanya izin trade, withdraw dimatikan**, IP whitelist, disimpan di
    env/file terpisah, tidak pernah masuk kode atau log.
 9. **Limit order saja.** Tidak ada market order di koin tipis.

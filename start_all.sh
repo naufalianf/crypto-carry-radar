@@ -16,6 +16,7 @@ EXTRA_paper_carry=""
 # MAX_EXEC_POS = berapa posisi yang benar-benar dikirim ke bursa (sisanya paper).
 # Naikkan ke 3 hanya setelah satu siklus buka-tutup nyata bersih.
 export MAX_EXEC_POS="${MAX_EXEC_POS:-1}"
+export BINANCE_MODE="${BINANCE_MODE:-testnet}"
 
 pola() { echo "^${PY} ${1}\.py --loop"; }
 
@@ -25,6 +26,23 @@ if [ "${1:-}" = "stop" ]; then
   done
   exit 0
 fi
+
+# BINANCE_MODE = testnet (default) / live. Live hanya jalan kalau KEDUA syarat ini benar:
+#   BINANCE_MODE=live  DAN  KUNCI_LIVE_DISETUJUI=1
+# Syarat kedua mencegah variabel BINANCE_MODE yang tertinggal di shell/skrip lain
+# menyalakan order uang asli tanpa manusia mengetiknya di perintah start.
+# Diletakkan SETELAH cabang 'stop' supaya menghentikan bot tidak pernah butuh konfirmasi.
+case "$BINANCE_MODE" in
+  testnet) ;;
+  live)
+    if [ "${KUNCI_LIVE_DISETUJUI:-0}" != "1" ]; then
+      echo "BINANCE_MODE=live butuh KUNCI_LIVE_DISETUJUI=1. Berhenti tanpa menyalakan apa pun." >&2
+      exit 1
+    fi
+    echo "!!! MODE LIVE: order akan dikirim ke bursa dengan UANG ASLI. Ctrl-C dalam 10 detik untuk batal."
+    sleep 10 ;;
+  *) echo "BINANCE_MODE tidak dikenal: $BINANCE_MODE" >&2; exit 1 ;;
+esac
 
 for i in "${!NAMES[@]}"; do
   n="${NAMES[$i]}"; log="${LOGS[$i]}"
